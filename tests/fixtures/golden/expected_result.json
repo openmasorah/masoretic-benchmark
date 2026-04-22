@@ -1,0 +1,94 @@
+{
+  "prediction_id": "golden_deut_6_4_5",
+  "gt_version": "v0.1.0-golden",
+  "scorer_version": "0.1.0",
+  "normalization": "NFD (scoring) / LC-order (raw GT)",
+  "denominator_policy": {
+    "tier1": "consonants_only",
+    "tier2": "consonants+nikkud",
+    "tier3": "full"
+  },
+  "qere_ketiv_policy": "score_against_qere",
+  "tiers": {
+    "tier1": {
+      "cer": 0.0,
+      "edits": 0,
+      "denominator": 79
+    },
+    "tier2": {
+      "cer": 0.0,
+      "edits": 0,
+      "denominator": 134,
+      "dec": 1.0,
+      "cha": 0.03424657534246575,
+      "wor": 0.9230769230769231,
+      "voc": 1.0,
+      "nakdimon_disagreement_rate": null,
+      "dicta_disagreement_rate": null
+    },
+    "tier3": {
+      "cer": 0.00684931506849315,
+      "edits": 1,
+      "denominator": 146
+    },
+    "tier4": {
+      "f1": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "tp_exact": 0,
+      "tp_partial": 0,
+      "fp": 0,
+      "fn": 1
+    }
+  },
+  "composite": {
+    "cer3": 0.0013698630136986301
+  },
+  "confusion_matrices": {
+    "tier2_nikkud": {
+      "shva": {
+        "shva": 15
+      },
+      "shin_dot": {
+        "shin_dot": 2
+      },
+      "patach": {
+        "patach": 3
+      },
+      "__absent__": {
+        "__absent__": 31
+      },
+      "hiriq": {
+        "hiriq": 1
+      },
+      "sin_dot": {
+        "sin_dot": 1
+      },
+      "qamatz": {
+        "qamatz": 15
+      },
+      "tsere": {
+        "tsere": 3
+      },
+      "hataf_segol": {
+        "hataf_segol": 2
+      },
+      "holam": {
+        "holam": 3
+      },
+      "dagesh": {
+        "dagesh": 5
+      },
+      "segol": {
+        "segol": 3
+      },
+      "meteg": {
+        "meteg": 2
+      }
+    }
+  },
+  "caveats": [
+    "nakdimon_disagreement_rate is the reproducible canonical signal; indicative, not ground truth",
+    "dicta_disagreement_rate is a proprietary best-available comparison; not reproducible due to rotating endpoint + no version header"
+  ]
+}

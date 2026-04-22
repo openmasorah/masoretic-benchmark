@@ -1,0 +1,34 @@
+{
+  "version": "v0.1.0",
+  "frozen_at": "2026-05-26T00:00:00Z",
+  "folios": [
+    {
+      "id": "leningrad_devarim_f237b",
+      "manuscript": "leningrad",
+      "book": "devarim",
+      "folio": "F237B",
+      "image_url": "https://iiif.archive.org/iiif/Leningrad_Codex_Color_Images/f237b.json",
+      "iaa_folio": true,
+      "in_frozen_scope": true,
+      "gt_hash": "sha256:abc"
+    },
+    {
+      "id": "leningrad_devarim_f238a",
+      "manuscript": "leningrad",
+      "book": "devarim",
+      "folio": "F238A",
+      "image_url": "https://iiif.archive.org/iiif/Leningrad_Codex_Color_Images/f238a.json",
+      "iaa_folio": false,
+      "in_frozen_scope": true,
+      "gt_hash": "sha256:def"
+    }
+  ],
+  "iaa_subset": ["leningrad_devarim_f237b"],
+  "fuses_fired": [],
+  "baselines_seeded": ["abbyy_llm", "biblia_kraken", "biblia_nakdimon", "biblia_char_menaked"],
+  "expected_reports_per_baseline": 2,
+  "expected_total_reports": 8,
+  "scorer_version": "0.1.0",
+  "nakdimon_model_hash": "pending",
+  "notes": "Sample manifest for scorer tests"
+}
