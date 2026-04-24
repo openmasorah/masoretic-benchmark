@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:masoretic:phase_0_manifest.schema:v0.1",
+  "title": "phase_0_manifest.json",
+  "description": "Single source of truth for the frozen Phase 0 scope of the masoretic-benchmark sibling public repo. Append-only-immutable in git (see manifest_immutable.py).",
+  "type": "object",
+  "required": [
+    "version",
+    "frozen_at",
+    "folios",
+    "scorer_version",
+    "expected_total_reports"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^v\\d+\\.\\d+(\\.\\d+)?$"
+    },
+    "frozen_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "scorer_version": {
+      "type": "string"
+    },
+    "nakdimon_model_hash": {
+      "type": ["string", "null"]
+    },
+    "expected_total_reports": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "folios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "manuscript",
+          "book",
+          "folio",
+          "image_url",
+          "in_frozen_scope"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "manuscript": {
+            "type": "string",
+            "enum": ["leningrad", "cairo_shmuel", "el_codice", "other"]
+          },
+          "book": {
+            "type": "string",
+            "minLength": 1
+          },
+          "folio": {
+            "type": "string",
+            "pattern": "^F\\d{3}[AB]$"
+          },
+          "image_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "iaa_folio": {
+            "type": "boolean"
+          },
+          "gt_hash": {
+            "type": ["string", "null"]
+          },
+          "in_frozen_scope": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "baselines": {
+      "type": "object"
+    },
+    "fuses_fired": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  }
+}

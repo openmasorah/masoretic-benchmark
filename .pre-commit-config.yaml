@@ -1,17 +1,49 @@
+# Pre-commit config snippet for the SIBLING public repo (~/Workspace/masoretic-benchmark/).
+#
+# Merge these `repos:` entries into the sibling repo's `.pre-commit-config.yaml`.
+# DO NOT install in baalshem — baalshem has its own (lighter) hooks; see
+# CLAUDE.md + Pitfall 8 (.planning/phases/01-gt-infra/01-RESEARCH.md).
+#
+# The two `local` hooks reference scripts copied to `scripts/` per the runbook
+# in ./README.md.
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
-      - id: trailing-whitespace
-      - id: end-of-file-fixer
-      - id: check-yaml
       - id: check-added-large-files
         args: ["--maxkb=5000"]
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: check-json
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
       - id: no-commit-to-branch
         args: ["--branch", "main"]
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.11
     hooks:
       - id: ruff
         args: ["--fix"]
       - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: reject-binary-extensions
+        name: "Reject *.jpg/*.pdf/*.png/... and anything under scans/"
+        entry: python scripts/reject_binaries.py
+        language: python
+        pass_filenames: true
+
+      - id: manifest-append-only
+        name: "Enforce phase_0_manifest.json append-only immutability"
+        entry: python scripts/manifest_immutable.py
+        language: python
+        files: ^phase_0_manifest\.json$
+        pass_filenames: false
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.20.0
+    hooks:
+      - id: gitleaks
