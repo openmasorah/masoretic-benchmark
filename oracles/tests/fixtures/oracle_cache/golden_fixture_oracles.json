@@ -1,0 +1,16 @@
+{
+  "fixture_id": "golden_deut_6_4_5",
+  "generated_at_iso": "2026-04-25T03:33:56.055767Z",
+  "nakdimon_model_hash": "8fd7722b8002a690",
+  "nakdan_endpoint_resolved_ip": "32.194.254.2",
+  "nakdimon_disagreement_rate": null,
+  "dicta_disagreement_rate": 0.5625,
+  "provenance": {
+    "nakdimon_lines_scored": 0,
+    "dicta_lines_scored": 1,
+    "dicta_failures": 0,
+    "scorer_pinned_version": "v0.1.0-scorer",
+    "regeneration_command": "RUN_LIVE_ORACLES=1 python oracles/scripts/regenerate_golden_oracle_cache.py",
+    "regeneration_note": "Generated in NAKDIMON_DEGRADED=1 mode (Pitfall 1: TF 2.15 SIGABRT on macOS arm64). nakdimon_model_hash carried forward from NAKDIMON_PIN.md (deterministic given pinned wheel). Re-run on Linux to refresh nakdimon_disagreement_rate."
+  }
+}
