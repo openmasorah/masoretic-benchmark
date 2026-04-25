@@ -47,7 +47,7 @@ jobs:
         run: pytest -v --cov=masoretic_eval --cov-report=term-missing
 
       - name: External reference cross-val
-        run: pytest tests/test_external_ref_crossval.py -v
+        run: pytest tests/test_external_crossval.py -v
 
       - name: Manifest schema validation (jsonschema)
         run: |
