@@ -166,7 +166,7 @@ jobs:
         run: |
           pip install -e .
           pip install -e "./oracles[dev,dicta,dictabert]"
-          pip install -e "./baselines[dev,kraken,llm]"
+          pip install -e "./baselines[dev]"
 
       - name: Install nakdimon extra (Python 3.11 only -- Phase 2 Pitfall 1)
         # nakdimon==0.1.2 pins TensorFlow 2.15, which has no wheel for Python
@@ -203,7 +203,7 @@ jobs:
         run: |
           pip install -e .
           pip install -e "./oracles[dev,dicta,dictabert]"
-          pip install -e "./baselines[dev,kraken,llm]"
+          pip install -e "./baselines[dev]"
 
       - name: Run replay-mode tests against committed JSONL fixtures
         # No API keys: replay mode never calls live providers

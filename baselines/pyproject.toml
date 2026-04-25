@@ -27,7 +27,9 @@ all = ["masoretic-baselines[kraken,llm]"]
 dev = [
     "pytest>=7",
     "pytest-mock>=3",
+    "pytest-cov>=4.0",
     "jsonschema>=4.0",
+    "PyYAML>=6.0",
 ]
 
 [tool.setuptools.packages.find]
