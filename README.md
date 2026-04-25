@@ -15,6 +15,10 @@
 
     pip install -e ".[dev]"
 
+### Python version
+
+This project pins to Python 3.11 (`.python-version`). Local dev on Python >= 3.12 will fail to import `nakdimon` because its transitive `tensorflow==2.15.0` dependency has no wheel for 3.12 on macOS arm64. CI runs 3.11. Use pyenv or your equivalent to honor the `.python-version` file.
+
 ## Usage
 
     masoretic-eval score \
