@@ -22,6 +22,7 @@ This module is intentionally tiny: just two pure validators + a small
 loader. ``_load_validator`` is ``lru_cache``-d so the second-and-later
 calls are O(1).
 """
+
 from __future__ import annotations
 
 import json
@@ -47,7 +48,7 @@ def _load_validator(schema_path_str: str) -> jsonschema.Draft202012Validator:
     Takes a string (not a Path) so lru_cache's hash key is stable.
     """
     schema_path = Path(schema_path_str)
-    with open(schema_path, "r", encoding="utf-8") as f:
+    with open(schema_path, encoding="utf-8") as f:
         schema = json.load(f)
     # Defensive: catch broken schemas at first use rather than at every
     # validate() call.

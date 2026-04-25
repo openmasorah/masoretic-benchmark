@@ -22,16 +22,15 @@ Coverage (per plan 03-07 Task 3 behavior):
 from __future__ import annotations
 
 import json
-import os
 import sys
+from datetime import UTC
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from baselines._base import LineRecord
-from tests._fake_manifest import FakeFolio, FakeManifest
 
+from tests._fake_manifest import FakeFolio, FakeManifest
 
 # ----------------------------------------------------------------------
 # PIL stub injected into sys.modules so the lazy "from PIL import Image"
@@ -101,9 +100,9 @@ def _ctor(tmp_path: Path, manifest: FakeManifest, replay: bool = False):
     bl.replay = replay
     bl.kraken_model_path = tmp_path / "fake.mlmodel"
     bl.image_cache = tmp_path / "image-cache"
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    bl._started_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    bl._started_at = datetime.now(UTC).isoformat(timespec="seconds")
     bl._folio_meta = {}
     bl._used_total_usd = 0.0
     bl._tie_breaks_total = 0
@@ -164,16 +163,14 @@ def _patches(claude_text: str, gemini_text: str, kraken_n: int = 1):
     fake_claude = MagicMock()
     fake_claude.messages.create = MagicMock(return_value=_claude_response(claude_text))
     fake_gemini = MagicMock()
-    fake_gemini.models.generate_content = MagicMock(
-        return_value=_gemini_response(gemini_text)
-    )
+    fake_gemini.models.generate_content = MagicMock(return_value=_gemini_response(gemini_text))
 
     return {
         "fake_image_path": fake_image_path,
-        "fake_kraken":     fake_kraken,
-        "fake_pil_img":    fake_pil_img,
-        "fake_claude":     fake_claude,
-        "fake_gemini":     fake_gemini,
+        "fake_kraken": fake_kraken,
+        "fake_pil_img": fake_pil_img,
+        "fake_claude": fake_claude,
+        "fake_gemini": fake_gemini,
     }
 
 
@@ -199,11 +196,13 @@ def test_llm_vision_agreement_writes_prediction_and_replay_log(tmp_path, monkeyp
     real_img.parent.mkdir(parents=True, exist_ok=True)
     # Write a 4x4 JPEG via PIL only if PIL is installed; otherwise patch
     # PIL.Image.open. The unit-test environment has no Pillow, so we patch.
-    with patch("baselines.llm_vision.fetch_image", return_value=p["fake_image_path"]), \
-         patch("baselines.llm_vision.image_sha256", return_value="img-sha"), \
-         patch("baselines.llm_vision.recognize_lines", return_value=p["fake_kraken"]), \
-         patch("baselines.llm_vision.claude_client", return_value=p["fake_claude"]), \
-         patch("baselines.llm_vision.gemini_client", return_value=p["fake_gemini"]):
+    with (
+        patch("baselines.llm_vision.fetch_image", return_value=p["fake_image_path"]),
+        patch("baselines.llm_vision.image_sha256", return_value="img-sha"),
+        patch("baselines.llm_vision.recognize_lines", return_value=p["fake_kraken"]),
+        patch("baselines.llm_vision.claude_client", return_value=p["fake_claude"]),
+        patch("baselines.llm_vision.gemini_client", return_value=p["fake_gemini"]),
+    ):
         bl = _ctor(tmp_path, manifest)
         rc = bl.run()
 
@@ -226,9 +225,7 @@ def test_llm_vision_agreement_writes_prediction_and_replay_log(tmp_path, monkeyp
     replay_log = tmp_path / "llm_vision" / fid / "llm_calls.jsonl"
     assert replay_log.exists()
     records = [
-        json.loads(r)
-        for r in replay_log.read_text(encoding="utf-8").splitlines()
-        if r.strip()
+        json.loads(r) for r in replay_log.read_text(encoding="utf-8").splitlines() if r.strip()
     ]
     assert len(records) == 4, "2 lines × 2 LLMs = 4 records"
     # BOTH providers represented
@@ -275,17 +272,17 @@ def test_llm_vision_disagreement_claude_wins_no_tier_mixing(tmp_path, monkeypatc
     gemini_text = "שמא ישראל"  # tier-1 disagreement on the second consonant
     p = _patches(claude_text=claude_text, gemini_text=gemini_text, kraken_n=1)
 
-    with patch("baselines.llm_vision.fetch_image", return_value=p["fake_image_path"]), \
-         patch("baselines.llm_vision.image_sha256", return_value="img-sha"), \
-         patch("baselines.llm_vision.recognize_lines", return_value=p["fake_kraken"]), \
-         patch("baselines.llm_vision.claude_client", return_value=p["fake_claude"]), \
-         patch("baselines.llm_vision.gemini_client", return_value=p["fake_gemini"]):
+    with (
+        patch("baselines.llm_vision.fetch_image", return_value=p["fake_image_path"]),
+        patch("baselines.llm_vision.image_sha256", return_value="img-sha"),
+        patch("baselines.llm_vision.recognize_lines", return_value=p["fake_kraken"]),
+        patch("baselines.llm_vision.claude_client", return_value=p["fake_claude"]),
+        patch("baselines.llm_vision.gemini_client", return_value=p["fake_gemini"]),
+    ):
         bl = _ctor(tmp_path, manifest)
         bl.run()
 
-    pred = json.loads(
-        (tmp_path / "llm_vision" / f"{fid}.json").read_text(encoding="utf-8")
-    )
+    pred = json.loads((tmp_path / "llm_vision" / f"{fid}.json").read_text(encoding="utf-8"))
     line = pred["lines"][0]
     assert line["llm_winner"] == "claude"
     assert line["llm_tie_breaks"] == 1
@@ -295,9 +292,7 @@ def test_llm_vision_disagreement_claude_wins_no_tier_mixing(tmp_path, monkeypatc
     assert line["tier3"] == claude_text
     assert gemini_text not in (line["tier1"], line["tier2"], line["tier3"])
 
-    meta = json.loads(
-        (tmp_path / "llm_vision" / "run_meta.json").read_text(encoding="utf-8")
-    )
+    meta = json.loads((tmp_path / "llm_vision" / "run_meta.json").read_text(encoding="utf-8"))
     assert meta["combine"]["tie_break_total"] == 1
     assert meta["combine"]["tie_break_winners"] == {"claude": 1, "gemini": 0}
 
@@ -327,15 +322,15 @@ def test_llm_vision_budget_cap_fires_and_preserves_sandbox(tmp_path, monkeypatch
     p["fake_claude"].messages.create.return_value = _claude_response(
         "x", in_t=1_000_000_000, out_t=1
     )
-    p["fake_gemini"].models.generate_content.return_value = _gemini_response(
-        "x", in_t=1, out_t=1
-    )
+    p["fake_gemini"].models.generate_content.return_value = _gemini_response("x", in_t=1, out_t=1)
 
-    with patch("baselines.llm_vision.fetch_image", return_value=p["fake_image_path"]), \
-         patch("baselines.llm_vision.image_sha256", return_value="img-sha"), \
-         patch("baselines.llm_vision.recognize_lines", return_value=p["fake_kraken"]), \
-         patch("baselines.llm_vision.claude_client", return_value=p["fake_claude"]), \
-         patch("baselines.llm_vision.gemini_client", return_value=p["fake_gemini"]):
+    with (
+        patch("baselines.llm_vision.fetch_image", return_value=p["fake_image_path"]),
+        patch("baselines.llm_vision.image_sha256", return_value="img-sha"),
+        patch("baselines.llm_vision.recognize_lines", return_value=p["fake_kraken"]),
+        patch("baselines.llm_vision.claude_client", return_value=p["fake_claude"]),
+        patch("baselines.llm_vision.gemini_client", return_value=p["fake_gemini"]),
+    ):
         bl = _ctor(tmp_path, manifest)
         with pytest.raises(BudgetExceeded, match="D-08"):
             bl.run()
@@ -368,10 +363,12 @@ def test_llm_vision_scope_violation_fires_before_llm_clients(tmp_path, monkeypat
         expected_reports_per_baseline={"llm_vision": 1},
     )
 
-    with patch("baselines.llm_vision.claude_client") as m_claude, \
-         patch("baselines.llm_vision.gemini_client") as m_gemini, \
-         patch("baselines.llm_vision.recognize_lines") as m_rec, \
-         patch("baselines.llm_vision.fetch_image") as m_fetch:
+    with (
+        patch("baselines.llm_vision.claude_client") as m_claude,
+        patch("baselines.llm_vision.gemini_client") as m_gemini,
+        patch("baselines.llm_vision.recognize_lines") as m_rec,
+        patch("baselines.llm_vision.fetch_image") as m_fetch,
+    ):
         bl = _ctor(tmp_path, manifest)
         with pytest.raises(ScopeViolation, match="BL-08"):
             bl.run(folio_ids=["non_existent_folio"])

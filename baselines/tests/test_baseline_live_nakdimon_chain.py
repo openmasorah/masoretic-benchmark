@@ -27,20 +27,17 @@ runs end-to-end against Kraken + Nakdimon when both gates pass.
 
 from __future__ import annotations
 
-import os
+from datetime import UTC
 from pathlib import Path
 
 import pytest
-
 
 # Sibling-repo + baalshem path roots.
 _THIS = Path(__file__).resolve()
 SIBLING_ROOT = _THIS.parents[2]
 BAALSHEM_ROOT = Path("/Users/benlamm/Workspace/baalshem")
 
-DEFAULT_KRAKEN_MODEL = (
-    SIBLING_ROOT / "baselines" / ".cache" / "kraken" / "BiblIA_01.mlmodel"
-)
+DEFAULT_KRAKEN_MODEL = SIBLING_ROOT / "baselines" / ".cache" / "kraken" / "BiblIA_01.mlmodel"
 
 # GT-fixture candidates for the diagnostic-chain assertion (Issue 2 fix).
 GT_CANDIDATES = [
@@ -72,10 +69,11 @@ def test_live_realistic_chain_on_shema_fixture(tmp_path):
     # Construct against an in-memory FakeManifest to avoid the manifest
     # schema bump's strictness for live ops; the real Manifest path is
     # exercised by score-time integration tests (Phase 4).
-    from datetime import datetime, timezone
+    from datetime import datetime
+
+    from baselines.biblia_nakdimon import BibliaNakdimonBaseline
 
     from tests._fake_manifest import FakeFolio, FakeManifest
-    from baselines.biblia_nakdimon import BibliaNakdimonBaseline
 
     fid = "leningrad_devarim_shema_fixture"
     manifest = FakeManifest(
@@ -89,7 +87,7 @@ def test_live_realistic_chain_on_shema_fixture(tmp_path):
     bl.kraken_model_path = DEFAULT_KRAKEN_MODEL
     bl.image_cache = tmp_path / "image-cache"
     bl.gt_root = tmp_path / "no-gt-here"  # forces the diagnostic to fail; see below
-    bl._started_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    bl._started_at = datetime.now(UTC).isoformat(timespec="seconds")
     bl._folio_meta = {}
 
     # Issue 2 fix: if no GT fixture is available, skip the diagnostic-chain
@@ -99,8 +97,7 @@ def test_live_realistic_chain_on_shema_fixture(tmp_path):
     if not gt_present:
         pytest.skip(
             "GT fixture not provisioned until Phase 1 line-level GT export "
-            "lands at one of: "
-            + ", ".join(str(p) for p in GT_CANDIDATES)
+            "lands at one of: " + ", ".join(str(p) for p in GT_CANDIDATES)
         )
 
     # Use the first available GT candidate.
@@ -113,9 +110,7 @@ def test_live_realistic_chain_on_shema_fixture(tmp_path):
     assert rc == 0
 
     realistic_path = tmp_path / "results" / "biblia_nakdimon" / f"{fid}.json"
-    diag_path = (
-        tmp_path / "results" / "biblia_nakdimon" / "diagnostic" / f"{fid}.gt_fed.json"
-    )
+    diag_path = tmp_path / "results" / "biblia_nakdimon" / "diagnostic" / f"{fid}.gt_fed.json"
     rm_path = tmp_path / "results" / "biblia_nakdimon" / "run_meta.json"
 
     assert realistic_path.exists()

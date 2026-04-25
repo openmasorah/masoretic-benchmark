@@ -77,7 +77,7 @@ def test_kraken_model_hash_derives_from_pin_md():
     assert rows
     cols = [c.strip() for c in rows[0].strip("|").split("|")]
     pinned_sha = cols[3]
-    seed = f"kraken=={KRAKEN_VERSION}:{pinned_sha}".encode("utf-8")
+    seed = f"kraken=={KRAKEN_VERSION}:{pinned_sha}".encode()
     expected = hashlib.sha256(seed).hexdigest()[:16]
     assert KRAKEN_MODEL_HASH == expected
 
@@ -110,6 +110,7 @@ def test_recognize_lines_returns_line_records_with_kraken_confidence(monkeypatch
 
     with patch("baselines._kraken._load_model", return_value=MagicMock()):
         from baselines._kraken import recognize_lines
+
         out = recognize_lines(
             Path("/tmp/fake.jpg"),
             Path("/tmp/fake.mlmodel"),
@@ -139,6 +140,7 @@ def test_recognize_lines_raises_on_zero_records(monkeypatch):
 
     with patch("baselines._kraken._load_model", return_value=MagicMock()):
         from baselines._kraken import recognize_lines
+
         with pytest.raises(KrakenInferenceFailure) as exc:
             recognize_lines(
                 Path("/tmp/missing.jpg"),
@@ -158,6 +160,7 @@ def test_recognize_lines_raises_on_all_empty_text(monkeypatch):
 
     with patch("baselines._kraken._load_model", return_value=MagicMock()):
         from baselines._kraken import recognize_lines
+
         with pytest.raises(KrakenInferenceFailure):
             recognize_lines(
                 Path("/tmp/blank.jpg"),

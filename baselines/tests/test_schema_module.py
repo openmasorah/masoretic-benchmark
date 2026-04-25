@@ -9,14 +9,13 @@ Two layers covered:
 
 Mirrors test_prediction_schema.py / test_run_meta_schema.py fixtures.
 """
+
 from __future__ import annotations
 
 from copy import deepcopy
-from pathlib import Path
 
 import jsonschema
 import pytest
-
 from baselines._atomic import SandboxRun
 from baselines._run_meta import write_run_meta as run_meta_writer
 from baselines._schema import validate_prediction, validate_run_meta
@@ -126,9 +125,7 @@ def test_validate_run_meta_accepts_null_pin_value(valid_run_meta):
 # -- SandboxRun wiring (D-14 + D-16 defense-in-depth) ------------------------
 
 
-def test_sandbox_write_prediction_validates_before_write(
-    tmp_path, valid_prediction
-):
+def test_sandbox_write_prediction_validates_before_write(tmp_path, valid_prediction):
     """Off-shape payload raises ValidationError BEFORE atomic write.
     Sandbox is preserved (D-14 leave-for-inspection), but no .json file
     is written for that folio."""
@@ -152,16 +149,12 @@ def test_sandbox_write_prediction_validates_before_write(
 
 def test_sandbox_write_prediction_succeeds_for_valid(tmp_path, valid_prediction):
     with SandboxRun(tmp_path, "biblia_kraken") as sb:
-        path = sb.write_prediction(
-            "leningrad_devarim_shema_fixture", valid_prediction
-        )
+        path = sb.write_prediction("leningrad_devarim_shema_fixture", valid_prediction)
         assert path.exists()
         assert path.parent == sb.sandbox_dir
 
 
-def test_sandbox_write_diagnostic_validates_before_write(
-    tmp_path, valid_prediction
-):
+def test_sandbox_write_diagnostic_validates_before_write(tmp_path, valid_prediction):
     """write_diagnostic uses the same prediction shape (D-01)."""
     bad = deepcopy(valid_prediction)
     del bad["lines"]

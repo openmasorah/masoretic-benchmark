@@ -23,9 +23,10 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-from datetime import datetime, timezone
+from collections.abc import Callable, Iterator
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, Iterator
+from typing import Any
 
 PIPE_BUF = 4096
 
@@ -42,9 +43,7 @@ def canonical_prompt_hash(request: dict) -> str:
     encoded as UTF-8. The replay reader re-derives this hash on lookup, so the
     request dict must be reproducible byte-equal across runs.
     """
-    canonical = json.dumps(request, sort_keys=True, ensure_ascii=False).encode(
-        "utf-8"
-    )
+    canonical = json.dumps(request, sort_keys=True, ensure_ascii=False).encode("utf-8")
     return hashlib.sha256(canonical).hexdigest()
 
 
@@ -52,7 +51,7 @@ def _iter_records(log_path: Path) -> Iterator[dict]:
     """Yield JSON records from `log_path`. Empty/missing file yields nothing."""
     if not log_path.exists():
         return
-    with open(log_path, "r", encoding="utf-8") as f:
+    with open(log_path, encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if line:
@@ -68,17 +67,13 @@ def _atomic_append(log_path: Path, record: dict) -> None:
     fall back silently.
     """
     log_path.parent.mkdir(parents=True, exist_ok=True)
-    line = (
-        json.dumps(record, sort_keys=True, ensure_ascii=False) + "\n"
-    ).encode("utf-8")
+    line = (json.dumps(record, sort_keys=True, ensure_ascii=False) + "\n").encode("utf-8")
     if len(line) >= PIPE_BUF:
         raise RuntimeError(
             f"D-10 replay record exceeds PIPE_BUF ({len(line)} >= {PIPE_BUF}); "
             f"split image bytes by reference (not inlined)."
         )
-    flags = (
-        os.O_APPEND | os.O_CREAT | os.O_WRONLY | getattr(os, "O_CLOEXEC", 0)
-    )
+    flags = os.O_APPEND | os.O_CREAT | os.O_WRONLY | getattr(os, "O_CLOEXEC", 0)
     fd = os.open(log_path, flags, 0o644)
     try:
         n = os.write(fd, line)
@@ -123,29 +118,25 @@ def llm_call_with_replay(
         for rec in _iter_records(replay_log):
             if rec["prompt_hash"] == prompt_hash:
                 return {
-                    "response":               rec["response"],
-                    "response_id":            rec.get("response_id"),
+                    "response": rec["response"],
+                    "response_id": rec.get("response_id"),
                     "model_version_returned": rec.get("model_version_returned"),
-                    "token_counts":           rec.get("token_counts"),
-                    "finish_reason":          rec.get("finish_reason"),
+                    "token_counts": rec.get("token_counts"),
+                    "finish_reason": rec.get("finish_reason"),
                 }
-        raise ReplayMissError(
-            f"D-10 replay miss: prompt_hash {prompt_hash} not in {replay_log}"
-        )
+        raise ReplayMissError(f"D-10 replay miss: prompt_hash {prompt_hash} not in {replay_log}")
 
     raw = client_fn(**request)
     meta = extract_response_meta(raw)
     record = {
-        "prompt_hash":            prompt_hash,
-        "request":                request,
-        "response":               meta["response"],
-        "response_id":            meta.get("response_id"),
+        "prompt_hash": prompt_hash,
+        "request": request,
+        "response": meta["response"],
+        "response_id": meta.get("response_id"),
         "model_version_returned": meta.get("model_version_returned"),
-        "token_counts":           meta.get("token_counts"),
-        "finish_reason":          meta.get("finish_reason"),
-        "timestamp":              datetime.now(timezone.utc).isoformat(
-            timespec="seconds"
-        ),
+        "token_counts": meta.get("token_counts"),
+        "finish_reason": meta.get("finish_reason"),
+        "timestamp": datetime.now(UTC).isoformat(timespec="seconds"),
     }
     _atomic_append(replay_log, record)
     return meta

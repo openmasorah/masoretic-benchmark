@@ -16,11 +16,9 @@ Coverage (per plan 03-07 Task 2 behavior):
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
-
 from baselines._llm_replay import (
     PIPE_BUF,
     ReplayMissError,
@@ -34,30 +32,30 @@ def _extract_meta(raw):
     BL-01 will use (response, response_id, model_version_returned,
     token_counts, finish_reason)."""
     return {
-        "response":               raw["text"],
-        "response_id":            raw["id"],
+        "response": raw["text"],
+        "response_id": raw["id"],
         "model_version_returned": raw["model"],
-        "token_counts":           raw["usage"],
-        "finish_reason":          raw["stop_reason"],
+        "token_counts": raw["usage"],
+        "finish_reason": raw["stop_reason"],
     }
 
 
 def _fake_request(text="prompt", img_sha="abc123") -> dict:
     return {
-        "model":            "claude-opus-4-7",
-        "max_tokens":       2048,
-        "temperature":      0,
-        "image_bytes_ref":  f"sha256:{img_sha}",
-        "prompt":           text,
+        "model": "claude-opus-4-7",
+        "max_tokens": 2048,
+        "temperature": 0,
+        "image_bytes_ref": f"sha256:{img_sha}",
+        "prompt": text,
     }
 
 
 def _fake_response(text="שמע ישראל") -> dict:
     return {
-        "text":        text,
-        "id":          "msg_01abcdef",
-        "model":       "claude-opus-4-7-20260101",
-        "usage":       {"input": 1234, "output": 12},
+        "text": text,
+        "id": "msg_01abcdef",
+        "model": "claude-opus-4-7-20260101",
+        "usage": {"input": 1234, "output": 12},
         "stop_reason": "end_turn",
     }
 
@@ -116,8 +114,11 @@ def test_replay_read_hit_does_not_call_client(tmp_path):
     # Seed the log with one prior record.
     seed = MagicMock(return_value=_fake_response("seed-text"))
     llm_call_with_replay(
-        client_fn=seed, request=request, replay_log=log,
-        replay=False, extract_response_meta=_extract_meta,
+        client_fn=seed,
+        request=request,
+        replay_log=log,
+        replay=False,
+        extract_response_meta=_extract_meta,
     )
 
     # Now in replay-mode the same request must hit and NOT call client_fn.
@@ -148,8 +149,11 @@ def test_replay_read_miss_raises_replay_miss_error(tmp_path):
     request_b = _fake_request(text="prompt-B")
     seed = MagicMock(return_value=_fake_response())
     llm_call_with_replay(
-        client_fn=seed, request=request_a, replay_log=log,
-        replay=False, extract_response_meta=_extract_meta,
+        client_fn=seed,
+        request=request_a,
+        replay_log=log,
+        replay=False,
+        extract_response_meta=_extract_meta,
     )
 
     blocked_client = MagicMock(side_effect=AssertionError("must NOT be called"))
@@ -195,10 +199,10 @@ def test_pipe_buf_guard_fires_on_oversized_record(tmp_path):
     log = tmp_path / "llm_calls.jsonl"
     huge_response = "א" * (PIPE_BUF // 2)  # multi-byte UTF-8 → > PIPE_BUF
     fake_resp = {
-        "text":        huge_response,
-        "id":          "x",
-        "model":       "x",
-        "usage":       {},
+        "text": huge_response,
+        "id": "x",
+        "model": "x",
+        "usage": {},
         "stop_reason": "end_turn",
     }
     client_fn = MagicMock(return_value=fake_resp)

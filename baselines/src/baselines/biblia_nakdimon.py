@@ -34,16 +34,18 @@ patches the diacritize symbol via sys.modules so the real Nakdimon
 stack never loads; the live tier (live_baselines marker) runs only on
 Linux + Py 3.11 in CI (Plan 03-08).
 """
+
 from __future__ import annotations
 
-from baselines._chain import ChainBaseline
+from oracles.nakdimon_oss import MODEL_HASH as NAKDIMON_MODEL_HASH
 
 # IMPORTANT (A-3, locked Phase 3 adjudication):
 #   Direct import of diacritize. The oracles.compute_oracles wrapper is
 #   Phase 4 score-time work, NOT a production import. Plan 03-08's
 #   contamination grep enforces zero references in baselines/.
 from oracles.nakdimon_oss import diacritize as nakdimon_diacritize
-from oracles.nakdimon_oss import MODEL_HASH as NAKDIMON_MODEL_HASH
+
+from baselines._chain import ChainBaseline
 
 
 class BibliaNakdimonBaseline(ChainBaseline):

@@ -38,13 +38,14 @@ macOS arm64 + Python 3.11/3.12 due to TF 2.15. Live tier (`live_baselines`
 marker) runs only on Linux + Py 3.11 in CI (Plan 03-08); local mocked
 unit tier never imports the real Nakdimon stack.
 """
+
 from __future__ import annotations
 
 import json
 import socket
 import subprocess
 from abc import abstractmethod
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from baselines._atomic import SandboxRun
@@ -57,9 +58,7 @@ from baselines._kraken import KRAKEN_MODEL_HASH, recognize_lines
 #   <repo>/baselines/src/baselines/_chain.py
 # parents[0]=baselines, parents[1]=src, parents[2]=baselines, parents[3]=<repo>.
 REPO_ROOT = Path(__file__).resolve().parents[3]
-DEFAULT_KRAKEN_MODEL = (
-    REPO_ROOT / "baselines" / ".cache" / "kraken" / "BiblIA_01.mlmodel"
-)
+DEFAULT_KRAKEN_MODEL = REPO_ROOT / "baselines" / ".cache" / "kraken" / "BiblIA_01.mlmodel"
 DEFAULT_IMAGE_CACHE = REPO_ROOT / "baselines" / ".cache" / "images"
 
 # Default GT roots for the diagnostic chain. Real Phase 1 has only a
@@ -126,9 +125,7 @@ class ChainBaseline(BaselineBase):
         # 1) Realistic chain: Kraken transcribes consonants from image,
         #    then diacritize() produces tier-2/3 from Kraken's noisy text.
         image_path = fetch_image(folio.id, folio.image_url, self.image_cache)
-        kraken_lines = recognize_lines(
-            image_path, self.kraken_model_path, folio_id=folio.id
-        )
+        kraken_lines = recognize_lines(image_path, self.kraken_model_path, folio_id=folio.id)
         out: list[LineRecord] = []
         for ln in kraken_lines:
             # ln.tier1/tier2/tier3 are all set to Kraken's raw line text by
@@ -141,9 +138,9 @@ class ChainBaseline(BaselineBase):
                 LineRecord(
                     line_id=ln.line_id,
                     bbox=ln.bbox,
-                    tier1=ln.tier1,        # Kraken's text (consonant-tier view at score time)
-                    tier2=diacritized,      # diacritizer's output
-                    tier3=diacritized,      # same — scorer re-derives trop view
+                    tier1=ln.tier1,  # Kraken's text (consonant-tier view at score time)
+                    tier2=diacritized,  # diacritizer's output
+                    tier3=diacritized,  # same — scorer re-derives trop view
                     tier4_records=tuple(),
                     kraken_confidence=ln.kraken_confidence,
                 )
@@ -160,9 +157,7 @@ class ChainBaseline(BaselineBase):
             "budget_used": None,
             "replay_used": None,
             "line_count": len(out),
-            "scope_check_passed_at_iso": datetime.now(timezone.utc).isoformat(
-                timespec="seconds"
-            ),
+            "scope_check_passed_at_iso": datetime.now(UTC).isoformat(timespec="seconds"),
         }
         return out
 
@@ -204,9 +199,7 @@ class ChainBaseline(BaselineBase):
         sb = SandboxRun(self.results_root, self.BASELINE_ID)
         sb.write_diagnostic(folio.id, payload)
 
-    def _load_gt_consonants(
-        self, folio
-    ) -> list[tuple[str, tuple[int, int, int, int], str]]:
+    def _load_gt_consonants(self, folio) -> list[tuple[str, tuple[int, int, int, int], str]]:
         """Load frozen GT consonants for the diagnostic chain.
 
         Reads from `<gt_root>/<folio_id>.json` first, then from a fallback
@@ -250,8 +243,10 @@ class ChainBaseline(BaselineBase):
         """Extend the base default with chain-baseline specifics (D-19).
 
         Subclass-determined diacritizer pin lands at:
-          - pins.nakdimon_model_hash       (BL-03 sets DIACRITIZER_PIN_FIELD="nakdimon_model_hash")
-          - pins.dictabert_model_revision  (BL-04 sets DIACRITIZER_PIN_FIELD="dictabert_model_revision")
+          - pins.nakdimon_model_hash
+            (BL-03 sets DIACRITIZER_PIN_FIELD="nakdimon_model_hash")
+          - pins.dictabert_model_revision
+            (BL-04 sets DIACRITIZER_PIN_FIELD="dictabert_model_revision")
         """
         base = super()._compose_run_meta()
         base["hostname"] = socket.gethostname()

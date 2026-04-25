@@ -3,6 +3,7 @@
 Validates the schema itself parses as draft-2020-12, and that it accepts
 canonical valid payloads while rejecting D-19 required-field violations.
 """
+
 from __future__ import annotations
 
 import json
@@ -12,14 +13,13 @@ from pathlib import Path
 import jsonschema
 import pytest
 
-
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RUN_META_SCHEMA_PATH = REPO_ROOT / "schemas" / "run_meta.schema.json"
 
 
 @pytest.fixture(scope="module")
 def run_meta_schema() -> dict:
-    with open(RUN_META_SCHEMA_PATH, "r", encoding="utf-8") as f:
+    with open(RUN_META_SCHEMA_PATH, encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -144,9 +144,7 @@ def test_combine_tie_break_winners_object_accepted(run_meta_validator, valid_run
     run_meta_validator.validate(payload)
 
 
-def test_combine_tie_break_winners_partial_object_rejected(
-    run_meta_validator, valid_run_meta
-):
+def test_combine_tie_break_winners_partial_object_rejected(run_meta_validator, valid_run_meta):
     """If tie_break_winners is an object, it MUST have both claude AND gemini."""
     payload = deepcopy(valid_run_meta)
     payload["combine"]["tie_break_winners"] = {"claude": 3}
@@ -154,9 +152,7 @@ def test_combine_tie_break_winners_partial_object_rejected(
         run_meta_validator.validate(payload)
 
 
-def test_combine_tie_break_winners_extra_key_rejected(
-    run_meta_validator, valid_run_meta
-):
+def test_combine_tie_break_winners_extra_key_rejected(run_meta_validator, valid_run_meta):
     payload = deepcopy(valid_run_meta)
     payload["combine"]["tie_break_winners"] = {
         "claude": 3,

@@ -16,7 +16,6 @@ from __future__ import annotations
 
 from baselines._llm_combine import combine_lines
 
-
 # ----------------------------------------------------------------------
 # T1: tier-1 agreement
 # ----------------------------------------------------------------------

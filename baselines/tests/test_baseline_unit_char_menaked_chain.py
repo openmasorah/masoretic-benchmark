@@ -23,15 +23,14 @@ Coverage:
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-
 from baselines._base import LineRecord
-from tests._fake_manifest import FakeFolio, FakeManifest
 
+from tests._fake_manifest import FakeFolio, FakeManifest
 
 # ----------------------------------------------------------------------
 # Fixtures
@@ -88,7 +87,7 @@ def _ctor(tmp_path: Path, manifest: FakeManifest, gt_root: Path):
     bl.kraken_model_path = tmp_path / "fake.mlmodel"
     bl.image_cache = tmp_path / "image-cache"
     bl.gt_root = Path(gt_root)
-    bl._started_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    bl._started_at = datetime.now(UTC).isoformat(timespec="seconds")
     bl._folio_meta = {}
     return bl
 
@@ -123,28 +122,20 @@ def test_char_menaked_chain_runs_realistic_and_diagnostic(
     # (`from baselines._kraken import recognize_lines` rebinds at module load
     # time; patching baselines._kraken.recognize_lines does NOT update the
     # _chain.recognize_lines reference once _chain is already imported).
-    with patch(
-        "baselines._chain.recognize_lines", return_value=fake_lines
-    ), patch(
-        "baselines._chain.fetch_image", return_value=fake_image_path
-    ), patch(
-        "baselines.biblia_char_menaked.dictabert_diacritize",
-        lambda s: f"DIAC({s})",
+    with (
+        patch("baselines._chain.recognize_lines", return_value=fake_lines),
+        patch("baselines._chain.fetch_image", return_value=fake_image_path),
+        patch(
+            "baselines.biblia_char_menaked.dictabert_diacritize",
+            lambda s: f"DIAC({s})",
+        ),
     ):
         bl = _ctor(tmp_path, manifest_with_shema_fixture, gt_fixture)
         rc = bl.run()
 
     assert rc == 0
-    realistic_path = (
-        tmp_path / "results" / "biblia_char_menaked" / f"{fid}.json"
-    )
-    diag_path = (
-        tmp_path
-        / "results"
-        / "biblia_char_menaked"
-        / "diagnostic"
-        / f"{fid}.gt_fed.json"
-    )
+    realistic_path = tmp_path / "results" / "biblia_char_menaked" / f"{fid}.json"
+    diag_path = tmp_path / "results" / "biblia_char_menaked" / "diagnostic" / f"{fid}.gt_fed.json"
     assert realistic_path.exists(), "realistic prediction not promoted"
     assert diag_path.exists(), "GT-fed diagnostic not promoted"
 
@@ -154,9 +145,7 @@ def test_char_menaked_chain_runs_realistic_and_diagnostic(
 # ----------------------------------------------------------------------
 
 
-def test_char_menaked_tier1_kraken_vs_gt(
-    tmp_path, manifest_with_shema_fixture, gt_fixture
-):
+def test_char_menaked_tier1_kraken_vs_gt(tmp_path, manifest_with_shema_fixture, gt_fixture):
     fid = "leningrad_devarim_shema_fixture"
     # Distinguishable strings so we can tell which path we're looking at.
     kraken_text = "ש0מע יש0ראל"  # Kraken's noisy output
@@ -177,29 +166,23 @@ def test_char_menaked_tier1_kraken_vs_gt(
     # (`from baselines._kraken import recognize_lines` rebinds at module load
     # time; patching baselines._kraken.recognize_lines does NOT update the
     # _chain.recognize_lines reference once _chain is already imported).
-    with patch(
-        "baselines._chain.recognize_lines", return_value=fake_lines
-    ), patch(
-        "baselines._chain.fetch_image", return_value=fake_image_path
-    ), patch(
-        "baselines.biblia_char_menaked.dictabert_diacritize",
-        lambda s: f"DIAC({s})",
+    with (
+        patch("baselines._chain.recognize_lines", return_value=fake_lines),
+        patch("baselines._chain.fetch_image", return_value=fake_image_path),
+        patch(
+            "baselines.biblia_char_menaked.dictabert_diacritize",
+            lambda s: f"DIAC({s})",
+        ),
     ):
         bl = _ctor(tmp_path, manifest_with_shema_fixture, gt_fixture)
         bl.run()
 
     realistic = json.loads(
-        (tmp_path / "results" / "biblia_char_menaked" / f"{fid}.json").read_text(
-            encoding="utf-8"
-        )
+        (tmp_path / "results" / "biblia_char_menaked" / f"{fid}.json").read_text(encoding="utf-8")
     )
     diag = json.loads(
         (
-            tmp_path
-            / "results"
-            / "biblia_char_menaked"
-            / "diagnostic"
-            / f"{fid}.gt_fed.json"
+            tmp_path / "results" / "biblia_char_menaked" / "diagnostic" / f"{fid}.gt_fed.json"
         ).read_text(encoding="utf-8")
     )
 
@@ -218,9 +201,7 @@ def test_char_menaked_tier1_kraken_vs_gt(
 # ----------------------------------------------------------------------
 
 
-def test_char_menaked_run_meta_pins(
-    tmp_path, manifest_with_shema_fixture, gt_fixture
-):
+def test_char_menaked_run_meta_pins(tmp_path, manifest_with_shema_fixture, gt_fixture):
     fid = "leningrad_devarim_shema_fixture"
     fake_lines = _kraken_lines(fid)
     fake_image_path = tmp_path / "image-cache" / f"{fid}.jpg"
@@ -229,13 +210,13 @@ def test_char_menaked_run_meta_pins(
     # (`from baselines._kraken import recognize_lines` rebinds at module load
     # time; patching baselines._kraken.recognize_lines does NOT update the
     # _chain.recognize_lines reference once _chain is already imported).
-    with patch(
-        "baselines._chain.recognize_lines", return_value=fake_lines
-    ), patch(
-        "baselines._chain.fetch_image", return_value=fake_image_path
-    ), patch(
-        "baselines.biblia_char_menaked.dictabert_diacritize",
-        lambda s: f"DIAC({s})",
+    with (
+        patch("baselines._chain.recognize_lines", return_value=fake_lines),
+        patch("baselines._chain.fetch_image", return_value=fake_image_path),
+        patch(
+            "baselines.biblia_char_menaked.dictabert_diacritize",
+            lambda s: f"DIAC({s})",
+        ),
     ):
         bl = _ctor(tmp_path, manifest_with_shema_fixture, gt_fixture)
         bl.run()
@@ -245,10 +226,7 @@ def test_char_menaked_run_meta_pins(
 
     # Phase 2 02-04 lock — re-asserted here so a Phase 2 revision drift is
     # caught at the consumer layer too.
-    assert (
-        meta["pins"]["dictabert_model_revision"]
-        == "d311fbf7c403e50b040440e4859ac78064d025d0"
-    )
+    assert meta["pins"]["dictabert_model_revision"] == "d311fbf7c403e50b040440e4859ac78064d025d0"
     assert meta["pins"]["nakdimon_model_hash"] is None
     # KRAKEN_MODEL_HASH is populated because the realistic chain uses Kraken.
     from baselines._kraken import KRAKEN_MODEL_HASH
@@ -278,13 +256,13 @@ def test_char_menaked_diagnostic_not_counted_for_d15(
     # (`from baselines._kraken import recognize_lines` rebinds at module load
     # time; patching baselines._kraken.recognize_lines does NOT update the
     # _chain.recognize_lines reference once _chain is already imported).
-    with patch(
-        "baselines._chain.recognize_lines", return_value=fake_lines
-    ), patch(
-        "baselines._chain.fetch_image", return_value=fake_image_path
-    ), patch(
-        "baselines.biblia_char_menaked.dictabert_diacritize",
-        lambda s: f"DIAC({s})",
+    with (
+        patch("baselines._chain.recognize_lines", return_value=fake_lines),
+        patch("baselines._chain.fetch_image", return_value=fake_image_path),
+        patch(
+            "baselines.biblia_char_menaked.dictabert_diacritize",
+            lambda s: f"DIAC({s})",
+        ),
     ):
         bl = _ctor(tmp_path, manifest_with_shema_fixture, gt_fixture)
         rc = bl.run()
@@ -310,10 +288,7 @@ def test_char_menaked_baseline_id_canonical():
 def test_char_menaked_pin_field_and_value():
     from baselines.biblia_char_menaked import BibliaCharMenakedBaseline
 
-    assert (
-        BibliaCharMenakedBaseline.DIACRITIZER_PIN_FIELD
-        == "dictabert_model_revision"
-    )
+    assert BibliaCharMenakedBaseline.DIACRITIZER_PIN_FIELD == "dictabert_model_revision"
     assert (
         BibliaCharMenakedBaseline.DIACRITIZER_PIN_VALUE
         == "d311fbf7c403e50b040440e4859ac78064d025d0"
@@ -326,12 +301,9 @@ def test_char_menaked_does_not_override_run_or_infer_folio():
     It MUST NOT override run() or infer_folio()."""
     from baselines.biblia_char_menaked import BibliaCharMenakedBaseline
 
-    assert "run" not in BibliaCharMenakedBaseline.__dict__, (
-        "D-12: BL-04 must NOT override run()"
-    )
+    assert "run" not in BibliaCharMenakedBaseline.__dict__, "D-12: BL-04 must NOT override run()"
     assert "infer_folio" not in BibliaCharMenakedBaseline.__dict__, (
-        "BL-04 must NOT override infer_folio() — that's ChainBaseline's "
-        "shared two-output template"
+        "BL-04 must NOT override infer_folio() — that's ChainBaseline's shared two-output template"
     )
     # And it MUST override diacritize().
     assert "diacritize" in BibliaCharMenakedBaseline.__dict__, (

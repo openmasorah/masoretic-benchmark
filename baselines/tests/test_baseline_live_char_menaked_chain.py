@@ -24,14 +24,9 @@ from pathlib import Path
 
 import pytest
 
-
 GT_CANDIDATES = [
-    Path(
-        "/Users/benlamm/Workspace/baalshem/gt-infra/exports/leningrad_devarim_shema_fixture.json"
-    ),
-    Path(
-        "/Users/benlamm/Workspace/baalshem/tests/fixtures/leningrad_devarim_shema_fixture.json"
-    ),
+    Path("/Users/benlamm/Workspace/baalshem/gt-infra/exports/leningrad_devarim_shema_fixture.json"),
+    Path("/Users/benlamm/Workspace/baalshem/tests/fixtures/leningrad_devarim_shema_fixture.json"),
 ]
 
 
@@ -43,9 +38,7 @@ def test_live_char_menaked_chain_realistic_only(tmp_path):
     # landing, Phase 1 has only a single-text-blob fixture
     # (tests/fixtures/golden/gt.json) lacking per-line bboxes (D-30/D-31).
     if not any(p.exists() for p in GT_CANDIDATES):
-        pytest.skip(
-            "GT fixture not provisioned until Phase 1 line-level GT export lands"
-        )
+        pytest.skip("GT fixture not provisioned until Phase 1 line-level GT export lands")
 
     # If the GT lands, this test exercises the real DictaBERT model on the
     # cached image. The realistic chain validates against
@@ -60,6 +53,4 @@ def test_live_char_menaked_chain_realistic_only(tmp_path):
     #   pred = json.loads((tmp_path / "results" / "biblia_char_menaked" /
     #                      "leningrad_devarim_shema_fixture.json").read_text())
     #   assert pred["baseline_id"] == "biblia_char_menaked"
-    pytest.skip(
-        "GT fixture present — but live-run scaffold deferred to a future plan"
-    )
+    pytest.skip("GT fixture present — but live-run scaffold deferred to a future plan")

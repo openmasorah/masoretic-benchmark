@@ -20,15 +20,15 @@ from __future__ import annotations
 
 import json
 import sys
+from datetime import UTC
 from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
-
 from baselines._base import LineRecord
 from baselines._llm_replay import canonical_prompt_hash
-from tests._fake_manifest import FakeFolio, FakeManifest
 
+from tests._fake_manifest import FakeFolio, FakeManifest
 
 FIXTURE_PATH = (
     Path(__file__).resolve().parent
@@ -85,11 +85,11 @@ def _claude_request(crop_sha: str) -> dict:
     from baselines.llm_vision import PROMPT_TEXT
 
     return {
-        "model":            ANTHROPIC_MODEL_ID,
-        "max_tokens":       INFERENCE_CFG["max_output_tokens"],
-        "temperature":      INFERENCE_CFG["temperature"],
-        "image_bytes_ref":  f"sha256:{crop_sha}",
-        "prompt":           PROMPT_TEXT,
+        "model": ANTHROPIC_MODEL_ID,
+        "max_tokens": INFERENCE_CFG["max_output_tokens"],
+        "temperature": INFERENCE_CFG["temperature"],
+        "image_bytes_ref": f"sha256:{crop_sha}",
+        "prompt": PROMPT_TEXT,
     }
 
 
@@ -99,30 +99,28 @@ def _gemini_request(crop_sha: str) -> dict:
     from baselines.llm_vision import PROMPT_TEXT
 
     return {
-        "model":             GEMINI_MODEL_ID,
+        "model": GEMINI_MODEL_ID,
         "max_output_tokens": INFERENCE_CFG["max_output_tokens"],
-        "temperature":       INFERENCE_CFG["temperature"],
-        "seed":              INFERENCE_CFG["seed"],
-        "image_bytes_ref":   f"sha256:{crop_sha}",
-        "prompt":            PROMPT_TEXT,
+        "temperature": INFERENCE_CFG["temperature"],
+        "seed": INFERENCE_CFG["seed"],
+        "image_bytes_ref": f"sha256:{crop_sha}",
+        "prompt": PROMPT_TEXT,
     }
 
 
 def _make_record(*, request: dict, response: str, response_id: str, model_version: str) -> dict:
     """Construct a D-10 replay record."""
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     return {
-        "prompt_hash":            canonical_prompt_hash(request),
-        "request":                request,
-        "response":               response,
-        "response_id":            response_id,
+        "prompt_hash": canonical_prompt_hash(request),
+        "request": request,
+        "response": response,
+        "response_id": response_id,
         "model_version_returned": model_version,
-        "token_counts":           {"input": 1234, "output": 56},
-        "finish_reason":          "end_turn" if "claude" in model_version else "STOP",
-        "timestamp":              datetime(2026, 4, 25, tzinfo=timezone.utc).isoformat(
-            timespec="seconds"
-        ),
+        "token_counts": {"input": 1234, "output": 56},
+        "finish_reason": "end_turn" if "claude" in model_version else "STOP",
+        "timestamp": datetime(2026, 4, 25, tzinfo=UTC).isoformat(timespec="seconds"),
     }
 
 
@@ -187,37 +185,37 @@ def test_replay_mode_uses_logged_responses_not_live_clients(tmp_path, monkeypatc
     # Pre-populate the SANDBOX path with the replay fixture so
     # llm_call_with_replay can find it. The sandbox path mirrors the
     # production layout: results/.in_progress/llm_vision/<folio>/llm_calls.jsonl.
-    sandbox_log = (
-        tmp_path
-        / ".in_progress"
-        / "llm_vision"
-        / fid
-        / "llm_calls.jsonl"
-    )
+    sandbox_log = tmp_path / ".in_progress" / "llm_vision" / fid / "llm_calls.jsonl"
     _seed_replay_log(sandbox_log, crop_sha=crop_sha)
 
     # Patches: clients must NOT be invoked; image / kraken are stubbed.
-    blocked_claude = MagicMock(side_effect=AssertionError("claude_client must NOT be invoked in replay"))
-    blocked_gemini = MagicMock(side_effect=AssertionError("gemini_client must NOT be invoked in replay"))
+    blocked_claude = MagicMock(
+        side_effect=AssertionError("claude_client must NOT be invoked in replay")
+    )
+    blocked_gemini = MagicMock(
+        side_effect=AssertionError("gemini_client must NOT be invoked in replay")
+    )
 
     from unittest.mock import patch as _patch
 
-    with _patch("baselines.llm_vision.fetch_image", return_value=tmp_path / "fake.jpg"), \
-         _patch("baselines.llm_vision.image_sha256", return_value=crop_sha), \
-         _patch("baselines.llm_vision.recognize_lines", return_value=_kraken_lines(fid)), \
-         _patch("baselines.llm_vision.claude_client", blocked_claude), \
-         _patch("baselines.llm_vision.gemini_client", blocked_gemini):
+    with (
+        _patch("baselines.llm_vision.fetch_image", return_value=tmp_path / "fake.jpg"),
+        _patch("baselines.llm_vision.image_sha256", return_value=crop_sha),
+        _patch("baselines.llm_vision.recognize_lines", return_value=_kraken_lines(fid)),
+        _patch("baselines.llm_vision.claude_client", blocked_claude),
+        _patch("baselines.llm_vision.gemini_client", blocked_gemini),
+    ):
         from baselines.llm_vision import LLMVisionBaseline
 
         bl = LLMVisionBaseline.__new__(LLMVisionBaseline)
         bl.manifest = manifest
         bl.results_root = tmp_path
-        bl.replay = True   # <-- the contract under test
+        bl.replay = True  # <-- the contract under test
         bl.kraken_model_path = tmp_path / "fake.mlmodel"
         bl.image_cache = tmp_path / "image-cache"
-        from datetime import datetime, timezone
+        from datetime import datetime
 
-        bl._started_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        bl._started_at = datetime.now(UTC).isoformat(timespec="seconds")
         bl._folio_meta = {}
         bl._used_total_usd = 0.0
         bl._tie_breaks_total = 0
@@ -239,9 +237,7 @@ def test_replay_mode_uses_logged_responses_not_live_clients(tmp_path, monkeypatc
     assert line["llm_tie_breaks"] == 0  # tier-1 agreement (both fixtures say "שמע ישראל")
     assert line["tier1"] == "שמע ישראל"
 
-    meta = json.loads(
-        (tmp_path / "llm_vision" / "run_meta.json").read_text(encoding="utf-8")
-    )
+    meta = json.loads((tmp_path / "llm_vision" / "run_meta.json").read_text(encoding="utf-8"))
     assert meta["replay_mode"] is True
     assert meta["folios"][fid]["replay_used"] is True
 
@@ -272,11 +268,13 @@ def test_replay_mode_raises_on_missing_fixture(tmp_path, monkeypatch):
 
     from unittest.mock import patch as _patch
 
-    with _patch("baselines.llm_vision.fetch_image", return_value=tmp_path / "fake.jpg"), \
-         _patch("baselines.llm_vision.image_sha256", return_value="img-sha"), \
-         _patch("baselines.llm_vision.recognize_lines", return_value=_kraken_lines(fid)), \
-         _patch("baselines.llm_vision.claude_client", blocked_claude), \
-         _patch("baselines.llm_vision.gemini_client", blocked_gemini):
+    with (
+        _patch("baselines.llm_vision.fetch_image", return_value=tmp_path / "fake.jpg"),
+        _patch("baselines.llm_vision.image_sha256", return_value="img-sha"),
+        _patch("baselines.llm_vision.recognize_lines", return_value=_kraken_lines(fid)),
+        _patch("baselines.llm_vision.claude_client", blocked_claude),
+        _patch("baselines.llm_vision.gemini_client", blocked_gemini),
+    ):
         from baselines.llm_vision import LLMVisionBaseline
 
         bl = LLMVisionBaseline.__new__(LLMVisionBaseline)
@@ -285,9 +283,9 @@ def test_replay_mode_raises_on_missing_fixture(tmp_path, monkeypatch):
         bl.replay = True
         bl.kraken_model_path = tmp_path / "fake.mlmodel"
         bl.image_cache = tmp_path / "image-cache"
-        from datetime import datetime, timezone
+        from datetime import datetime
 
-        bl._started_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        bl._started_at = datetime.now(UTC).isoformat(timespec="seconds")
         bl._folio_meta = {}
         bl._used_total_usd = 0.0
         bl._tie_breaks_total = 0

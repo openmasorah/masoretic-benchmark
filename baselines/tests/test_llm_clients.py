@@ -19,7 +19,6 @@ from pathlib import Path
 
 import pytest
 
-
 REPO_ROOT = Path(__file__).resolve().parents[2]
 LLM_PIN_MD = REPO_ROOT / "baselines" / "LLM_PIN.md"
 CONFIG_YAML = REPO_ROOT / "baselines" / "llm_vision.config.yaml"
@@ -98,7 +97,7 @@ def test_gemini_client_raises_KeyError_when_env_var_unset(monkeypatch):
 def test_llm_vision_config_yaml_parses_cleanly():
     import yaml
 
-    with open(CONFIG_YAML, "r", encoding="utf-8") as f:
+    with open(CONFIG_YAML, encoding="utf-8") as f:
         cfg = yaml.safe_load(f)
     assert isinstance(cfg["budget"]["cap_per_folio_usd"], (int, float))
     assert cfg["budget"]["cap_per_folio_usd"] > 0
@@ -107,9 +106,7 @@ def test_llm_vision_config_yaml_parses_cleanly():
     # AbbyyFR is NOT a configured source (the dropped-rationale comment is fine
     # but no abbyyfr_id / abbyy_engine / abbyyfr_input_per_mtok keys exist)
     text = CONFIG_YAML.read_text(encoding="utf-8")
-    forbidden_keys = re.compile(
-        r"\babbyyfr_input_per_mtok\b|\babbyyfr_id\b|\babbyy_engine\b"
-    )
+    forbidden_keys = re.compile(r"\babbyyfr_input_per_mtok\b|\babbyyfr_id\b|\babbyy_engine\b")
     assert not forbidden_keys.search(text), (
         "active YAML config must not reference AbbyyFR as a configured source"
     )
@@ -157,9 +154,7 @@ def test_no_dot_get_fallback_for_api_keys():
     Allowed: ``os.environ["ANTHROPIC_API_KEY"]`` (raises KeyError on missing).
     """
     text = CLIENTS_PY.read_text(encoding="utf-8")
-    bad_pattern = re.compile(
-        r'\.get\(\s*"(?:ANTHROPIC_API_KEY|GOOGLE_API_KEY)"', re.MULTILINE
-    )
+    bad_pattern = re.compile(r'\.get\(\s*"(?:ANTHROPIC_API_KEY|GOOGLE_API_KEY)"', re.MULTILINE)
     assert not bad_pattern.search(text), (
         "B-4 strict: API keys must use os.environ[KEY] (no .get() fallback)"
     )

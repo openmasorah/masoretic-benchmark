@@ -25,10 +25,10 @@ Run-on text rejected. bbox preserves PAGE-XML coordinates.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Iterator
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Iterator
 
 from baselines._errors import BaselineError, ScopeViolation
 
@@ -83,11 +83,9 @@ class BaselineBase(ABC):
         self.manifest = Manifest.load(manifest_path)
         self.results_root = Path(results_root)
         self.replay = replay
-        self._started_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        self._started_at = datetime.now(UTC).isoformat(timespec="seconds")
         if not self.BASELINE_ID:
-            raise BaselineError(
-                f"{type(self).__name__}: subclass must set BASELINE_ID"
-            )
+            raise BaselineError(f"{type(self).__name__}: subclass must set BASELINE_ID")
 
     # -- LOCKED template-method ------------------------------------------------
     def run(self, *, folio_ids: list[str] | None = None) -> int:
@@ -145,9 +143,7 @@ class BaselineBase(ABC):
         if folio_ids:
             bad = [fid for fid in folio_ids if fid not in leningrad_ids]
             if bad:
-                raise ScopeViolation(
-                    f"BL-08: folio(s) outside Leningrad scope: {bad!r}"
-                )
+                raise ScopeViolation(f"BL-08: folio(s) outside Leningrad scope: {bad!r}")
 
     def _scope_check(self, folio) -> None:
         """D-13b: per-folio re-check. Catches manifest mutation between
@@ -160,8 +156,7 @@ class BaselineBase(ABC):
             )
         if not folio.in_frozen_scope:
             raise ScopeViolation(
-                f"BL-08: per-folio re-check failed: folio={folio.id} "
-                f"not in frozen scope"
+                f"BL-08: per-folio re-check failed: folio={folio.id} not in frozen scope"
             )
 
     # -- iteration ------------------------------------------------------------
@@ -177,7 +172,8 @@ class BaselineBase(ABC):
         # Snapshot the id list at the start; iterate fresh-resolved entries
         # against the (possibly mutated) manifest on each pass.
         initial_ids = [
-            f.id for f in self.manifest.frozen_leningrad_folios()
+            f.id
+            for f in self.manifest.frozen_leningrad_folios()
             if wanted is None or f.id in wanted
         ]
         for fid in initial_ids:
@@ -197,8 +193,7 @@ class BaselineBase(ABC):
         # If the folio disappeared entirely from manifest.folios mid-run,
         # treat as a scope violation (manifest tampering case).
         raise ScopeViolation(
-            f"BL-08: per-folio re-check failed: folio={folio_id} "
-            f"vanished from manifest mid-run"
+            f"BL-08: per-folio re-check failed: folio={folio_id} vanished from manifest mid-run"
         )
 
     # -- serialization (subclass MAY override _serialize / _compose_run_meta) -
@@ -222,11 +217,7 @@ class BaselineBase(ABC):
                         if ln.kraken_confidence is not None
                         else {}
                     ),
-                    **(
-                        {"llm_winner": ln.llm_winner}
-                        if ln.llm_winner is not None
-                        else {}
-                    ),
+                    **({"llm_winner": ln.llm_winner} if ln.llm_winner is not None else {}),
                     **(
                         {"llm_tie_breaks": ln.llm_tie_breaks}
                         if ln.llm_tie_breaks is not None
@@ -260,10 +251,8 @@ class BaselineBase(ABC):
             "manifest_hash": getattr(self.manifest, "manifest_hash", None),
             "scorer_version": getattr(self.manifest, "scorer_version", None),
             "started_at_iso": getattr(self, "_started_at", None)
-            or datetime.now(timezone.utc).isoformat(timespec="seconds"),
-            "completed_at_iso": datetime.now(timezone.utc).isoformat(
-                timespec="seconds"
-            ),
+            or datetime.now(UTC).isoformat(timespec="seconds"),
+            "completed_at_iso": datetime.now(UTC).isoformat(timespec="seconds"),
             "hostname": socket.gethostname(),
             "sibling_git_sha": None,
             "replay_mode": self.replay,

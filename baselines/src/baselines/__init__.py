@@ -12,6 +12,7 @@ from baselines._errors import (  # noqa: F401
     ScopeViolation,
 )
 
+
 # BaselineBase is re-exported lazily to avoid importing the masoretic_eval
 # manifest module at package-import time; some downstream tests construct
 # fake manifests without installing masoretic-eval.

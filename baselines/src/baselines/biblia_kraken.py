@@ -30,7 +30,7 @@ from __future__ import annotations
 
 import socket
 import subprocess
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from baselines._base import BaselineBase, LineRecord
@@ -87,9 +87,7 @@ class BibliaKrakenBaseline(BaselineBase):
             "budget_used": None,
             "replay_used": None,
             "line_count": len(lines),
-            "scope_check_passed_at_iso": datetime.now(timezone.utc).isoformat(
-                timespec="seconds"
-            ),
+            "scope_check_passed_at_iso": datetime.now(UTC).isoformat(timespec="seconds"),
         }
         return lines
 

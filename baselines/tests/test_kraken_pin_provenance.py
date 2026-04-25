@@ -63,9 +63,7 @@ def test_cached_mlmodel_matches_pin():
             h.update(chunk)
     actual = h.hexdigest()
     expected = _latest_row_sha256()
-    assert actual == expected, (
-        f"local model sha256 {actual!r} != pin row {expected!r}"
-    )
+    assert actual == expected, f"local model sha256 {actual!r} != pin row {expected!r}"
 
 
 @pytest.mark.skipif(
@@ -78,6 +76,6 @@ def test_module_hash_constant_matches_pin():
     from baselines._kraken import KRAKEN_MODEL_HASH
 
     sha = _latest_row_sha256()
-    seed = f"kraken=={KRAKEN_VERSION}:{sha}".encode("utf-8")
+    seed = f"kraken=={KRAKEN_VERSION}:{sha}".encode()
     expected = hashlib.sha256(seed).hexdigest()[:16]
     assert KRAKEN_MODEL_HASH == expected

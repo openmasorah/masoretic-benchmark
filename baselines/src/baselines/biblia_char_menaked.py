@@ -36,8 +36,6 @@ infer_folio + diagnostic-write + run_meta extension shared with BL-03.
 
 from __future__ import annotations
 
-from baselines._chain import ChainBaseline
-
 # IMPORTANT (D-26 + A-3): direct import of diacritize ONLY.
 # This file deliberately contains NO references to either of the two
 # forbidden symbols enumerated in the module docstring above. A grep-based
@@ -46,8 +44,12 @@ from baselines._chain import ChainBaseline
 # test_baseline_unit_char_menaked_chain.py + the plan acceptance criteria.
 from oracles.dictabert import (
     MODEL_REVISION as DICTABERT_REVISION,
+)
+from oracles.dictabert import (
     diacritize as dictabert_diacritize,
 )
+
+from baselines._chain import ChainBaseline
 
 
 class BibliaCharMenakedBaseline(ChainBaseline):
