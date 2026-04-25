@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "masoretic-oracles"
+version = "0.1.0"
+description = "Hebrew diacritization oracles for the Masoretic benchmark scorer (Nakdimon OSS, DICTA Nakdan, DictaBERT off-label)."
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+dependencies = [
+    "masoretic-eval>=0.1.0,<0.2",
+    "requests>=2.31",
+    "tenacity>=8.0",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+nakdimon = ["nakdimon==0.1.2"]
+dictabert = ["transformers>=4.44,<6", "torch>=2.2,<3", "safetensors>=0.4"]
+dicta = []  # core deps already cover requests + tenacity
+all = [
+    "nakdimon==0.1.2",
+    "transformers>=4.44,<6",
+    "torch>=2.2,<3",
+    "safetensors>=0.4",
+]
+dev = ["pytest>=8.0", "pytest-mock>=3.12"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
