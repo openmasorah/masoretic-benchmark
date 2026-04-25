@@ -7,6 +7,8 @@ here with date + reason (D-03 / Phase 2 D-09 carry-forward). Newest first.
 |---|---|---|---|---|
 | 2026-04-25 | 10.5281/zenodo.5468286 | 7.0.1 | bb48c481d8c46b41465920482e253dc990163405c584d24700cfb0d9b4ca9147 | Initial pin (Phase 3 BL-02 launch). |
 
+- 2026-04-25 — Network re-verified: Zenodo download sha256 matches pin. Verified by: housekeeping pass (Tier 1 #3).
+
 ## Derived kraken_model_hash
 
 `oracles._hashing`-style derivation for the 2026-04-25 row:
