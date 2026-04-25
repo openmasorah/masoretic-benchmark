@@ -36,4 +36,5 @@ where = ["src"]
 [tool.pytest.ini_options]
 markers = [
     "live_baselines: real network/model calls; gated by RUN_LIVE_BASELINES=1 env var",
+    "live_kraken: real Kraken model + archive.org image fetch (BL-02); sub-marker of live_baselines",
 ]
