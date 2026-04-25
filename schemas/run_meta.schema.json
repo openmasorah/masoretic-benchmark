@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:masoretic:run_meta.schema:v0.1.0",
+  "title": "run_meta.json",
+  "description": "One run_meta.json per baseline run (D-18). Per-folio data nested under .folios. Required-field set per D-19 (revised per A-2). Top-level pins/budget/combine objects are required; their inner fields are required keys but values may be null when not applicable to the baseline (e.g. BL-02/03/04 emit null inside budget/combine; BL-01 populates them).",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "baseline_id",
+    "manifest_hash",
+    "scorer_version",
+    "started_at_iso",
+    "completed_at_iso",
+    "hostname",
+    "sibling_git_sha",
+    "replay_mode",
+    "pins",
+    "budget",
+    "combine",
+    "folios"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.1.0"
+    },
+    "baseline_id": {
+      "type": "string",
+      "enum": [
+        "llm_vision",
+        "biblia_kraken",
+        "biblia_nakdimon",
+        "biblia_char_menaked"
+      ]
+    },
+    "manifest_hash": {
+      "type": ["string", "null"]
+    },
+    "scorer_version": {
+      "type": ["string", "null"]
+    },
+    "started_at_iso": {
+      "type": "string",
+      "minLength": 1
+    },
+    "completed_at_iso": {
+      "type": "string",
+      "minLength": 1
+    },
+    "hostname": {
+      "type": ["string", "null"]
+    },
+    "sibling_git_sha": {
+      "type": ["string", "null"]
+    },
+    "replay_mode": {
+      "type": "boolean"
+    },
+    "pins": {
+      "type": "object",
+      "required": [
+        "kraken_model_hash",
+        "nakdimon_model_hash",
+        "dictabert_model_revision",
+        "llm_pin_md_hash"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kraken_model_hash": {
+          "type": ["string", "null"]
+        },
+        "nakdimon_model_hash": {
+          "type": ["string", "null"]
+        },
+        "dictabert_model_revision": {
+          "type": ["string", "null"]
+        },
+        "llm_pin_md_hash": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "required": [
+        "cap_per_folio",
+        "cap_run",
+        "used_total",
+        "rate_table_snapshot"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "cap_per_folio": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "cap_run": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "used_total": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "rate_table_snapshot": {
+          "type": ["object", "null"]
+        }
+      }
+    },
+    "combine": {
+      "type": "object",
+      "required": ["tie_break_total", "tie_break_winners"],
+      "additionalProperties": false,
+      "properties": {
+        "tie_break_total": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "tie_break_winners": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "required": ["claude", "gemini"],
+              "additionalProperties": false,
+              "properties": {
+                "claude": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "gemini": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "folios": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "budget_used",
+          "replay_used",
+          "line_count",
+          "scope_check_passed_at_iso"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "budget_used": {
+            "type": ["number", "null"],
+            "minimum": 0
+          },
+          "replay_used": {
+            "type": ["boolean", "null"]
+          },
+          "line_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "scope_check_passed_at_iso": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

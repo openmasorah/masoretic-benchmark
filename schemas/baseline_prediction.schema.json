@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:masoretic:baseline_prediction.schema:v0.1.0",
+  "title": "baseline_prediction.json",
+  "description": "Per-folio prediction emitted by Phase 3 baselines (BL-01..BL-04). Validated by SandboxRun.write_prediction at write time and by the masoretic_eval CLI at score time. Shape per D-17 (revised per A-2: AbbyyFR dropped). Per-line records preserve Phase 1 D-30/D-31 line semantics. Optional provenance fields are populated per baseline: kraken_confidence on BL-02/03/04; llm_winner + llm_tie_breaks on BL-01.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "baseline_id",
+    "folio_id",
+    "manifest_hash",
+    "run_meta_ref",
+    "lines"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.1.0"
+    },
+    "baseline_id": {
+      "type": "string",
+      "enum": [
+        "llm_vision",
+        "biblia_kraken",
+        "biblia_nakdimon",
+        "biblia_char_menaked"
+      ]
+    },
+    "folio_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "manifest_hash": {
+      "type": ["string", "null"]
+    },
+    "run_meta_ref": {
+      "type": "string",
+      "const": "run_meta.json"
+    },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "line_id",
+          "bbox",
+          "tier1",
+          "tier2",
+          "tier3",
+          "tier4_records"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "line_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "bbox": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "tier1": {
+            "type": "string"
+          },
+          "tier2": {
+            "type": "string"
+          },
+          "tier3": {
+            "type": "string"
+          },
+          "tier4_records": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["type", "verse_ref", "ordinal"],
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "LARGE",
+                    "SMALL",
+                    "PE",
+                    "SAMEKH",
+                    "INV_NUN",
+                    "PUNCTA",
+                    "SUSPENDED"
+                  ]
+                },
+                "verse_ref": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "ordinal": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          },
+          "kraken_confidence": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0
+          },
+          "llm_winner": {
+            "type": "string",
+            "enum": ["claude", "gemini"]
+          },
+          "llm_tie_breaks": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  }
+}
