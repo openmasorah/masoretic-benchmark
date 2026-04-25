@@ -15,6 +15,7 @@ the production gate AND the self-test invoke the SAME function — a
 regression in the scan logic surfaces as the self-test failing, not as
 silent under-detection in production.
 """
+
 from __future__ import annotations
 
 import json
@@ -66,7 +67,7 @@ def _scan_for_contamination(scan_roots: list[Path]) -> list[tuple[str, str, str]
         if rp in seen:
             continue
         seen.add(rp)
-        with open(log_path, "r", encoding="utf-8") as f:
+        with open(log_path, encoding="utf-8") as f:
             for i, line in enumerate(f, start=1):
                 line = line.strip()
                 if not line:
@@ -83,10 +84,9 @@ def test_no_uxlc_fragment_in_any_prompt():
     """Production gate: scan REPO_ROOT — fail on any UXLC fragment in any prompt."""
     offenders = _scan_for_contamination([REPO_ROOT])
     assert not offenders, (
-        f"D-05 contamination boundary breached: UXLC fragments found in LLM prompts:\n"
+        "D-05 contamination boundary breached: UXLC fragments found in LLM prompts:\n"
         + "\n".join(
-            f"  fragment={f!r} location={loc} prompt_preview={p!r}..."
-            for f, loc, p in offenders
+            f"  fragment={f!r} location={loc} prompt_preview={p!r}..." for f, loc, p in offenders
         )
     )
 
@@ -128,9 +128,7 @@ def test_uxlc_fragments_fixture_has_canonical_shape():
     payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
     assert "fragments" in payload, "fixture missing 'fragments' key"
     fragments = payload["fragments"]
-    assert isinstance(fragments, list) and fragments, (
-        "fragments must be a non-empty list"
-    )
+    assert isinstance(fragments, list) and fragments, "fragments must be a non-empty list"
     for frag in fragments:
         assert isinstance(frag, str) and frag.strip(), (
             f"fragment must be non-empty string; got {frag!r}"

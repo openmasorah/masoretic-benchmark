@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import json
 import os
+from datetime import UTC
 from pathlib import Path
 
 import pytest
@@ -52,17 +53,15 @@ def test_live_kraken_shema_fixture_emits_schema_valid_prediction(tmp_path):
     real archive.org image fetch. The emitted prediction is validated by
     SandboxRun.write_prediction at write time (jsonschema), so the test
     only needs to assert success + spot-check the on-disk artifact."""
-    from baselines.biblia_kraken import BibliaKrakenBaseline
     from baselines._kraken import KRAKEN_MODEL_HASH
-    from tests._fake_manifest import FakeFolio, FakeManifest
+    from baselines.biblia_kraken import BibliaKrakenBaseline
+
+    from tests._fake_manifest import FakeManifest
 
     fid = "leningrad_devarim_shema_fixture"
-    image_url = (
-        "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F195A.jpg"
-    )
-    folio = FakeFolio(id=fid)
-    # FakeFolio doesn't carry an image_url field; attach via setattr because
-    # FakeFolio is frozen=True we can't, so use a small concrete subclass.
+    image_url = "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F195A.jpg"
+    # FakeFolio doesn't carry an image_url field; FakeFolio is frozen=True so
+    # setattr won't work — use a small concrete subclass below instead.
     from dataclasses import dataclass
 
     @dataclass(frozen=True)
@@ -83,8 +82,9 @@ def test_live_kraken_shema_fixture_emits_schema_valid_prediction(tmp_path):
     bl.replay = False
     bl.model_path = MODEL_PATH
     bl.image_cache = REPO_ROOT / "baselines" / ".cache" / "images"
-    from datetime import datetime, timezone
-    bl._started_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    from datetime import datetime
+
+    bl._started_at = datetime.now(UTC).isoformat(timespec="seconds")
     bl._folio_meta = {}
 
     rc = bl.run()

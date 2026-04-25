@@ -25,12 +25,13 @@ Coverage:
 from __future__ import annotations
 
 import json
+from datetime import UTC
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
-
 from baselines._base import LineRecord
+
 from tests._fake_manifest import FakeFolio, FakeManifest
 
 
@@ -45,8 +46,9 @@ def _ctor(tmp_path: Path, manifest: FakeManifest):
     # Defaults the production __init__ would set:
     bl.model_path = tmp_path / "fake.mlmodel"
     bl.image_cache = tmp_path / "image-cache"
-    from datetime import datetime, timezone
-    bl._started_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    from datetime import datetime
+
+    bl._started_at = datetime.now(UTC).isoformat(timespec="seconds")
     bl._folio_meta = {}
     return bl
 
@@ -81,9 +83,11 @@ def test_kraken_run_writes_valid_prediction_and_run_meta(tmp_path, monkeypatch):
     fake_lines = _fake_lines(fid, n=2)
     fake_image_path = tmp_path / "image-cache" / f"{fid}.jpg"
 
-    with patch("baselines.biblia_kraken.recognize_lines", return_value=fake_lines), \
-         patch("baselines.biblia_kraken.fetch_image", return_value=fake_image_path), \
-         patch("baselines.biblia_kraken.image_sha256", return_value="abc123"):
+    with (
+        patch("baselines.biblia_kraken.recognize_lines", return_value=fake_lines),
+        patch("baselines.biblia_kraken.fetch_image", return_value=fake_image_path),
+        patch("baselines.biblia_kraken.image_sha256", return_value="abc123"),
+    ):
         bl = _ctor(tmp_path, manifest)
         rc = bl.run()
 
@@ -102,6 +106,7 @@ def test_kraken_run_writes_valid_prediction_and_run_meta(tmp_path, monkeypatch):
 
     meta = json.loads(meta_path.read_text())
     from baselines._kraken import KRAKEN_MODEL_HASH
+
     assert meta["pins"]["kraken_model_hash"] == KRAKEN_MODEL_HASH
     # D-19 required keys
     assert meta["baseline_id"] == "biblia_kraken"
@@ -131,9 +136,11 @@ def test_kraken_d15_off_by_one_prevents_promote(tmp_path):
     fake_lines = _fake_lines(fid)
     fake_image_path = tmp_path / "image-cache" / f"{fid}.jpg"
 
-    with patch("baselines.biblia_kraken.recognize_lines", return_value=fake_lines), \
-         patch("baselines.biblia_kraken.fetch_image", return_value=fake_image_path), \
-         patch("baselines.biblia_kraken.image_sha256", return_value="abc"):
+    with (
+        patch("baselines.biblia_kraken.recognize_lines", return_value=fake_lines),
+        patch("baselines.biblia_kraken.fetch_image", return_value=fake_image_path),
+        patch("baselines.biblia_kraken.image_sha256", return_value="abc"),
+    ):
         bl = _ctor(tmp_path, manifest)
         with pytest.raises(BaselineError, match=r"D-15.*mismatch"):
             bl.run()
@@ -162,9 +169,11 @@ def test_kraken_d13a_scope_violation_fires_before_model_load(tmp_path):
         expected_reports_per_baseline={"biblia_kraken": 1},
     )
 
-    with patch("baselines.biblia_kraken.recognize_lines") as m_rec, \
-         patch("baselines.biblia_kraken.fetch_image") as m_fetch, \
-         patch("baselines._kraken._load_model") as m_load:
+    with (
+        patch("baselines.biblia_kraken.recognize_lines") as m_rec,
+        patch("baselines.biblia_kraken.fetch_image") as m_fetch,
+        patch("baselines._kraken._load_model") as m_load,
+    ):
         bl = _ctor(tmp_path, manifest)
         with pytest.raises(ScopeViolation, match="BL-08"):
             bl.run(folio_ids=["non_existent_folio"])
@@ -196,9 +205,11 @@ def test_kraken_d04_inference_failure_leaves_sandbox(tmp_path):
 
     fake_image_path = tmp_path / "image-cache" / f"{fid}.jpg"
 
-    with patch("baselines.biblia_kraken.recognize_lines", side_effect=boom), \
-         patch("baselines.biblia_kraken.fetch_image", return_value=fake_image_path), \
-         patch("baselines.biblia_kraken.image_sha256", return_value="abc"):
+    with (
+        patch("baselines.biblia_kraken.recognize_lines", side_effect=boom),
+        patch("baselines.biblia_kraken.fetch_image", return_value=fake_image_path),
+        patch("baselines.biblia_kraken.image_sha256", return_value="abc"),
+    ):
         bl = _ctor(tmp_path, manifest)
         with pytest.raises(KrakenInferenceFailure, match="D-04"):
             bl.run()
@@ -243,15 +254,15 @@ def test_kraken_confidence_flows_into_prediction_lines(tmp_path):
     ]
     fake_image_path = tmp_path / "image-cache" / f"{fid}.jpg"
 
-    with patch("baselines.biblia_kraken.recognize_lines", return_value=fake_lines), \
-         patch("baselines.biblia_kraken.fetch_image", return_value=fake_image_path), \
-         patch("baselines.biblia_kraken.image_sha256", return_value="abc"):
+    with (
+        patch("baselines.biblia_kraken.recognize_lines", return_value=fake_lines),
+        patch("baselines.biblia_kraken.fetch_image", return_value=fake_image_path),
+        patch("baselines.biblia_kraken.image_sha256", return_value="abc"),
+    ):
         bl = _ctor(tmp_path, manifest)
         bl.run()
 
-    pred = json.loads(
-        (tmp_path / "biblia_kraken" / f"{fid}.json").read_text()
-    )
+    pred = json.loads((tmp_path / "biblia_kraken" / f"{fid}.json").read_text())
     confs = [ln["kraken_confidence"] for ln in pred["lines"]]
     assert confs == [0.5, 0.99]
 

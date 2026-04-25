@@ -5,6 +5,7 @@ canonical valid payloads while rejecting D-17 shape violations.
 
 Pairs with test_run_meta_schema.py and test_schema_module.py.
 """
+
 from __future__ import annotations
 
 import json
@@ -14,14 +15,13 @@ from pathlib import Path
 import jsonschema
 import pytest
 
-
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PREDICTION_SCHEMA_PATH = REPO_ROOT / "schemas" / "baseline_prediction.schema.json"
 
 
 @pytest.fixture(scope="module")
 def prediction_schema() -> dict:
-    with open(PREDICTION_SCHEMA_PATH, "r", encoding="utf-8") as f:
+    with open(PREDICTION_SCHEMA_PATH, encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -58,10 +58,7 @@ def test_schema_parses_as_draft202012(prediction_schema):
 
 
 def test_schema_id_is_v010(prediction_schema):
-    assert (
-        prediction_schema["$id"]
-        == "urn:masoretic:baseline_prediction.schema:v0.1.0"
-    )
+    assert prediction_schema["$id"] == "urn:masoretic:baseline_prediction.schema:v0.1.0"
 
 
 def test_valid_payload_passes(prediction_validator, valid_prediction):
@@ -88,10 +85,7 @@ def test_kraken_confidence_capped_at_1(prediction_validator, valid_prediction):
     payload["lines"][0]["kraken_confidence"] = 1.5
     with pytest.raises(jsonschema.ValidationError) as exc:
         prediction_validator.validate(payload)
-    assert (
-        exc.value.validator == "maximum"
-        or "kraken_confidence" in str(exc.value)
-    )
+    assert exc.value.validator == "maximum" or "kraken_confidence" in str(exc.value)
 
 
 def test_kraken_confidence_negative_rejected(prediction_validator, valid_prediction):

@@ -11,9 +11,9 @@ Plan 03-02 Task 2 behavior tests 1 + 2:
 from __future__ import annotations
 
 import pytest
-
 from baselines._base import BaselineBase, LineRecord
 from baselines._errors import ScopeViolation
+
 from tests._fake_manifest import FakeFolio, FakeManifest
 
 
@@ -71,9 +71,12 @@ def test_d13a_preflight_rejects_non_leningrad_folio_id(tmp_path):
 
     assert bl.calls == [], "infer_folio must NOT have been called"
     # Sandbox should be empty (preflight fails before sandbox enter)
-    assert not (tmp_path / ".in_progress").exists() or not any(
-        (tmp_path / ".in_progress" / "biblia_kraken").iterdir()
-    ) if (tmp_path / ".in_progress" / "biblia_kraken").exists() else True
+    assert (
+        not (tmp_path / ".in_progress").exists()
+        or not any((tmp_path / ".in_progress" / "biblia_kraken").iterdir())
+        if (tmp_path / ".in_progress" / "biblia_kraken").exists()
+        else True
+    )
 
 
 def test_d13a_preflight_accepts_in_scope_folio_id(tmp_path):
@@ -101,7 +104,6 @@ def test_d13b_per_folio_recheck_catches_manuscript_mutation(tmp_path):
         folios=[FakeFolio(id=fid_ok), FakeFolio(id=fid_bad, manuscript="leningrad")],
         expected_reports_per_baseline={"biblia_kraken": 2},
     )
-    bl = _ctor(tmp_path, manifest)
 
     # Subclass that mutates the manifest mid-run between two folios
     class MutatingBaseline(_SpyBaseline):
@@ -158,12 +160,8 @@ def test_d13b_per_folio_recheck_catches_in_frozen_scope_flip(tmp_path):
     # frozen_leningrad_folios filters it out, so we put a SECOND
     # in-scope folio first to ensure the loop runs.)
     fid2 = "second_leningrad_folio"
-    manifest.folios.insert(
-        0, FakeFolio(id=fid2, manuscript="leningrad", in_frozen_scope=True)
-    )
+    manifest.folios.insert(0, FakeFolio(id=fid2, manuscript="leningrad", in_frozen_scope=True))
     manifest.expected_reports_per_baseline["biblia_kraken"] = 2
-
-    bl = _ctor(tmp_path, manifest)
 
     # Now flip the second folio's in_frozen_scope to False; iter_folios
     # filters it out via frozen_leningrad_folios, so it is never iterated.

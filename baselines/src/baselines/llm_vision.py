@@ -40,7 +40,7 @@ import base64
 import hashlib
 import socket
 import subprocess
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from baselines._base import BaselineBase, LineRecord
@@ -124,15 +124,9 @@ class LLMVisionBaseline(BaselineBase):
         # image_sha256 surfaces drift in live runs; not currently emitted to
         # the schema (run_meta.folios per-entry is additionalProperties=false).
         _ = image_sha256(image_path)
-        kraken_lines = recognize_lines(
-            image_path, self.kraken_model_path, folio_id=folio.id
-        )
+        kraken_lines = recognize_lines(image_path, self.kraken_model_path, folio_id=folio.id)
         replay_log = (
-            self.results_root
-            / ".in_progress"
-            / "llm_vision"
-            / folio.id
-            / "llm_calls.jsonl"
+            self.results_root / ".in_progress" / "llm_vision" / folio.id / "llm_calls.jsonl"
         )
 
         out: list[LineRecord] = []
@@ -166,12 +160,10 @@ class LLMVisionBaseline(BaselineBase):
             self._winners[winner] += 1
 
         self._folio_meta[folio.id] = {
-            "budget_used":               round(folio_used_usd, 6),
-            "replay_used":               self.replay,
-            "line_count":                len(out),
-            "scope_check_passed_at_iso": datetime.now(timezone.utc).isoformat(
-                timespec="seconds"
-            ),
+            "budget_used": round(folio_used_usd, 6),
+            "replay_used": self.replay,
+            "line_count": len(out),
+            "scope_check_passed_at_iso": datetime.now(UTC).isoformat(timespec="seconds"),
         }
         return out
 
@@ -206,8 +198,7 @@ class LLMVisionBaseline(BaselineBase):
         out_t = float(tc.get("output", 0))
         rates = RATE_TABLE[source]
         return (
-            in_t * rates["input_per_mtok_usd"]
-            + out_t * rates["output_per_mtok_usd"]
+            in_t * rates["input_per_mtok_usd"] + out_t * rates["output_per_mtok_usd"]
         ) / 1_000_000
 
     # -- per-provider call wrappers -----------------------------------------
@@ -216,11 +207,11 @@ class LLMVisionBaseline(BaselineBase):
         with open(crop_path, "rb") as f:
             b64 = base64.b64encode(f.read()).decode("ascii")
         request = {
-            "model":            ANTHROPIC_MODEL_ID,
-            "max_tokens":       INFERENCE_CFG["max_output_tokens"],
-            "temperature":      INFERENCE_CFG["temperature"],
-            "image_bytes_ref":  f"sha256:{crop_sha}",  # D-10: NEVER inline raw bytes
-            "prompt":           PROMPT_TEXT,
+            "model": ANTHROPIC_MODEL_ID,
+            "max_tokens": INFERENCE_CFG["max_output_tokens"],
+            "temperature": INFERENCE_CFG["temperature"],
+            "image_bytes_ref": f"sha256:{crop_sha}",  # D-10: NEVER inline raw bytes
+            "prompt": PROMPT_TEXT,
         }
 
         def _client_fn(**req):
@@ -250,11 +241,9 @@ class LLMVisionBaseline(BaselineBase):
             return {
                 "response": raw.content[0].text if raw.content else "",
                 "response_id": getattr(raw, "id", None),
-                "model_version_returned": getattr(
-                    raw, "model", ANTHROPIC_MODEL_ID
-                ),
+                "model_version_returned": getattr(raw, "model", ANTHROPIC_MODEL_ID),
                 "token_counts": {
-                    "input":  raw.usage.input_tokens,
+                    "input": raw.usage.input_tokens,
                     "output": raw.usage.output_tokens,
                 },
                 "finish_reason": getattr(raw, "stop_reason", None),
@@ -273,12 +262,12 @@ class LLMVisionBaseline(BaselineBase):
         with open(crop_path, "rb") as f:
             image_bytes = f.read()
         request = {
-            "model":             GEMINI_MODEL_ID,
+            "model": GEMINI_MODEL_ID,
             "max_output_tokens": INFERENCE_CFG["max_output_tokens"],
-            "temperature":       INFERENCE_CFG["temperature"],
-            "seed":              INFERENCE_CFG["seed"],
-            "image_bytes_ref":   f"sha256:{crop_sha}",  # D-10: NEVER inline raw bytes
-            "prompt":            PROMPT_TEXT,
+            "temperature": INFERENCE_CFG["temperature"],
+            "seed": INFERENCE_CFG["seed"],
+            "image_bytes_ref": f"sha256:{crop_sha}",  # D-10: NEVER inline raw bytes
+            "prompt": PROMPT_TEXT,
         }
 
         def _client_fn(**req):
@@ -300,13 +289,11 @@ class LLMVisionBaseline(BaselineBase):
         def _extract(raw):
             u = getattr(raw, "usage_metadata", None)
             return {
-                "response":      raw.text or "",
-                "response_id":   getattr(raw, "response_id", None),
-                "model_version_returned": getattr(
-                    raw, "model_version", GEMINI_MODEL_ID
-                ),
-                "token_counts":  {
-                    "input":  getattr(u, "prompt_token_count", 0) if u else 0,
+                "response": raw.text or "",
+                "response_id": getattr(raw, "response_id", None),
+                "model_version_returned": getattr(raw, "model_version", GEMINI_MODEL_ID),
+                "token_counts": {
+                    "input": getattr(u, "prompt_token_count", 0) if u else 0,
                     "output": getattr(u, "candidates_token_count", 0) if u else 0,
                 },
                 "finish_reason": str(getattr(raw, "finish_reason", None)),
@@ -327,8 +314,8 @@ class LLMVisionBaseline(BaselineBase):
         base["hostname"] = socket.gethostname()
         base["sibling_git_sha"] = self._read_git_sha()
         base["pins"] = {
-            "kraken_model_hash":        KRAKEN_MODEL_HASH,  # shared segmentation
-            "nakdimon_model_hash":      None,
+            "kraken_model_hash": KRAKEN_MODEL_HASH,  # shared segmentation
+            "nakdimon_model_hash": None,
             "dictabert_model_revision": None,
             "llm_pin_md_hash": (
                 hashlib.sha256(LLM_PIN_MD.read_bytes()).hexdigest()[:16]
@@ -337,13 +324,13 @@ class LLMVisionBaseline(BaselineBase):
             ),
         }
         base["budget"] = {
-            "cap_per_folio":       BUDGET_CFG["cap_per_folio_usd"],
-            "cap_run":             BUDGET_CFG["cap_run_usd"],
-            "used_total":          round(self._used_total_usd, 6),
+            "cap_per_folio": BUDGET_CFG["cap_per_folio_usd"],
+            "cap_run": BUDGET_CFG["cap_run_usd"],
+            "used_total": round(self._used_total_usd, 6),
             "rate_table_snapshot": RATE_TABLE,
         }
         base["combine"] = {
-            "tie_break_total":   self._tie_breaks_total,
+            "tie_break_total": self._tie_breaks_total,
             "tie_break_winners": dict(self._winners),
         }
         base["folios"] = self._folio_meta

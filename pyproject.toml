@@ -41,7 +41,14 @@ target-version = "py311"
 select = ["E", "F", "I", "W", "B", "UP"]
 
 [tool.ruff.lint.per-file-ignores]
+# D-27 verbatim disclaimer — must match character-for-character across:
+#   oracles/src/oracles/dictabert.py
+#   oracles/README.md
+#   baselines/src/baselines/biblia_char_menaked.py
+#   baselines/README.md
+# Wrapping the disclaimer would break the D-27 invariant test.
 "oracles/src/oracles/dictabert.py" = ["E501"]
+"baselines/src/baselines/biblia_char_menaked.py" = ["E501"]
 
 [tool.mypy]
 python_version = "3.11"

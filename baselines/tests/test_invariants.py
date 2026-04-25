@@ -25,8 +25,6 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-import pytest
-
 # .../baselines/tests/test_invariants.py
 #   parents[0] = baselines/tests/
 #   parents[1] = baselines/
@@ -53,9 +51,7 @@ def _baseline_subclass_classes() -> list[tuple[Path, ast.ClassDef]]:
         tree = ast.parse(py.read_text(encoding="utf-8"))
         for node in ast.walk(tree):
             if isinstance(node, ast.ClassDef):
-                base_names = {
-                    b.id for b in node.bases if isinstance(b, ast.Name)
-                }
+                base_names = {b.id for b in node.bases if isinstance(b, ast.Name)}
                 # Also catch dotted bases (e.g., baselines._base.BaselineBase)
                 for b in node.bases:
                     if isinstance(b, ast.Attribute) and b.attr in (
@@ -80,9 +76,7 @@ def test_no_subclass_overrides_run():
     for path, cls in _baseline_subclass_classes():
         for child in cls.body:
             if isinstance(child, ast.FunctionDef) and child.name == "run":
-                offenders.append(
-                    f"{path.name}::{cls.name}.run (line {child.lineno})"
-                )
+                offenders.append(f"{path.name}::{cls.name}.run (line {child.lineno})")
     assert not offenders, (
         "BaselineBase.run() is locked (D-12). The following subclasses "
         "illegally override run():\n  " + "\n  ".join(offenders)
@@ -100,10 +94,7 @@ def test_every_concrete_subclass_sets_BASELINE_ID():
                     if isinstance(tgt, ast.Name) and tgt.id == "BASELINE_ID":
                         has = True
             elif isinstance(child, ast.AnnAssign):
-                if (
-                    isinstance(child.target, ast.Name)
-                    and child.target.id == "BASELINE_ID"
-                ):
+                if isinstance(child.target, ast.Name) and child.target.id == "BASELINE_ID":
                     has = True
         if not has:
             missing.append(f"{path.name}::{cls.name}")
@@ -180,12 +171,9 @@ def test_violator_run_override_would_be_detected():
     assert len(classes) == 1
     cls = classes[0]
     has_run_override = any(
-        isinstance(child, ast.FunctionDef) and child.name == "run"
-        for child in cls.body
+        isinstance(child, ast.FunctionDef) and child.name == "run" for child in cls.body
     )
-    assert has_run_override, (
-        "Synthetic violator must declare def run; sanity check failed"
-    )
+    assert has_run_override, "Synthetic violator must declare def run; sanity check failed"
 
 
 def test_violator_missing_baseline_id_would_be_detected():
@@ -200,11 +188,6 @@ def test_violator_missing_baseline_id_would_be_detected():
                 if isinstance(tgt, ast.Name) and tgt.id == "BASELINE_ID":
                     has_baseline_id = True
         elif isinstance(child, ast.AnnAssign):
-            if (
-                isinstance(child.target, ast.Name)
-                and child.target.id == "BASELINE_ID"
-            ):
+            if isinstance(child.target, ast.Name) and child.target.id == "BASELINE_ID":
                 has_baseline_id = True
-    assert not has_baseline_id, (
-        "Synthetic violator must omit BASELINE_ID; sanity check failed"
-    )
+    assert not has_baseline_id, "Synthetic violator must omit BASELINE_ID; sanity check failed"

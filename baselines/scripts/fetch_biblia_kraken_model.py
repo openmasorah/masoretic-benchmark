@@ -55,7 +55,7 @@ def _sha256_file(path: Path) -> str:
 
 def compute_kraken_model_hash(version: str, mlmodel_sha256: str) -> str:
     """Mirror oracles._hashing.compute_nakdimon_model_hash shape."""
-    seed = f"kraken=={version}:{mlmodel_sha256}".encode("utf-8")
+    seed = f"kraken=={version}:{mlmodel_sha256}".encode()
     return hashlib.sha256(seed).hexdigest()[:16]
 
 
@@ -99,8 +99,7 @@ def main() -> int:
             )
             return 2
         print(
-            f"BiblIA_01.mlmodel already cached at {MODEL_PATH} "
-            f"(skip download).",
+            f"BiblIA_01.mlmodel already cached at {MODEL_PATH} (skip download).",
             file=sys.stderr,
         )
     else:

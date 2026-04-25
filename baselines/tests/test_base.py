@@ -14,9 +14,9 @@ import inspect
 from abc import ABC
 
 import pytest
-
 from baselines._base import BaselineBase, LineRecord
 from baselines._errors import BaselineError
+
 from tests._fake_manifest import FakeFolio, FakeManifest
 
 

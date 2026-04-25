@@ -56,8 +56,7 @@ def _read_pin_sha256() -> str:
     sha = cols[3]
     if not re.fullmatch(r"[0-9a-f]{64}", sha):
         raise RuntimeError(
-            f"KRAKEN_PIN.md latest row sha256 malformed: {sha!r} "
-            "(placeholder not replaced?)"
+            f"KRAKEN_PIN.md latest row sha256 malformed: {sha!r} (placeholder not replaced?)"
         )
     return sha
 
@@ -65,7 +64,7 @@ def _read_pin_sha256() -> str:
 def _derive_model_hash() -> str:
     """Mirror oracles._hashing.compute_nakdimon_model_hash."""
     sha = _read_pin_sha256()
-    seed = f"kraken=={KRAKEN_VERSION}:{sha}".encode("utf-8")
+    seed = f"kraken=={KRAKEN_VERSION}:{sha}".encode()
     return hashlib.sha256(seed).hexdigest()[:16]
 
 
@@ -111,8 +110,8 @@ def recognize_lines(
     """
     # Lazy-imported so unit tests (which patch via the package qualified path)
     # don't require kraken / PIL on the import path.
-    from PIL import Image  # noqa: WPS433
     from kraken import blla, rpred  # noqa: WPS433
+    from PIL import Image  # noqa: WPS433
 
     try:
         image = Image.open(image_path).convert("RGB")
@@ -123,14 +122,12 @@ def recognize_lines(
         raise
     except Exception as e:
         raise KrakenInferenceFailure(
-            f"D-04: Kraken full-page failure on folio {folio_id} "
-            f"(image={image_path}): {e!r}"
+            f"D-04: Kraken full-page failure on folio {folio_id} (image={image_path}): {e!r}"
         ) from e
 
     if not records:
         raise KrakenInferenceFailure(
-            f"D-04: Kraken yielded zero line records on folio {folio_id} "
-            f"(image={image_path})"
+            f"D-04: Kraken yielded zero line records on folio {folio_id} (image={image_path})"
         )
 
     out: list[LineRecord] = []
@@ -142,11 +139,7 @@ def recognize_lines(
         mean_conf = (sum(confs) / len(confs)) if confs else 0.0
         # Kraken's record exposes line geometry under one of a few attribute
         # names depending on version; tolerate the common shapes.
-        bbox_raw = (
-            getattr(rec, "line_bbox", None)
-            or getattr(rec, "bbox", None)
-            or (0, 0, 0, 0)
-        )
+        bbox_raw = getattr(rec, "line_bbox", None) or getattr(rec, "bbox", None) or (0, 0, 0, 0)
         x0, y0, x1, y1 = (
             int(bbox_raw[0]),
             int(bbox_raw[1]),

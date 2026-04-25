@@ -27,16 +27,15 @@ from __future__ import annotations
 import ast
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from types import ModuleType
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
-
 from baselines._base import LineRecord
-from tests._fake_manifest import FakeFolio, FakeManifest
 
+from tests._fake_manifest import FakeFolio, FakeManifest
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -72,7 +71,7 @@ def _ctor_chain(cls, tmp_path: Path, manifest: FakeManifest, *, gt_root: Path):
     bl.kraken_model_path = tmp_path / "fake.mlmodel"
     bl.image_cache = tmp_path / "image-cache"
     bl.gt_root = gt_root
-    bl._started_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    bl._started_at = datetime.now(UTC).isoformat(timespec="seconds")
     bl._folio_meta = {}
     return bl
 
@@ -132,8 +131,8 @@ def test_chain_is_abstract_cannot_instantiate(monkeypatch):
     """Test 1 (Task 1): ChainBaseline is an ABC; instantiating it directly
     raises TypeError — diacritize is the abstract method."""
     _stub_nakdimon_oss(monkeypatch)
-    from baselines._chain import ChainBaseline  # noqa: WPS433
     from baselines._base import BaselineBase  # noqa: WPS433
+    from baselines._chain import ChainBaseline  # noqa: WPS433
 
     assert issubclass(ChainBaseline, BaselineBase)
     # Abstract: cannot instantiate without overriding diacritize.
@@ -144,12 +143,10 @@ def test_chain_does_not_override_run(monkeypatch):
     """Test 2 (Task 1): ChainBaseline does NOT override run() — the locked
     template-method contract holds (D-12 / I-1)."""
     _stub_nakdimon_oss(monkeypatch)
-    from baselines._chain import ChainBaseline  # noqa: WPS433
     from baselines._base import BaselineBase  # noqa: WPS433
+    from baselines._chain import ChainBaseline  # noqa: WPS433
 
-    assert "run" not in ChainBaseline.__dict__, (
-        "D-12: ChainBaseline must NOT override run()"
-    )
+    assert "run" not in ChainBaseline.__dict__, "D-12: ChainBaseline must NOT override run()"
     assert ChainBaseline.run is BaselineBase.run
 
 
@@ -175,10 +172,9 @@ def test_chain_runs_realistic_and_diagnostic(monkeypatch, tmp_path):
     fake_lines = _kraken_lines(fid, n=2)
     fake_image_path = tmp_path / "image-cache" / f"{fid}.jpg"
 
-    with patch(
-        "baselines._chain.recognize_lines", return_value=fake_lines
-    ), patch(
-        "baselines._chain.fetch_image", return_value=fake_image_path
+    with (
+        patch("baselines._chain.recognize_lines", return_value=fake_lines),
+        patch("baselines._chain.fetch_image", return_value=fake_image_path),
     ):
         bl = _ctor_chain(BibliaNakdimonBaseline, tmp_path, manifest, gt_root=gt_root)
         rc = bl.run()
@@ -186,13 +182,7 @@ def test_chain_runs_realistic_and_diagnostic(monkeypatch, tmp_path):
     assert rc == 0
 
     realistic_path = tmp_path / "results" / "biblia_nakdimon" / f"{fid}.json"
-    diag_path = (
-        tmp_path
-        / "results"
-        / "biblia_nakdimon"
-        / "diagnostic"
-        / f"{fid}.gt_fed.json"
-    )
+    diag_path = tmp_path / "results" / "biblia_nakdimon" / "diagnostic" / f"{fid}.gt_fed.json"
     rm_path = tmp_path / "results" / "biblia_nakdimon" / "run_meta.json"
     assert realistic_path.exists(), "realistic prediction missing"
     assert diag_path.exists(), "GT-fed diagnostic missing"
@@ -232,10 +222,9 @@ def test_chain_diagnostic_not_counted_toward_expected_total(monkeypatch, tmp_pat
     )
     gt_root = _gt_fixture(tmp_path, fid)
 
-    with patch(
-        "baselines._chain.recognize_lines", return_value=_kraken_lines(fid, n=1)
-    ), patch(
-        "baselines._chain.fetch_image", return_value=tmp_path / "fake.jpg"
+    with (
+        patch("baselines._chain.recognize_lines", return_value=_kraken_lines(fid, n=1)),
+        patch("baselines._chain.fetch_image", return_value=tmp_path / "fake.jpg"),
     ):
         bl = _ctor_chain(BibliaNakdimonBaseline, tmp_path, manifest, gt_root=gt_root)
         rc = bl.run()
@@ -243,13 +232,7 @@ def test_chain_diagnostic_not_counted_toward_expected_total(monkeypatch, tmp_pat
     assert rc == 0
     # Realistic + diagnostic both promoted
     assert (tmp_path / "results" / "biblia_nakdimon" / f"{fid}.json").exists()
-    assert (
-        tmp_path
-        / "results"
-        / "biblia_nakdimon"
-        / "diagnostic"
-        / f"{fid}.gt_fed.json"
-    ).exists()
+    assert (tmp_path / "results" / "biblia_nakdimon" / "diagnostic" / f"{fid}.gt_fed.json").exists()
 
 
 # ---------------------------------------------------------------------------
@@ -272,18 +255,15 @@ def test_run_meta_pins_nakdimon_hash_set_others_null(monkeypatch, tmp_path):
     )
     gt_root = _gt_fixture(tmp_path, fid)
 
-    with patch(
-        "baselines._chain.recognize_lines", return_value=_kraken_lines(fid)
-    ), patch(
-        "baselines._chain.fetch_image", return_value=tmp_path / "fake.jpg"
+    with (
+        patch("baselines._chain.recognize_lines", return_value=_kraken_lines(fid)),
+        patch("baselines._chain.fetch_image", return_value=tmp_path / "fake.jpg"),
     ):
         bl = _ctor_chain(BibliaNakdimonBaseline, tmp_path, manifest, gt_root=gt_root)
         bl.run()
 
     rm = json.loads(
-        (tmp_path / "results" / "biblia_nakdimon" / "run_meta.json").read_text(
-            encoding="utf-8"
-        )
+        (tmp_path / "results" / "biblia_nakdimon" / "run_meta.json").read_text(encoding="utf-8")
     )
     assert rm["pins"]["nakdimon_model_hash"] == "8fd7722b8002a690"
     assert rm["pins"]["kraken_model_hash"] == KRAKEN_MODEL_HASH
@@ -312,9 +292,7 @@ def test_a3_no_compute_oracle_rates_in_biblia_nakdimon():
     bn = (repo / "baselines" / "src" / "baselines" / "biblia_nakdimon.py").read_text(
         encoding="utf-8"
     )
-    chain = (repo / "baselines" / "src" / "baselines" / "_chain.py").read_text(
-        encoding="utf-8"
-    )
+    chain = (repo / "baselines" / "src" / "baselines" / "_chain.py").read_text(encoding="utf-8")
     assert "compute_oracle_rates" not in bn, (
         "A-3 violation: biblia_nakdimon.py references compute_oracle_rates; "
         "production baselines call diacritize() directly. Phase 4 score-time only."
@@ -333,8 +311,7 @@ def test_biblia_nakdimon_imports_diacritize_directly():
         encoding="utf-8"
     )
     assert "from oracles.nakdimon_oss import diacritize" in src, (
-        "A-3: biblia_nakdimon.py must import diacritize directly from "
-        "oracles.nakdimon_oss"
+        "A-3: biblia_nakdimon.py must import diacritize directly from oracles.nakdimon_oss"
     )
 
 
@@ -381,13 +358,10 @@ def test_biblia_nakdimon_overrides_only_diacritize_and_class_attrs():
     assert len(classes) == 1
     cls = classes[0]
     assert cls.name == "BibliaNakdimonBaseline"
-    method_names = [
-        c.name for c in cls.body if isinstance(c, ast.FunctionDef)
-    ]
+    method_names = [c.name for c in cls.body if isinstance(c, ast.FunctionDef)]
     # The only method definition allowed is diacritize.
     assert method_names == ["diacritize"], (
-        "BibliaNakdimonBaseline must override ONLY diacritize(); found: "
-        f"{method_names!r}"
+        f"BibliaNakdimonBaseline must override ONLY diacritize(); found: {method_names!r}"
     )
     # Class attrs MUST set BASELINE_ID, DIACRITIZER_PIN_FIELD, DIACRITIZER_PIN_VALUE.
     attr_names: set[str] = set()

@@ -10,12 +10,11 @@ Plan 03-02 Task 2 behavior tests 3 + 4:
 from __future__ import annotations
 
 import json
-import os
 
 import pytest
-
 from baselines._atomic import SandboxRun
 from baselines._base import BaselineBase, LineRecord
+
 from tests._fake_manifest import FakeFolio, FakeManifest
 
 
