@@ -15,10 +15,41 @@ from __future__ import annotations
 
 import hashlib
 import re
+import sys
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+
+
+def _install_fake_kraken_modules(monkeypatch, *, records, segment_value=None):
+    """Install fake kraken / PIL modules into sys.modules so the lazy imports
+    inside baselines._kraken.recognize_lines bind to mocks. Mocked unit tier
+    runs without kraken / PIL actually installed (model is gated to live tier
+    by RUN_LIVE_BASELINES=1)."""
+    fake_pil = MagicMock()
+    fake_image_module = MagicMock()
+    fake_image_module.open = MagicMock(
+        return_value=MagicMock(convert=MagicMock(return_value=MagicMock()))
+    )
+    fake_pil.Image = fake_image_module
+
+    fake_kraken = MagicMock()
+    fake_blla = MagicMock()
+    fake_blla.segment = MagicMock(return_value=segment_value or MagicMock())
+    fake_rpred = MagicMock()
+    fake_rpred.rpred = MagicMock(return_value=iter(records))
+    fake_kraken.blla = fake_blla
+    fake_kraken.rpred = fake_rpred
+    fake_kraken_lib = MagicMock()
+    fake_kraken_lib.models = MagicMock()
+
+    monkeypatch.setitem(sys.modules, "PIL", fake_pil)
+    monkeypatch.setitem(sys.modules, "PIL.Image", fake_image_module)
+    monkeypatch.setitem(sys.modules, "kraken", fake_kraken)
+    monkeypatch.setitem(sys.modules, "kraken.blla", fake_blla)
+    monkeypatch.setitem(sys.modules, "kraken.rpred", fake_rpred)
+    monkeypatch.setitem(sys.modules, "kraken.lib", fake_kraken_lib)
 
 
 # ---------------------------------------------------------------------
@@ -58,33 +89,26 @@ def test_recognize_lines_signature_exported():
     assert callable(recognize_lines)
 
 
-def test_recognize_lines_returns_line_records_with_kraken_confidence():
+def _make_record(text: str, confs: list, bbox: tuple):
+    rec = MagicMock()
+    rec.__str__ = lambda self, t=text: t
+    rec.confidences = confs
+    rec.line_bbox = bbox
+    return rec
+
+
+def test_recognize_lines_returns_line_records_with_kraken_confidence(monkeypatch):
     """Per D-04: per-line LineRecord.kraken_confidence populated as the mean
     of per-character confidences from rpred.rpred."""
     from baselines._base import LineRecord
 
-    fake_image = MagicMock()
-    fake_baseline = MagicMock()
-    fake_network = MagicMock()
+    fake_records = [
+        _make_record("שמע", [0.9, 0.85, 0.95], (10, 20, 500, 60)),
+        _make_record("ישראל", [0.7, 0.8, 0.9, 0.6, 0.85], (10, 80, 500, 120)),
+    ]
+    _install_fake_kraken_modules(monkeypatch, records=fake_records)
 
-    # Two fake ocr_record objects — minimum kraken yields per line.
-    fake_records = []
-    for text, confs, bbox in [
-        ("שמע", [0.9, 0.85, 0.95], (10, 20, 500, 60)),
-        ("ישראל", [0.7, 0.8, 0.9, 0.6, 0.85], (10, 80, 500, 120)),
-    ]:
-        rec = MagicMock()
-        rec.__str__ = lambda self, t=text: t
-        rec.confidences = confs
-        rec.line_bbox = bbox
-        fake_records.append(rec)
-
-    image_open = MagicMock(return_value=MagicMock(convert=MagicMock(return_value=fake_image)))
-
-    with patch("PIL.Image.open", image_open), \
-         patch("kraken.blla.segment", return_value=fake_baseline), \
-         patch("kraken.rpred.rpred", return_value=iter(fake_records)), \
-         patch("baselines._kraken._load_model", return_value=fake_network):
+    with patch("baselines._kraken._load_model", return_value=MagicMock()):
         from baselines._kraken import recognize_lines
         out = recognize_lines(
             Path("/tmp/fake.jpg"),
@@ -95,26 +119,25 @@ def test_recognize_lines_returns_line_records_with_kraken_confidence():
     assert isinstance(out, list)
     assert len(out) == 2
     assert all(isinstance(r, LineRecord) for r in out)
-    # Per-char confidence mean
     assert out[0].tier1 == "שמע"
     assert 0.0 <= out[0].kraken_confidence <= 1.0
     assert abs(out[0].kraken_confidence - (0.9 + 0.85 + 0.95) / 3) < 1e-3
     assert out[0].line_id.startswith("leningrad_devarim_F195A_L")
+    # tier1=tier2=tier3 — scorer derives consonantal/nikkud/trop tiers later.
+    assert out[0].tier1 == out[0].tier2 == out[0].tier3
+    # Kraken doesn't emit metamarks
+    assert out[0].tier4_records == tuple()
 
 
-def test_recognize_lines_raises_on_zero_records():
+def test_recognize_lines_raises_on_zero_records(monkeypatch):
     """D-04: full-page Kraken failure (zero records) raises KrakenInferenceFailure
-    naming the image path / folio id. SandboxRun __exit__ on exception leaves
+    naming the folio id. SandboxRun __exit__ on exception leaves
     .in_progress/<bl>/ for inspection per D-14."""
     from baselines._errors import KrakenInferenceFailure
 
-    fake_image = MagicMock()
-    image_open = MagicMock(return_value=MagicMock(convert=MagicMock(return_value=fake_image)))
+    _install_fake_kraken_modules(monkeypatch, records=[])
 
-    with patch("PIL.Image.open", image_open), \
-         patch("kraken.blla.segment", return_value=MagicMock()), \
-         patch("kraken.rpred.rpred", return_value=iter([])), \
-         patch("baselines._kraken._load_model", return_value=MagicMock()):
+    with patch("baselines._kraken._load_model", return_value=MagicMock()):
         from baselines._kraken import recognize_lines
         with pytest.raises(KrakenInferenceFailure) as exc:
             recognize_lines(
@@ -125,23 +148,15 @@ def test_recognize_lines_raises_on_zero_records():
         assert "leningrad_devarim_FXXX" in str(exc.value)
 
 
-def test_recognize_lines_raises_on_all_empty_text():
+def test_recognize_lines_raises_on_all_empty_text(monkeypatch):
     """If every record has empty text, raise — there is no transcription
     extractable from the page (per D-04 full-page-failure semantics)."""
     from baselines._errors import KrakenInferenceFailure
 
-    fake_image = MagicMock()
-    image_open = MagicMock(return_value=MagicMock(convert=MagicMock(return_value=fake_image)))
+    rec = _make_record("", [], (0, 0, 0, 0))
+    _install_fake_kraken_modules(monkeypatch, records=[rec])
 
-    rec = MagicMock()
-    rec.__str__ = lambda self: ""
-    rec.confidences = []
-    rec.line_bbox = (0, 0, 0, 0)
-
-    with patch("PIL.Image.open", image_open), \
-         patch("kraken.blla.segment", return_value=MagicMock()), \
-         patch("kraken.rpred.rpred", return_value=iter([rec])), \
-         patch("baselines._kraken._load_model", return_value=MagicMock()):
+    with patch("baselines._kraken._load_model", return_value=MagicMock()):
         from baselines._kraken import recognize_lines
         with pytest.raises(KrakenInferenceFailure):
             recognize_lines(
