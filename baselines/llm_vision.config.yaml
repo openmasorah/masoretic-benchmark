@@ -1,0 +1,35 @@
+# BL-01 LLM Vision Baseline configuration.
+# Phase 3 Adjudication A-2 (2026-04-25): AbbyyFR was dropped. This config
+# has TWO sources only: Claude Opus 4.7 + Gemini 2.5 Pro.
+#
+# Provider price changes mid-Phase 3 = a documented re-pin event:
+# commit message + LLM_PIN.md row + run_meta.budget.rate_table_snapshot.
+# NEVER silent drift.
+
+models:
+  claude:
+    id: "claude-opus-4-7"
+    # Anthropic pricing: https://www.anthropic.com/pricing
+    # Retrieved: 2026-04-25
+    input_per_mtok_usd: 15.00
+    output_per_mtok_usd: 75.00
+  gemini:
+    id: "gemini-2.5-pro"
+    # Google pricing: https://ai.google.dev/pricing
+    # Retrieved: 2026-04-25
+    input_per_mtok_usd: 1.25
+    output_per_mtok_usd: 10.00
+
+budget:
+  cap_per_folio_usd: 5.00
+  cap_run_usd: 25.00
+
+inference:
+  max_output_tokens: 2048
+  temperature: 0
+  seed: 0  # forward-compat; not deterministic on gemini-2.5-pro per RESEARCH
+
+combine:
+  # D-07: alphabetical tie-break Claude < Gemini, so Claude wins ties.
+  # WHOLE-LINE WINNER: NO tier-mixing across sources within a line.
+  tie_break: "alphabetical"
