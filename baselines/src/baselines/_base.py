@@ -238,24 +238,50 @@ class BaselineBase(ABC):
         }
 
     def _compose_run_meta(self) -> dict:
-        """Default run_meta payload. Subclasses extend (e.g., BL-01 adds
-        `budget` + `combine` fields).
+        """Default run_meta payload, schema-conformant per D-19.
 
-        D-19 required-field set: schema_version, baseline_id, manifest_hash,
-        scorer_version, started_at_iso, completed_at_iso, replay_mode.
-        Optional / per-baseline: hostname, sibling_git_sha, pins, budget,
-        combine, folios.
+        Subclasses MAY override to populate ``pins``, ``budget``, ``combine``,
+        and per-folio ``folios`` entries (e.g., BL-01 fills ``budget`` and
+        ``combine.tie_break_winners``; BL-02 fills ``pins.kraken_model_hash``).
+
+        The base default emits null-valued required keys for fields that
+        every schema entry must declare but some baselines don't populate
+        (BL-02/03/04 emit null inside ``budget`` and ``combine``; BL-01
+        emits null inside ``pins`` keys it doesn't use).
+
+        Validation runs at write time inside SandboxRun.write_run_meta;
+        the payload returned here MUST satisfy schemas/run_meta.schema.json.
         """
+        import socket
+
         return {
             "schema_version": self.SCHEMA_VERSION,
             "baseline_id": self.BASELINE_ID,
             "manifest_hash": getattr(self.manifest, "manifest_hash", None),
             "scorer_version": getattr(self.manifest, "scorer_version", None),
-            "started_at_iso": getattr(self, "_started_at", None),
+            "started_at_iso": getattr(self, "_started_at", None)
+            or datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "completed_at_iso": datetime.now(timezone.utc).isoformat(
                 timespec="seconds"
             ),
+            "hostname": socket.gethostname(),
+            "sibling_git_sha": None,
             "replay_mode": self.replay,
-            "pins": {},
+            "pins": {
+                "kraken_model_hash": None,
+                "nakdimon_model_hash": None,
+                "dictabert_model_revision": None,
+                "llm_pin_md_hash": None,
+            },
+            "budget": {
+                "cap_per_folio": None,
+                "cap_run": None,
+                "used_total": None,
+                "rate_table_snapshot": None,
+            },
+            "combine": {
+                "tie_break_total": None,
+                "tie_break_winners": None,
+            },
             "folios": {},
         }

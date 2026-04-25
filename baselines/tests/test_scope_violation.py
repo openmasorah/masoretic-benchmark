@@ -20,7 +20,7 @@ from tests._fake_manifest import FakeFolio, FakeManifest
 class _SpyBaseline(BaselineBase):
     """Test double that records every infer_folio call."""
 
-    BASELINE_ID = "spy"
+    BASELINE_ID = "biblia_kraken"
 
     def __init__(self, manifest, results_root, **kw):
         super().__init__(manifest, results_root, **kw)
@@ -62,7 +62,7 @@ def test_d13a_preflight_rejects_non_leningrad_folio_id(tmp_path):
     ScopeViolation BEFORE any infer_folio call."""
     manifest = FakeManifest(
         folios=[FakeFolio(id="leningrad_devarim_shema_fixture")],
-        expected_reports_per_baseline={"spy": 1},
+        expected_reports_per_baseline={"biblia_kraken": 1},
     )
     bl = _ctor(tmp_path, manifest)
 
@@ -72,8 +72,8 @@ def test_d13a_preflight_rejects_non_leningrad_folio_id(tmp_path):
     assert bl.calls == [], "infer_folio must NOT have been called"
     # Sandbox should be empty (preflight fails before sandbox enter)
     assert not (tmp_path / ".in_progress").exists() or not any(
-        (tmp_path / ".in_progress" / "spy").iterdir()
-    ) if (tmp_path / ".in_progress" / "spy").exists() else True
+        (tmp_path / ".in_progress" / "biblia_kraken").iterdir()
+    ) if (tmp_path / ".in_progress" / "biblia_kraken").exists() else True
 
 
 def test_d13a_preflight_accepts_in_scope_folio_id(tmp_path):
@@ -81,7 +81,7 @@ def test_d13a_preflight_accepts_in_scope_folio_id(tmp_path):
     fid = "leningrad_devarim_shema_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
-        expected_reports_per_baseline={"spy": 1},
+        expected_reports_per_baseline={"biblia_kraken": 1},
     )
     bl = _ctor(tmp_path, manifest)
     rc = bl.run(folio_ids=[fid])
@@ -99,13 +99,13 @@ def test_d13b_per_folio_recheck_catches_manuscript_mutation(tmp_path):
 
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid_ok), FakeFolio(id=fid_bad, manuscript="leningrad")],
-        expected_reports_per_baseline={"spy": 2},
+        expected_reports_per_baseline={"biblia_kraken": 2},
     )
     bl = _ctor(tmp_path, manifest)
 
     # Subclass that mutates the manifest mid-run between two folios
     class MutatingBaseline(_SpyBaseline):
-        BASELINE_ID = "spy"
+        BASELINE_ID = "biblia_kraken"
 
         def infer_folio(self, folio):
             # AFTER the first (legitimate) folio is processed, flip
@@ -151,7 +151,7 @@ def test_d13b_per_folio_recheck_catches_in_frozen_scope_flip(tmp_path):
     fid = "leningrad_devarim_shema_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
-        expected_reports_per_baseline={"spy": 1},
+        expected_reports_per_baseline={"biblia_kraken": 1},
     )
     # Mutate before run so iter_folios sees the flipped folio
     # (script-start preflight does NOT see this folio because
@@ -161,7 +161,7 @@ def test_d13b_per_folio_recheck_catches_in_frozen_scope_flip(tmp_path):
     manifest.folios.insert(
         0, FakeFolio(id=fid2, manuscript="leningrad", in_frozen_scope=True)
     )
-    manifest.expected_reports_per_baseline["spy"] = 2
+    manifest.expected_reports_per_baseline["biblia_kraken"] = 2
 
     bl = _ctor(tmp_path, manifest)
 
@@ -171,7 +171,7 @@ def test_d13b_per_folio_recheck_catches_in_frozen_scope_flip(tmp_path):
     # AFTER iter_folios has resolved its first batch — emulate by mutating
     # mid-iteration in infer_folio.
     class FlipperBaseline(_SpyBaseline):
-        BASELINE_ID = "spy"
+        BASELINE_ID = "biblia_kraken"
 
         def infer_folio(self, folio):
             self.calls.append(folio.id)

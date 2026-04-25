@@ -47,13 +47,13 @@ def test_run_calls_template_methods_in_order(tmp_path, mocker):
     fid = "leningrad_devarim_shema_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
-        expected_reports_per_baseline={"toy": 1},
+        expected_reports_per_baseline={"biblia_kraken": 1},
     )
 
     call_order: list[str] = []
 
     class TracingBaseline(BaselineBase):
-        BASELINE_ID = "toy"
+        BASELINE_ID = "biblia_kraken"
 
         def _preflight(self, folio_ids):
             call_order.append("preflight")
@@ -131,7 +131,7 @@ def test_baseline_id_required(tmp_path):
     fid = "leningrad_devarim_shema_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
-        expected_reports_per_baseline={"toy": 1},
+        expected_reports_per_baseline={"biblia_kraken": 1},
     )
 
     class Untagged(BaselineBase):
@@ -159,12 +159,12 @@ def test_run_meta_includes_required_fields(tmp_path):
     fid = "leningrad_devarim_shema_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
-        expected_reports_per_baseline={"toy": 1},
+        expected_reports_per_baseline={"biblia_kraken": 1},
         scorer_version="v0.1.0-scorer",
     )
 
     class GoodBaseline(BaselineBase):
-        BASELINE_ID = "toy"
+        BASELINE_ID = "biblia_kraken"
 
         def infer_folio(self, folio):
             return [
@@ -184,8 +184,8 @@ def test_run_meta_includes_required_fields(tmp_path):
     bl.replay = False
     bl.run()
 
-    meta = json.loads((tmp_path / "toy" / "run_meta.json").read_text())
-    assert meta["baseline_id"] == "toy"
+    meta = json.loads((tmp_path / "biblia_kraken" / "run_meta.json").read_text())
+    assert meta["baseline_id"] == "biblia_kraken"
     assert meta["scorer_version"] == "v0.1.0-scorer"
     assert "completed_at_iso" in meta
     assert "replay_mode" in meta
@@ -200,11 +200,11 @@ def test_serialize_includes_optional_fields_when_set(tmp_path):
     fid = "leningrad_devarim_shema_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
-        expected_reports_per_baseline={"toy": 1},
+        expected_reports_per_baseline={"biblia_kraken": 1},
     )
 
     class Provenanced(BaselineBase):
-        BASELINE_ID = "toy"
+        BASELINE_ID = "biblia_kraken"
 
         def infer_folio(self, folio):
             return [
@@ -227,7 +227,7 @@ def test_serialize_includes_optional_fields_when_set(tmp_path):
     bl.replay = False
     bl.run()
 
-    pred = json.loads((tmp_path / "toy" / f"{fid}.json").read_text())
+    pred = json.loads((tmp_path / "biblia_kraken" / f"{fid}.json").read_text())
     line = pred["lines"][0]
     assert line["kraken_confidence"] == 0.97
     assert line["llm_winner"] == "claude"

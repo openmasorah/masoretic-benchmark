@@ -16,6 +16,8 @@ import os
 import shutil
 from pathlib import Path
 
+from baselines._schema import validate_prediction, validate_run_meta
+
 
 class SandboxRun:
     """Context manager wrapping a per-baseline output sandbox.
@@ -47,6 +49,9 @@ class SandboxRun:
         return False
 
     def write_prediction(self, folio_id: str, payload: dict) -> Path:
+        # D-16/D-17: validate BEFORE the atomic write so off-shape
+        # payloads never reach the sandbox (and never reach results/<bl>/).
+        validate_prediction(payload)
         path = self.sandbox_dir / f"{folio_id}.json"
         self._atomic_write_json(path, payload)
         return path
@@ -55,6 +60,9 @@ class SandboxRun:
         """BL-03/BL-04 only: GT-fed diagnostic chain (D-01).
         Lands at results/<bl>/diagnostic/<folio_id>.gt_fed.json.
         NOT counted toward expected_total_reports (D-15)."""
+        # D-16/D-17: diagnostic uses the same prediction shape; validate
+        # BEFORE any disk side-effect (including mkdir of diagnostic/).
+        validate_prediction(payload)
         diag_dir = self.sandbox_dir / "diagnostic"
         diag_dir.mkdir(parents=True, exist_ok=True)
         path = diag_dir / f"{folio_id}.gt_fed.json"
@@ -62,6 +70,8 @@ class SandboxRun:
         return path
 
     def write_run_meta(self, payload: dict) -> Path:
+        # D-16/D-19: validate BEFORE the atomic write.
+        validate_run_meta(payload)
         path = self.sandbox_dir / "run_meta.json"
         self._atomic_write_json(path, payload)
         return path

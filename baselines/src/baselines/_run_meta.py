@@ -52,7 +52,16 @@ def validate_expected_total_reports(
 
 
 def write_run_meta(path: Path, payload: dict) -> None:
-    """Write run_meta.json atomically. Used internally by SandboxRun."""
-    from baselines._atomic import SandboxRun
+    """Write run_meta.json atomically.
 
+    Defense-in-depth (D-16/D-19): validates the payload via
+    ``baselines._schema.validate_run_meta`` BEFORE the atomic write,
+    in addition to the validation that ``SandboxRun.write_run_meta``
+    performs at its call site. Both call sites validate so neither path
+    can leak an off-shape payload to disk.
+    """
+    from baselines._atomic import SandboxRun
+    from baselines._schema import validate_run_meta
+
+    validate_run_meta(payload)
     SandboxRun._atomic_write_json(path, payload)
