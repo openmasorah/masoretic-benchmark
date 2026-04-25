@@ -9,7 +9,7 @@ FIXTURE = Path(__file__).parent / "fixtures" / "phase_0_manifest_sample.json"
 
 def test_load_manifest():
     m = Manifest.load(FIXTURE)
-    assert m.version == "v0.1.0"
+    assert m.version == "v0.2.0"
     assert len(m.folios) == 2
 
 

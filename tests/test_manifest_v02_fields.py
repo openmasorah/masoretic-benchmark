@@ -285,14 +285,38 @@ def test_manifest_load_v02_exposes_new_fields(tmp_path):
     assert m.nakdimon_model_hash == ""
 
 
-def test_manifest_load_v02_missing_required_field_raises(tmp_path):
+def test_manifest_load_malformed_doc_raises(tmp_path):
+    """A malformation NOT covered by v0.1 coercion must raise.
+
+    Coercion only fills in missing iaa_subset/baselines_seeded/
+    expected_reports_per_baseline and null nakdimon_model_hash.
+    Other malformations (wrong types, missing version, malformed folios)
+    must still surface as ManifestValidationError.
+    """
     from masoretic_eval.manifest import Manifest, ManifestValidationError
 
+    # Wrong type for version -- not coerceable.
     bad = dict(V02_DOC)
-    bad.pop("iaa_subset")
+    bad["version"] = 123  # must be string per schema
     path = _write(tmp_path, bad)
     with pytest.raises((ManifestValidationError, jsonschema.ValidationError)):
         Manifest.load(path)
+
+    # Folio missing required field 'image_url' -- not coerceable.
+    bad2 = dict(V02_DOC)
+    bad2["folios"] = [
+        {
+            "id": "x",
+            "manuscript": "leningrad",
+            "book": "devarim",
+            "folio": "F195A",
+            "in_frozen_scope": True,
+            # missing image_url
+        }
+    ]
+    path2 = _write(tmp_path, bad2, "bad2.json")
+    with pytest.raises((ManifestValidationError, jsonschema.ValidationError)):
+        Manifest.load(path2)
 
 
 # ---------------------------------------------------------------------------

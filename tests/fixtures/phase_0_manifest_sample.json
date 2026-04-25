@@ -1,5 +1,5 @@
 {
-  "version": "v0.1.0",
+  "version": "v0.2.0",
   "frozen_at": "2026-05-26T00:00:00Z",
   "folios": [
     {
@@ -25,10 +25,15 @@
   ],
   "iaa_subset": ["leningrad_devarim_f237b"],
   "fuses_fired": [],
-  "baselines_seeded": ["abbyy_llm", "biblia_kraken", "biblia_nakdimon", "biblia_char_menaked"],
-  "expected_reports_per_baseline": 2,
+  "baselines_seeded": ["llm_vision", "biblia_kraken", "biblia_nakdimon", "biblia_char_menaked"],
+  "expected_reports_per_baseline": {
+    "llm_vision": 2,
+    "biblia_kraken": 2,
+    "biblia_nakdimon": 2,
+    "biblia_char_menaked": 2
+  },
   "expected_total_reports": 8,
   "scorer_version": "0.1.0",
-  "nakdimon_model_hash": "pending",
+  "nakdimon_model_hash": "8fd7722b8002a690",
   "notes": "Sample manifest for scorer tests"
 }
