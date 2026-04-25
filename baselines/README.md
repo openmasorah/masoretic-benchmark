@@ -36,3 +36,34 @@ both this README and the module docstring by
 `tests/test_dictabert_disclaimer_invariant.py`; drift in either location
 fails CI. Defense in depth: Phase 2 already pins the same disclaimer at the
 oracle layer (`oracles/dictabert.py` + `oracles/README.md`).
+
+## CI
+
+Three sibling-repo CI jobs cover Phase 3 baselines (mirroring the Phase 2
+oracle pattern; full workflow at `.github/workflows/ci.yml`):
+
+| Job              | Runs                            | Blocks PR? | Cost          |
+|------------------|---------------------------------|------------|---------------|
+| `baseline-unit`  | every PR + push                 | yes        | $0 (mocked)   |
+| `baseline-replay`| every PR + push                 | yes        | $0 (replay)   |
+| `baseline-live`  | nightly cron 06:00 UTC + manual | no (continue-on-error) | $$$ (real API) |
+
+**Three-tier discipline (D-10 + D-11 corollary):**
+
+- **Mocked unit:** `pytest -m "not live_baselines and not live_kraken"` — clients fully patched at the `sys.modules` boundary; no network, no Kraken model load, no Pillow needed. Includes the three structural invariants (contamination, A-3 grep, D-15 declarations) plus the 5 AST invariants (D-12 locked-`run()`, BASELINE_ID enum) plus the DictaBERT disclaimer + KRAKEN_PIN provenance invariants.
+- **Replay mode:** `pytest baselines/tests/test_baseline_replay_llm_vision.py` — exercises the real combine logic against the committed `tests/fixtures/llm_calls/<folio>.replay.jsonl`. No API spend; `LLMVisionBaseline(replay=True)` raises `ReplayMissError` on hash miss rather than falling through to a live call.
+- **Live:** `RUN_LIVE_BASELINES=1 pytest -m live_baselines` — exercises real Anthropic / Google / Kraken / Nakdimon / DictaBERT inference. Nightly cron on Linux + Python 3.11 (Phase 2 Pitfall 1: `nakdimon==0.1.2` pins TF 2.15, no Python 3.12 wheel). API keys via repository secrets (`ANTHROPIC_API_KEY`, `GOOGLE_API_KEY`); BiblIA Kraken model cached in GitHub Actions cache keyed on `KRAKEN_MODEL_HASH = 8514a0c7cc2b5b45` (canonical-from-`KRAKEN_PIN.md`).
+
+**Structural invariants always-on (in `baseline-unit`):**
+
+- `test_contamination.py` — greps `llm_calls.jsonl` for UXLC fragments (D-05 boundary)
+- `test_no_compute_oracle_rates.py` — A-3 zero-reference enforcement
+- `test_expected_totals.py` — D-15 declaration check (manifest's `expected_reports_per_baseline` keyset)
+- `test_invariants.py` — D-12 locked-`run()` AST walk + BASELINE_ID enum
+- `test_dictabert_disclaimer_invariant.py` — D-27 verbatim disclaimer in code + README
+- `test_kraken_pin_provenance.py` — `KRAKEN_PIN.md` row vs cached `BiblIA_01.mlmodel` sha256
+
+**Deferred for Phase 3.1:** the `baseline-live` job's "real fixture generation" step is currently a no-op echo. Real predictions on the 5 IAA folios for BL-01..BL-04 (estimated ~$5–$25 LLM spend + Kraken/Nakdimon/DictaBERT inference) are deferred to a Phase 3.1 gap-closure plan. CI infrastructure (cache key, secrets, install pattern) is ready for Phase 3.1 to populate the live tier without further wiring work.
+
+**Phase 1 F8 gate is NOT in sibling CI** — Pitfall 8 carry-forward. The sibling
+repo must be independently verifiable; F8 is baalshem's gate.

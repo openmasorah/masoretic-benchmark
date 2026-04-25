@@ -128,3 +128,135 @@ jobs:
         env:
           RUN_LIVE_ORACLES: "1"
         run: pytest oracles/tests/ -q -m "live_oracles" --tb=short
+
+  # ----------------------------------------------------------------------------
+  # Phase 3 baseline CI: see baselines/README.md "## CI" section.
+  # Three-tier discipline (D-10 + D-11 corollary):
+  #   baseline-unit    — PR-blocking, mocked, no kraken/PIL/transformers needed
+  #   baseline-replay  — PR-blocking, replays committed llm_calls.jsonl fixtures
+  #   baseline-live    — nightly cron, full real-API + real-model pass; non-blocking
+  # Phase 1 GT-12 IAA gate (F8) is intentionally NOT added here -- Pitfall 8
+  # carry-forward: sibling repo must be independently verifiable.
+  # ----------------------------------------------------------------------------
+
+  baseline-unit:
+    name: Baseline unit tests (PR-blocking)
+    runs-on: ubuntu-latest
+    needs: [oracle-unit]
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install PyICU prerequisites
+        run: sudo apt-get update && sudo apt-get install -y libicu-dev pkg-config
+
+      - name: Install scorer + oracles + baselines
+        run: |
+          pip install -e .
+          pip install -e "./oracles[dev,dicta,dictabert]"
+          pip install -e "./baselines[dev,kraken,llm]"
+
+      - name: Install nakdimon extra (Python 3.11 only -- Phase 2 Pitfall 1)
+        # nakdimon==0.1.2 pins TensorFlow 2.15, which has no wheel for Python
+        # 3.12. Install only on 3.11; mocked tests still cover Nakdimon paths
+        # on 3.12 via sys.modules injection.
+        if: matrix.python-version == '3.11'
+        run: pip install -e "./oracles[nakdimon]"
+
+      - name: Run baseline unit tests (mocked, env-gated tests skipped)
+        # Includes the three structural invariants (contamination, A-3 grep,
+        # D-15 declarations) plus 5 AST invariants (D-12, BASELINE_ID enum)
+        # plus the DictaBERT disclaimer + KRAKEN_PIN provenance invariants.
+        run: pytest baselines/tests/ -x -q -m "not live_baselines and not live_kraken" --cov=baselines --cov-report=term-missing
+
+  baseline-replay:
+    name: Baseline replay tests (PR-blocking)
+    runs-on: ubuntu-latest
+    needs: [baseline-unit]
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install PyICU prerequisites
+        run: sudo apt-get update && sudo apt-get install -y libicu-dev pkg-config
+
+      - name: Install scorer + oracles + baselines
+        run: |
+          pip install -e .
+          pip install -e "./oracles[dev,dicta,dictabert]"
+          pip install -e "./baselines[dev,kraken,llm]"
+
+      - name: Run replay-mode tests against committed JSONL fixtures
+        # No API keys: replay mode never calls live providers
+        # (LLMVisionBaseline raises ReplayMissError on hash miss; never falls
+        # through to a live API call). Exercises the real combine logic
+        # against fixtures/llm_calls/*.replay.jsonl per D-10 + D-11 corollary.
+        run: pytest baselines/tests/test_baseline_replay_llm_vision.py -x -q
+
+  baseline-live:
+    name: Baseline live drift (nightly, non-blocking)
+    runs-on: ubuntu-latest
+    needs: [baseline-unit]
+    # Cron + manual trigger only; NEVER on push/PR.
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+    continue-on-error: true
+    strategy:
+      matrix:
+        python-version: ["3.11"]   # Pitfall 1: Linux + Py3.11 for real Nakdimon
+    env:
+      RUN_LIVE_BASELINES: "1"
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install PyICU prerequisites
+        run: sudo apt-get update && sudo apt-get install -y libicu-dev pkg-config
+
+      - name: Install scorer + oracles + baselines (full)
+        run: |
+          pip install -e .
+          pip install -e "./oracles[dev,dicta,dictabert,nakdimon]"
+          pip install -e "./baselines[dev,kraken,llm]"
+
+      # Cache the BiblIA Kraken model keyed on KRAKEN_MODEL_HASH (canonical
+      # from KRAKEN_PIN.md per plan 03-04). When Phase 3.1 lands and runs
+      # the real fixture pass, this cache is already populated.
+      - name: Cache BiblIA Kraken model (keyed on KRAKEN_MODEL_HASH)
+        uses: actions/cache@v4
+        with:
+          path: baselines/.cache/kraken
+          key: kraken-biblia-8514a0c7cc2b5b45
+
+      - name: Fetch BiblIA Kraken model (idempotent; skips if cached)
+        run: python baselines/scripts/fetch_biblia_kraken_model.py
+
+      - name: Run live baseline tests (real API spend; surfaces drift)
+        run: pytest baselines/tests/ -q -m "live_baselines or live_kraken" --tb=short
+
+      - name: Phase 3.1 real fixture generation (DEFERRED — placeholder)
+        # Phase 3 ships scaffolding + replay discipline + paper-defensible
+        # methodology. Real predictions on the 5 IAA folios for BL-01..BL-04
+        # are deferred to Phase 3.1. When Phase 3.1 plans land, replace this
+        # echo with the actual end-to-end fixture-generation step. continue-
+        # on-error: true at job level means a missing IAA fixture pass does
+        # NOT fail this job today.
+        run: echo "Phase 3.1 deferred — see .planning/STATE.md and 03-08 SUMMARY"
