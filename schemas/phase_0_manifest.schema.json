@@ -1,15 +1,19 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:masoretic:phase_0_manifest.schema:v0.1",
+  "$id": "urn:masoretic:phase_0_manifest.schema:v0.2",
   "title": "phase_0_manifest.json",
-  "description": "Single source of truth for the frozen Phase 0 scope of the masoretic-benchmark sibling public repo. Append-only-immutable in git (see manifest_immutable.py).",
+  "description": "Single source of truth for the frozen Phase 0 scope of the masoretic-benchmark sibling public repo. Append-only-immutable in git (see manifest_immutable.py). v0.2 (2026-04-25) adds iaa_subset, baselines_seeded, expected_reports_per_baseline; promotes nakdimon_model_hash to required string; expected_total_reports accepts both legacy scalar and per-baseline mapping (mapping is canonical when non-empty per A-1).",
   "type": "object",
   "required": [
     "version",
     "frozen_at",
     "folios",
     "scorer_version",
-    "expected_total_reports"
+    "expected_total_reports",
+    "iaa_subset",
+    "baselines_seeded",
+    "expected_reports_per_baseline",
+    "nakdimon_model_hash"
   ],
   "additionalProperties": true,
   "properties": {
@@ -25,11 +29,36 @@
       "type": "string"
     },
     "nakdimon_model_hash": {
-      "type": ["string", "null"]
+      "type": "string"
     },
     "expected_total_reports": {
-      "type": "integer",
-      "minimum": 0
+      "oneOf": [
+        { "type": "integer", "minimum": 0 },
+        {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        }
+      ]
+    },
+    "iaa_subset": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "baselines_seeded": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "llm_vision",
+          "biblia_kraken",
+          "biblia_nakdimon",
+          "biblia_char_menaked"
+        ]
+      }
+    },
+    "expected_reports_per_baseline": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
     },
     "folios": {
       "type": "array",
