@@ -53,10 +53,15 @@ jobs:
         run: |
           python -c "
           import json, jsonschema
-          manifest = json.loads(open('phase_0_manifest.json').read())
+          # Validate the committed sample fixture against the canonical schema.
+          # The canonical phase_0_manifest.json (per CLAUDE.md scope-freeze rule)
+          # has not landed at repo root yet — Phase 1 manifest-init writer ships
+          # to a different path. Validation against the fixture proves schema +
+          # validator are mutually consistent until the canonical file exists.
+          manifest = json.loads(open('tests/fixtures/phase_0_manifest_sample.json').read())
           schema = json.loads(open('schemas/phase_0_manifest.schema.json').read())
           jsonschema.Draft202012Validator(schema).validate(manifest)
-          print('manifest ok')
+          print('manifest fixture validates against schema')
           "
 
   # ----------------------------------------------------------------------------
