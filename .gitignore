@@ -19,3 +19,7 @@ venv/
 *.tif
 *.tiff
 scans/
+# Phase 3 baselines: model + image cache (never commit; ~16MB Kraken model,
+# image cache grows with folio coverage). KRAKEN_PIN.md tracks the pinned
+# sha256; re-fetch via baselines/scripts/fetch_biblia_kraken_model.py.
+baselines/.cache/
