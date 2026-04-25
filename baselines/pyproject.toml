@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "masoretic-baselines"
+version = "0.1.0"
+description = "Phase 3 baselines for the Masoretic CER benchmark."
+requires-python = ">=3.11,<3.13"
+license = { text = "Apache-2.0" }
+dependencies = [
+    "masoretic-eval>=0.1.0,<0.2",
+    "masoretic-oracles>=0.1.0,<0.2",
+    "jsonschema>=4.0",
+    "tenacity>=8.0",
+    "requests>=2.31",
+]
+
+[project.optional-dependencies]
+kraken = ["kraken==7.0.1"]
+llm = [
+    "anthropic==0.97.0",
+    "google-genai==1.73.1",
+    "PyYAML>=6.0",
+]
+all = ["masoretic-baselines[kraken,llm]"]
+dev = [
+    "pytest>=7",
+    "pytest-mock>=3",
+    "jsonschema>=4.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+markers = [
+    "live_baselines: real network/model calls; gated by RUN_LIVE_BASELINES=1 env var",
+]
