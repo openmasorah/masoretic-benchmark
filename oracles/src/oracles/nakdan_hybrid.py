@@ -15,6 +15,7 @@ Audit (D-15 / D-16): one JSONL record per successful call at
   oracles/audit/dicta_<YYYY-MM-DD>.jsonl
 Includes resolved_ip via socket.gethostbyname (D-14) — provenance, not security.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -22,14 +23,13 @@ import json
 import os
 import socket
 import time
-from datetime import datetime, timezone
-from typing import Tuple
+from datetime import UTC, datetime
 from urllib.parse import urlparse
 
 import requests
-from masoretic_eval.metrics.nakdimon import nakdimon_factoring
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
+from masoretic_eval.metrics.nakdimon import nakdimon_factoring
 from oracles._audit import append_audit_record
 from oracles._errors import OracleMalformed, OracleUnavailable
 from oracles._strip import strip_to_consonantal
@@ -138,7 +138,7 @@ def diacritize(consonantal: str) -> str:
     body_bytes = json.dumps(body, sort_keys=True).encode("utf-8")
     resp_bytes = json.dumps(response_json, sort_keys=True, ensure_ascii=False).encode("utf-8")
     append_audit_record(
-        ts_iso=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+        ts_iso=datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
         endpoint_url=ENDPOINT_URL,
         resolved_ip=_resolve_ip(ENDPOINT_URL),
         request_sha256=hashlib.sha256(body_bytes).hexdigest(),
@@ -154,7 +154,7 @@ def diacritize(consonantal: str) -> str:
     return out
 
 
-def disagreement_rate(prediction: str) -> Tuple[float | None, dict]:
+def disagreement_rate(prediction: str) -> tuple[float | None, dict]:
     """Per-line disagreement rate (D-02). Returns (None, meta) on failure (D-13)."""
     skeleton = strip_to_consonantal(prediction)
     try:

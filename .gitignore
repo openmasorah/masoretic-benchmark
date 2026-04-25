@@ -9,6 +9,7 @@ dist/
 build/
 *.egg-info/
 .venv/
+.venv-*/
 venv/
 # Never commit scans or images in this public repo
 *.pdf

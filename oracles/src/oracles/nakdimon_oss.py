@@ -34,13 +34,12 @@ Pitfall 1 (TF x Python compatibility):
   venv can still run the scorer + oracles scaffolding but must not try
   to import this module. CI pins the Nakdimon job to Python 3.11.
 """
+
 from __future__ import annotations
 
-from typing import Tuple
-
 import nakdimon  # type: ignore[import-untyped]
-from masoretic_eval.metrics.nakdimon import nakdimon_factoring
 
+from masoretic_eval.metrics.nakdimon import nakdimon_factoring
 from oracles._hashing import compute_nakdimon_model_hash
 from oracles._strip import strip_to_consonantal
 
@@ -58,7 +57,7 @@ def diacritize(consonantal: str) -> str:
     return nakdimon.diacritize(consonantal)
 
 
-def disagreement_rate(prediction: str) -> Tuple[float, dict]:
+def disagreement_rate(prediction: str) -> tuple[float, dict]:
     """Per-line disagreement rate (D-01): 1 - DEC(prediction, nakdimon(skeleton)).
 
     Returns:

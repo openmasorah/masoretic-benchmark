@@ -1,7 +1,9 @@
 """Unit + live-oracle tests for oracles.nakdimon_oss (ORA-01)."""
+
 from __future__ import annotations
 
 import pytest
+
 from masoretic_eval.metrics.nakdimon import nakdimon_factoring
 
 

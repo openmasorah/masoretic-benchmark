@@ -16,11 +16,11 @@ Pitfall 4 (trust_remote_code supply-chain risk):
   diff the new BertForDiacritization.py vs. the previous version and log
   the result in NAKDIMON_PIN.md (analogous DictaBERT log entry).
 """
+
 from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
-from typing import Tuple
 
 from transformers import AutoModel, AutoTokenizer  # type: ignore[import-untyped]
 
@@ -30,7 +30,7 @@ _CACHE_DIR: Path = Path(__file__).resolve().parents[2] / ".cache" / "dictabert"
 
 
 @lru_cache(maxsize=1)
-def _load() -> Tuple[object, object]:
+def _load() -> tuple[object, object]:
     """Load tokenizer + model from the pinned HF revision. Cached process-wide."""
     _CACHE_DIR.mkdir(parents=True, exist_ok=True)
     tok = AutoTokenizer.from_pretrained(

@@ -1,4 +1,5 @@
 """Unit + live-oracle tests for oracles.dictabert (ORA-03)."""
+
 from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
@@ -10,7 +11,9 @@ def test_module_imports_constants_only():
     # Patch HF entry points BEFORE importing oracles.dictabert to prove laziness.
     with patch("transformers.AutoTokenizer") as tok_cls, patch("transformers.AutoModel") as mdl_cls:
         import importlib
+
         import oracles.dictabert as dm
+
         importlib.reload(dm)  # ensure fresh module-level execution under our patches
         assert dm.MODEL_ID == "dicta-il/dictabert-large-char-menaked"
         assert dm.MODEL_REVISION == "d311fbf7c403e50b040440e4859ac78064d025d0"
@@ -20,6 +23,7 @@ def test_module_imports_constants_only():
 
 def test_diacritize_calls_predict_with_pinned_args(monkeypatch):
     from oracles import dictabert as dm
+
     # Clear lru_cache so we can substitute _load
     dm._load.cache_clear()
     captured = {}
@@ -42,6 +46,7 @@ def test_diacritize_calls_predict_with_pinned_args(monkeypatch):
 
 def test_load_uses_pinned_revision_and_cache_dir(monkeypatch):
     from oracles import dictabert as dm
+
     dm._load.cache_clear()
     tok_mock = MagicMock(name="from_pretrained_tok")
     mdl_mock = MagicMock(name="from_pretrained_mdl")
@@ -65,11 +70,13 @@ def test_load_uses_pinned_revision_and_cache_dir(monkeypatch):
 
 def test_no_disagreement_rate_in_module():
     from oracles import dictabert as dm
+
     assert not hasattr(dm, "disagreement_rate"), "D-26 violation"
 
 
 def test_diacritize_handles_empty_predict_output(monkeypatch):
     from oracles import dictabert as dm
+
     dm._load.cache_clear()
 
     class _MockModel:
@@ -83,6 +90,7 @@ def test_diacritize_handles_empty_predict_output(monkeypatch):
 @pytest.mark.live_oracles
 def test_live_diacritize_smoke():
     from oracles.dictabert import diacritize
+
     out = diacritize("שלום עליכם")
     assert isinstance(out, str)
     assert len(out) > 0
