@@ -1,0 +1,17 @@
+{
+  "description": "Canonical UXLC Leningrad Devarim fragments. Each is a multi-codepoint Hebrew phrase (consonants + nikkud + trop) that uniquely identifies UXLC-derived content. Used by test_contamination.py to grep llm_calls.jsonl for any leak of GT-derived signal into LLM prompts (D-05 contamination boundary).",
+  "source": "Public-domain Leningrad UXLC samples; Tanach.us / Open Siddur consonants+nikkud+trop. Public-domain text only — no Yosef-private material.",
+  "fragments": [
+    "שְׁמַ֖ע יִשְׂרָאֵ֑ל",
+    "וְאָ֣הַבְתָּ֔ אֵ֖ת יְהוָ֣ה",
+    "הוּא֙ הָאֱלֹהִ֔ים",
+    "אָנֹכִ֖י יְהוָ֣ה אֱלֹהֶ֑יךָ",
+    "אֲשֶׁ֣ר הוֹצֵאתִ֩יךָ֩",
+    "וְהָי֞וּ הַדְּבָרִ֣ים הָאֵ֗לֶּה"
+  ],
+  "notes": [
+    "Add fragments as Phase 3 expands beyond the Shema fixture.",
+    "Fragments must be byte-equal to UXLC source (no normalization — preserve U+034F CGJ).",
+    "If a future LLM prompt legitimately needs to mention a Hebrew letter (e.g., 'transcribe each אות (letter)'), the prompt template MUST be re-engineered to use a generic instruction; alternatively, add a NARROW exclusion mechanism to this fixture — but the default is: Hebrew text in a prompt = contamination."
+  ]
+}

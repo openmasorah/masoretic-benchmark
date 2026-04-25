@@ -15,9 +15,9 @@ Pinned invariants:
   I-2 (D-12): Concrete subclasses of BaselineBase MUST set BASELINE_ID
               as a class-level string attribute.
 
-  I-3 (A-3):  (Reserved.) Zero references to compute_oracle_rates from
-              baselines/. Plan 03-08 fills in the concrete grep test
-              once the four BL-* baselines exist.
+  I-3 (A-3):  Zero references to the Phase-4 score-time oracle wrapper
+              from baselines/. The concrete grep test lives in
+              test_no_compute_oracle_rates.py (added by plan 03-08, Wave 4).
 """
 
 from __future__ import annotations
