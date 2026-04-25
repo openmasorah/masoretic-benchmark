@@ -33,9 +33,17 @@ DISCLAIMER = (
 
 
 def _normalize(text: str) -> str:
-    """Collapse whitespace + line wraps so the markdown blockquote and the
-    docstring (which may wrap differently) match the same canonical form."""
-    return " ".join(text.split())
+    """Collapse whitespace + line wraps + strip markdown blockquote prefixes
+    so the markdown rendering (`> ...`) and the docstring (which may wrap
+    differently) match the same canonical form. The disclaimer is the
+    semantic content, not the markdown shell around it."""
+    # Strip leading "> " on each line (markdown blockquote) before
+    # whitespace-collapse, so the README's blockquoted disclaimer matches.
+    lines = [
+        ln.lstrip("> ").rstrip() if ln.lstrip().startswith(">") else ln
+        for ln in text.splitlines()
+    ]
+    return " ".join(" ".join(lines).split())
 
 
 def test_disclaimer_in_module_docstring():

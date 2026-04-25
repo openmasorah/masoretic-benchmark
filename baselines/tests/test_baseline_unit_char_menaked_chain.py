@@ -119,12 +119,17 @@ def test_char_menaked_chain_runs_realistic_and_diagnostic(
     fake_lines = _kraken_lines(fid)
     fake_image_path = tmp_path / "image-cache" / f"{fid}.jpg"
 
+    # Patch the symbols at the place where _chain.py imported them
+    # (`from baselines._kraken import recognize_lines` rebinds at module load
+    # time; patching baselines._kraken.recognize_lines does NOT update the
+    # _chain.recognize_lines reference once _chain is already imported).
     with patch(
-        "baselines._kraken.recognize_lines", return_value=fake_lines
+        "baselines._chain.recognize_lines", return_value=fake_lines
     ), patch(
-        "baselines._images.fetch_image", return_value=fake_image_path
+        "baselines._chain.fetch_image", return_value=fake_image_path
     ), patch(
-        "oracles.dictabert.diacritize", lambda s: f"DIAC({s})"
+        "baselines.biblia_char_menaked.dictabert_diacritize",
+        lambda s: f"DIAC({s})",
     ):
         bl = _ctor(tmp_path, manifest_with_shema_fixture, gt_fixture)
         rc = bl.run()
@@ -168,12 +173,17 @@ def test_char_menaked_tier1_kraken_vs_gt(
     ]
     fake_image_path = tmp_path / "image-cache" / f"{fid}.jpg"
 
+    # Patch the symbols at the place where _chain.py imported them
+    # (`from baselines._kraken import recognize_lines` rebinds at module load
+    # time; patching baselines._kraken.recognize_lines does NOT update the
+    # _chain.recognize_lines reference once _chain is already imported).
     with patch(
-        "baselines._kraken.recognize_lines", return_value=fake_lines
+        "baselines._chain.recognize_lines", return_value=fake_lines
     ), patch(
-        "baselines._images.fetch_image", return_value=fake_image_path
+        "baselines._chain.fetch_image", return_value=fake_image_path
     ), patch(
-        "oracles.dictabert.diacritize", lambda s: f"DIAC({s})"
+        "baselines.biblia_char_menaked.dictabert_diacritize",
+        lambda s: f"DIAC({s})",
     ):
         bl = _ctor(tmp_path, manifest_with_shema_fixture, gt_fixture)
         bl.run()
@@ -215,12 +225,17 @@ def test_char_menaked_run_meta_pins(
     fake_lines = _kraken_lines(fid)
     fake_image_path = tmp_path / "image-cache" / f"{fid}.jpg"
 
+    # Patch the symbols at the place where _chain.py imported them
+    # (`from baselines._kraken import recognize_lines` rebinds at module load
+    # time; patching baselines._kraken.recognize_lines does NOT update the
+    # _chain.recognize_lines reference once _chain is already imported).
     with patch(
-        "baselines._kraken.recognize_lines", return_value=fake_lines
+        "baselines._chain.recognize_lines", return_value=fake_lines
     ), patch(
-        "baselines._images.fetch_image", return_value=fake_image_path
+        "baselines._chain.fetch_image", return_value=fake_image_path
     ), patch(
-        "oracles.dictabert.diacritize", lambda s: f"DIAC({s})"
+        "baselines.biblia_char_menaked.dictabert_diacritize",
+        lambda s: f"DIAC({s})",
     ):
         bl = _ctor(tmp_path, manifest_with_shema_fixture, gt_fixture)
         bl.run()
@@ -259,12 +274,17 @@ def test_char_menaked_diagnostic_not_counted_for_d15(
     fake_image_path = tmp_path / "image-cache" / f"{fid}.jpg"
 
     # expected = 1 — must succeed if diagnostic is correctly excluded.
+    # Patch the symbols at the place where _chain.py imported them
+    # (`from baselines._kraken import recognize_lines` rebinds at module load
+    # time; patching baselines._kraken.recognize_lines does NOT update the
+    # _chain.recognize_lines reference once _chain is already imported).
     with patch(
-        "baselines._kraken.recognize_lines", return_value=fake_lines
+        "baselines._chain.recognize_lines", return_value=fake_lines
     ), patch(
-        "baselines._images.fetch_image", return_value=fake_image_path
+        "baselines._chain.fetch_image", return_value=fake_image_path
     ), patch(
-        "oracles.dictabert.diacritize", lambda s: f"DIAC({s})"
+        "baselines.biblia_char_menaked.dictabert_diacritize",
+        lambda s: f"DIAC({s})",
     ):
         bl = _ctor(tmp_path, manifest_with_shema_fixture, gt_fixture)
         rc = bl.run()
