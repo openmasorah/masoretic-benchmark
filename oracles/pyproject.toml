@@ -25,7 +25,7 @@ all = [
     "torch>=2.2,<3",
     "safetensors>=0.4",
 ]
-dev = ["pytest>=8.0", "pytest-mock>=3.12"]
+dev = ["pytest>=8.0", "pytest-mock>=3.12", "pytest-cov>=4.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
