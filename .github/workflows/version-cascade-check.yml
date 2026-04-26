@@ -1,0 +1,50 @@
+# Version cascade check.
+#
+# Detects pyproject.toml [project].version bumps that silently violate pin
+# consumers in sibling pyproject.toml files inside this repo. Originating
+# incident: Phase 03.1 W0 bumped masoretic-eval 0.1.0 -> 0.2.0 while
+# oracles/pyproject.toml and baselines/pyproject.toml pinned masoretic-eval
+# >=0.1.0,<0.2. Local tests passed (consumers were not installed). This is
+# the deterministic pre-merge gate that catches that class of failure with
+# no human judgment.
+#
+# Independent of ci.yml — does not extend or block its jobs. Runs on PRs and
+# on direct push to main (so manual main pushes do not bypass).
+
+name: Version cascade check
+
+on:
+  pull_request:
+    paths:
+      - "**/pyproject.toml"
+  push:
+    branches: [main]
+    paths:
+      - "**/pyproject.toml"
+
+jobs:
+  cascade-check:
+    name: pyproject pin cascade
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history so we can diff against the PR base SHA or HEAD~1.
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install packaging
+        run: pip install "packaging>=23"
+
+      - name: Run cascade check (pull_request)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          python scripts/check_version_cascade.py \
+            --base "${{ github.event.pull_request.base.sha }}"
+
+      - name: Run cascade check (push to main)
+        if: ${{ github.event_name == 'push' }}
+        run: python scripts/check_version_cascade.py --base HEAD~1
