@@ -23,7 +23,8 @@
   "properties": {
     "schema_version": {
       "type": "string",
-      "const": "0.1.0"
+      "const": "0.1.0",
+      "description": "Data-format version, distinct from package masoretic_eval.__version__ (and from the scorer_version field below, which IS the package version). Do NOT cascade schema_version when bumping package version — schema_version only changes when the JSON shape changes."
     },
     "baseline_id": {
       "type": "string",

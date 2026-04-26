@@ -1,7 +1,7 @@
 {
   "prediction_id": "golden_deut_6_4_5",
   "gt_version": "v0.1.0-golden",
-  "scorer_version": "0.1.0",
+  "scorer_version": "0.2.0",
   "normalization": "NFD (scoring) / LC-order (raw GT)",
   "denominator_policy": {
     "tier1": "consonants_only",
