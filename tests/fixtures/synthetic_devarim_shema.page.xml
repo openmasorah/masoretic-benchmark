@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SYNTHETIC fixture for parser correctness testing. NOT an adjudicated
+  IAA artifact. Real-folio fixtures land in Phase 03.1 W4 per execution
+  gate. Do not use for any GT-comparison or baseline-evaluation purpose.
+  Anchored on Devarim 6:4-9 (Shema) for thematic consistency with the
+  Phase 0 Devarim corpus.
+
+  Edge cases packed into this fixture (asserted in test_parse_page_xml.py):
+    (a) line_3: empty <TextEquiv> (no <Unicode> child) → text=""
+    (b'') line_xyz: non-integer @id suffix → line_num=0 via try/except
+          ValueError fallback AND records[0] is this line (sort-first behavior)
+    (c) Two <TextRegion>s — line_5 lives in region_2, exercises the
+        recursive-descent .//p:TextLine path
+    (d) line_2 + line_5: Hebrew diacritics (cantillation + nikkud) →
+        Unicode-clean roundtrip (Pitfall 2 byte preservation)
+-->
+<PcGts xmlns="http://schema.primaresearch.org/PAGE/gts/pagecontent/2019-07-15">
+  <Page imageFilename="synthetic_devarim_shema.jpg" imageWidth="1200" imageHeight="1800">
+    <TextRegion id="r1">
+      <Coords points="100,100 100,900 1100,900 1100,100"/>
+      <TextLine id="line_xyz" custom="verse_ref:Deut.6.4_pre">
+        <Coords points="100,100 100,200 1100,200 1100,100"/>
+        <TextEquiv index="0" conf="0.5000">
+          <Unicode>וַיְדַבֵּ֣ר מֹשֶׁ֔ה</Unicode>
+        </TextEquiv>
+      </TextLine>
+      <TextLine id="line_2" custom="verse_ref:Deut.6.4">
+        <Coords points="100,200 100,300 1100,300 1100,200"/>
+        <TextEquiv index="0" conf="0.9500">
+          <Unicode>שְׁמַ֥ע יִשְׂרָאֵ֖ל יְהוָ֣ה אֱלֹהֵ֑ינוּ יְהוָ֖ה ׀ אֶחָֽד׃</Unicode>
+        </TextEquiv>
+      </TextLine>
+      <TextLine id="line_3" custom="verse_ref:Deut.6.5">
+        <Coords points="100,300 100,400 1100,400 1100,300"/>
+        <TextEquiv index="0" conf="0.4000"/>
+      </TextLine>
+      <TextLine id="line_4" custom="verse_ref:Deut.6.5_cont">
+        <Coords points="100,400 100,500 1100,500 1100,400"/>
+        <TextEquiv index="0" conf="0.8800">
+          <Unicode>וְאָ֣הַבְתָּ֔ אֵ֖ת יְהוָ֣ה אֱלֹהֶ֑יךָ</Unicode>
+        </TextEquiv>
+      </TextLine>
+      <TextLine id="line_6" custom="verse_ref:Deut.6.6">
+        <Coords points="100,500 100,600 1100,600 1100,500"/>
+        <TextEquiv index="0" conf="0.9100">
+          <Unicode>וְהָי֞וּ הַדְּבָרִ֣ים הָאֵ֗לֶּה</Unicode>
+        </TextEquiv>
+      </TextLine>
+    </TextRegion>
+    <TextRegion id="r2">
+      <Coords points="100,900 100,1700 1100,1700 1100,900"/>
+      <TextLine id="line_5" custom="verse_ref:Deut.6.7">
+        <Coords points="100,900 100,1000 1100,1000 1100,900"/>
+        <TextEquiv index="0" conf="0.9200">
+          <Unicode>וְשִׁנַּנְתָּ֣ם לְבָנֶ֔יךָ</Unicode>
+        </TextEquiv>
+      </TextLine>
+      <TextLine id="line_7" custom="verse_ref:Deut.6.8">
+        <Coords points="100,1000 100,1100 1100,1100 1100,1000"/>
+        <TextEquiv index="0" conf="0.8700">
+          <Unicode>וּקְשַׁרְתָּ֥ם לְא֖וֹת עַל־יָדֶ֑ךָ</Unicode>
+        </TextEquiv>
+      </TextLine>
+      <TextLine id="line_8" custom="verse_ref:Deut.6.9">
+        <Coords points="100,1100 100,1200 1100,1200 1100,1100"/>
+        <TextEquiv index="0" conf="0.8500">
+          <Unicode>וּכְתַבְתָּ֛ם עַל־מְזוּז֥וֹת בֵּיתֶ֖ךָ</Unicode>
+        </TextEquiv>
+      </TextLine>
+    </TextRegion>
+  </Page>
+</PcGts>
