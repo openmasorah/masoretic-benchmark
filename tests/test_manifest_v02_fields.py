@@ -12,8 +12,14 @@ Covers:
 The legacy v0.1 schema is NOT supplied -- Manifest.load is the dual-read
 substrate (per A-1, file is never rewritten on disk; coercion is in-memory).
 """
+
 from __future__ import annotations
 
+# NOTE: "0.1.0" / "v0.1.0" string literals throughout this file are arbitrary
+# fixture data validating manifest field-shape roundtripping — they are NOT
+# tied to the package masoretic_eval.__version__. Do NOT cascade these when
+# bumping the package version. See schemas/run_meta.schema.json schema_version
+# description for the package-version vs data-format-version distinction.
 import json
 from pathlib import Path
 

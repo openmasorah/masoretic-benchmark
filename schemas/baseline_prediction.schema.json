@@ -16,7 +16,8 @@
   "properties": {
     "schema_version": {
       "type": "string",
-      "const": "0.1.0"
+      "const": "0.1.0",
+      "description": "Data-format version, distinct from package masoretic_eval.__version__. Do NOT cascade when bumping package version — schema_version only changes when the JSON shape changes (new required fields, removed fields, type changes), not when the scorer code changes."
     },
     "baseline_id": {
       "type": "string",
