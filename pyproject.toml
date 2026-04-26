@@ -46,14 +46,6 @@ packages = ["masoretic_eval"]
 line-length = 100
 target-version = "py311"
 
-[tool.ruff.format]
-# Phase 03.1 A-04 verbatim-move invariant: masoretic_eval/page_xml.py is a
-# byte-for-byte upstream copy of baalshem/gt-infra/gt_infra/export/page_xml_parser.py.
-# Reformatting would break the verbatim-move acceptance criterion in plan 03.1-01.
-# The gt-infra path becomes a 2-line shim in plan 03.1-02; this exclusion can
-# be removed once that shim is in place.
-exclude = ["masoretic_eval/page_xml.py"]
-
 [tool.ruff.lint]
 select = ["E", "F", "I", "W", "B", "UP"]
 

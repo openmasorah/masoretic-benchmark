@@ -59,8 +59,6 @@ def parse_page_xml(xml_path: Path) -> list[LineRecord]:
         uni = te.find("p:Unicode", NS)
         # lxml returns str without normalization — bytes survive (Pitfall 2).
         text = (uni.text if uni is not None else "") or ""
-        lines.append(
-            LineRecord(line_num=line_num, verse_ref=verse_ref, text=text, conf=conf)
-        )
+        lines.append(LineRecord(line_num=line_num, verse_ref=verse_ref, text=text, conf=conf))
     lines.sort(key=lambda lr: lr.line_num)
     return lines
