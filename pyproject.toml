@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "masoretic-eval"
-version = "0.1.0"
+version = "0.2.0"
 description = "4-tier CER scorer for medieval Hebrew manuscripts"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -27,6 +27,14 @@ dev = [
     "pre-commit>=3.5",
     "PyICU>=2.11; platform_system != 'Windows'",
 ]
+page-xml = [
+    # Documentation-only gate per Phase 03.1 RESEARCH.md Pitfall 1.
+    # lxml is ALREADY a hard dependency via masoretic_eval/uxlc_loader.py:25.
+    # This extra exists to mark consumer intent (gt-infra and baselines
+    # both opt in explicitly) and to provide a future-proof handle if the
+    # scorer ever decouples from lxml. The extra is currently a no-op.
+    "lxml>=5.0",
+]
 
 [project.scripts]
 masoretic-eval = "masoretic_eval.cli:main"
@@ -37,6 +45,14 @@ packages = ["masoretic_eval"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+
+[tool.ruff.format]
+# Phase 03.1 A-04 verbatim-move invariant: masoretic_eval/page_xml.py is a
+# byte-for-byte upstream copy of baalshem/gt-infra/gt_infra/export/page_xml_parser.py.
+# Reformatting would break the verbatim-move acceptance criterion in plan 03.1-01.
+# The gt-infra path becomes a 2-line shim in plan 03.1-02; this exclusion can
+# be removed once that shim is in place.
+exclude = ["masoretic_eval/page_xml.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W", "B", "UP"]
