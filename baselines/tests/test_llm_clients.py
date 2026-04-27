@@ -32,7 +32,12 @@ CLIENTS_PY = REPO_ROOT / "baselines" / "src" / "baselines" / "_llm_clients.py"
 
 def test_module_constants_match_yaml():
     """Module constants ANTHROPIC_MODEL_ID / GEMINI_MODEL_ID / INFERENCE_CFG /
-    BUDGET_CFG / RATE_TABLE are loaded from llm_vision.config.yaml at import."""
+    COST_CAPS_USD / RATE_TABLE are loaded from llm_vision.config.yaml at import.
+
+    Phase 03.1 A-02: ``budget`` block was renamed to ``cost_caps_usd`` with
+    fields ``per_folio`` + ``per_run``. Module surface uses ``COST_CAPS_USD``;
+    ``BUDGET_CFG`` is preserved as a back-compat alias pointing at the same
+    dict (Pitfall 6 zero-API-break carry-forward)."""
     # Set env vars so import succeeds even though clients are not constructed
     # at import time (lru_cache on factory).
     os.environ.setdefault("ANTHROPIC_API_KEY", "dummy-for-import")
@@ -45,8 +50,10 @@ def test_module_constants_match_yaml():
     assert m.INFERENCE_CFG["temperature"] == 0
     assert m.INFERENCE_CFG["seed"] == 0
     assert m.INFERENCE_CFG["max_output_tokens"] == 2048
-    assert m.BUDGET_CFG["cap_per_folio_usd"] > 0
-    assert m.BUDGET_CFG["cap_run_usd"] > 0
+    assert m.COST_CAPS_USD["per_folio"] == 5.00
+    assert m.COST_CAPS_USD["per_run"] == 30.00
+    # Back-compat alias still resolves to the same dict.
+    assert m.BUDGET_CFG is m.COST_CAPS_USD
     assert "claude" in m.RATE_TABLE
     assert "gemini" in m.RATE_TABLE
     # AbbyyFR explicitly NOT a configured source per A-2
@@ -95,13 +102,16 @@ def test_gemini_client_raises_KeyError_when_env_var_unset(monkeypatch):
 
 
 def test_llm_vision_config_yaml_parses_cleanly():
+    """Phase 03.1 A-02: cost_caps_usd block replaces v0.1 budget block.
+
+    Locked numerical values: per_folio=$5.00, per_run=$30.00."""
     import yaml
 
     with open(CONFIG_YAML, encoding="utf-8") as f:
         cfg = yaml.safe_load(f)
-    assert isinstance(cfg["budget"]["cap_per_folio_usd"], (int, float))
-    assert cfg["budget"]["cap_per_folio_usd"] > 0
-    assert cfg["budget"]["cap_run_usd"] > 0
+    assert isinstance(cfg["cost_caps_usd"]["per_folio"], (int, float))
+    assert cfg["cost_caps_usd"]["per_folio"] == 5.00
+    assert cfg["cost_caps_usd"]["per_run"] == 30.00
     assert {"claude", "gemini"} <= set(cfg["models"].keys())
     # AbbyyFR is NOT a configured source (the dropped-rationale comment is fine
     # but no abbyyfr_id / abbyy_engine / abbyyfr_input_per_mtok keys exist)
@@ -117,7 +127,9 @@ def test_llm_vision_config_yaml_pricing_metadata_recorded():
     changes are a documented re-pin event, not silent drift (D-08 / D-09)."""
     text = CONFIG_YAML.read_text(encoding="utf-8")
     assert "anthropic.com/pricing" in text
-    assert "ai.google.dev/pricing" in text
+    # Both common pricing URL stems are acceptable (.../pricing or
+    # .../gemini-api/docs/pricing); accept either as evidence of metadata.
+    assert "ai.google.dev" in text and "pricing" in text
     assert "Retrieved" in text  # retrieval date marker present
 
 

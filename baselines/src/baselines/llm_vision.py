@@ -49,7 +49,6 @@ from baselines._images import fetch_image, image_sha256
 from baselines._kraken import KRAKEN_MODEL_HASH, recognize_lines
 from baselines._llm_clients import (
     ANTHROPIC_MODEL_ID,
-    BUDGET_CFG,
     GEMINI_MODEL_ID,
     INFERENCE_CFG,
     RATE_TABLE,
@@ -101,6 +100,34 @@ class LLMVisionBaseline(BaselineBase):
         self._used_total_usd: float = 0.0
         self._tie_breaks_total: int = 0
         self._winners = {"claude": 0, "gemini": 0}
+        # Phase 03.1 A-02: cost caps come from the MANIFEST at runtime.
+        # YAML COST_CAPS_USD is the seed at first promotion only. If the
+        # manifest lacks the field, we fail fast (preflight gate).
+        self._cost_caps = self._resolve_cost_caps()
+
+    def _resolve_cost_caps(self) -> dict:
+        """A-02 cost-cap discipline: manifest is authoritative source.
+
+        Reads ``cost_caps_usd`` from the manifest (a dict with ``per_folio``
+        and ``per_run`` keys). Tries the dataclass property first (if a
+        future v0.3 schema bump exposes it), then falls back to the raw
+        coerced doc (Manifest._raw). FakeManifest (test) carries the
+        ``cost_caps_usd`` attribute directly. If absent, raises
+        BudgetExceeded with the canonical "manifest cost_caps_usd not
+        seeded" message — the ``preflight_cost_caps.py`` script greps
+        stderr for this message.
+        """
+        caps = None
+        # 1) Manifest dataclass attribute (FakeManifest test path + future v0.3).
+        caps = getattr(self.manifest, "cost_caps_usd", None)
+        # 2) Real Manifest._raw fallback (v0.2 schema reads raw dict).
+        if not caps:
+            raw = getattr(self.manifest, "_raw", None)
+            if isinstance(raw, dict):
+                caps = raw.get("cost_caps_usd")
+        if not caps or "per_folio" not in caps or "per_run" not in caps:
+            raise BudgetExceeded("manifest cost_caps_usd not seeded — run preflight to populate")
+        return dict(caps)
 
     # -- D-12 abstract method (only override) --------------------------------
     def infer_folio(self, folio) -> list[LineRecord]:
@@ -167,20 +194,24 @@ class LLMVisionBaseline(BaselineBase):
         }
         return out
 
-    # -- D-08 budget enforcement --------------------------------------------
+    # -- D-08 + A-02 budget enforcement -------------------------------------
     def _enforce_budget(self, folio_used: float, *, folio_id: str) -> None:
-        """Per-folio + per-run cap (D-08). BudgetExceeded is a ScopeViolation
-        sibling — sandbox-then-promote (D-14) leaves results/.in_progress/
-        for inspection."""
-        if folio_used > BUDGET_CFG["cap_per_folio_usd"]:
+        """Per-folio + per-run cap (D-08 + Phase 03.1 A-02). BudgetExceeded
+        is a ScopeViolation sibling — sandbox-then-promote (D-14, A-01
+        amended) leaves results/.in_progress/ for inspection.
+
+        Phase 03.1 A-02: caps read from manifest's ``cost_caps_usd`` field
+        (per_folio: 5.00, per_run: 30.00); resolved at __init__ time.
+        """
+        if folio_used > self._cost_caps["per_folio"]:
             raise BudgetExceeded(
-                f"D-08: per-folio budget cap exceeded on folio {folio_id}: "
-                f"${folio_used:.4f} > ${BUDGET_CFG['cap_per_folio_usd']}"
+                f"D-08/A-02: per-folio budget cap exceeded on folio {folio_id}: "
+                f"${folio_used:.4f} > ${self._cost_caps['per_folio']}"
             )
-        if self._used_total_usd > BUDGET_CFG["cap_run_usd"]:
+        if self._used_total_usd > self._cost_caps["per_run"]:
             raise BudgetExceeded(
-                f"D-08: per-run budget cap exceeded: "
-                f"${self._used_total_usd:.4f} > ${BUDGET_CFG['cap_run_usd']}"
+                f"D-08/A-02: per-run budget cap exceeded: "
+                f"${self._used_total_usd:.4f} > ${self._cost_caps['per_run']}"
             )
 
     @staticmethod
@@ -324,8 +355,8 @@ class LLMVisionBaseline(BaselineBase):
             ),
         }
         base["budget"] = {
-            "cap_per_folio": BUDGET_CFG["cap_per_folio_usd"],
-            "cap_run": BUDGET_CFG["cap_run_usd"],
+            "cap_per_folio": self._cost_caps["per_folio"],
+            "cap_run": self._cost_caps["per_run"],
             "used_total": round(self._used_total_usd, 6),
             "rate_table_snapshot": RATE_TABLE,
         }

@@ -220,6 +220,7 @@ def test_replay_mode_uses_logged_responses_not_live_clients(tmp_path, monkeypatc
         bl._used_total_usd = 0.0
         bl._tie_breaks_total = 0
         bl._winners = {"claude": 0, "gemini": 0}
+        bl._cost_caps = bl._resolve_cost_caps()
 
         rc = bl.run()
 
@@ -290,6 +291,7 @@ def test_replay_mode_raises_on_missing_fixture(tmp_path, monkeypatch):
         bl._used_total_usd = 0.0
         bl._tie_breaks_total = 0
         bl._winners = {"claude": 0, "gemini": 0}
+        bl._cost_caps = bl._resolve_cost_caps()
 
         with pytest.raises(ReplayMissError):
             bl.run()

@@ -136,6 +136,10 @@ def llm_call_with_replay(
         "model_version_returned": meta.get("model_version_returned"),
         "token_counts": meta.get("token_counts"),
         "finish_reason": meta.get("finish_reason"),
+        # Phase 03.1 A-02 extension to D-10: per-call spend in USD. Surfaces
+        # actual cost retrospectively (priced from token_counts x rate table)
+        # for the per-folio sum <= cost_caps_usd.per_folio assertion.
+        "actual_spend_usd": meta.get("actual_spend_usd"),
         "timestamp": datetime.now(UTC).isoformat(timespec="seconds"),
     }
     _atomic_append(replay_log, record)
