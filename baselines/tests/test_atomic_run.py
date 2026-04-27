@@ -5,6 +5,10 @@ Plan 03-02 Task 2 behavior tests 3 + 4:
     run_meta.json; .in_progress/<bl>/ is gone (or empty).
   - Test 4 (abort): infer_folio raises -> .in_progress/<bl>/ is left
     populated; results/<bl>/ is untouched.
+
+Phase 03.1 A-01 amendment: per-folio promotion replaces whole-batch
+sandbox.promote(). Tests that call bl.run() now route the manifest bump
+through a tmp_path manifest via PHASE_0_MANIFEST_PATH env var.
 """
 
 from __future__ import annotations
@@ -26,6 +30,28 @@ def _ctor(tmp_path, manifest, cls):
     return bl
 
 
+def _seed_manifest_for_run(tmp_path, monkeypatch, baseline_id: str = "biblia_kraken"):
+    """A-01: BaselineBase.run reads PHASE_0_MANIFEST_PATH per folio.
+    Seed an empty-but-valid manifest in tmp_path and point the env there.
+    Returns the path to the seeded manifest."""
+    p = tmp_path / "phase_0_manifest.json"
+    p.write_text(
+        json.dumps(
+            {
+                "version": "v0.2.0",
+                "frozen_at": "2026-04-25T16:30:44Z",
+                "expected_reports_per_baseline": {baseline_id: 0},
+                "manifest_changelog": [],
+            },
+            ensure_ascii=False,
+            sort_keys=True,
+            indent=2,
+        )
+    )
+    monkeypatch.setenv("PHASE_0_MANIFEST_PATH", str(p))
+    return p
+
+
 # -- D-14 success path -------------------------------------------------------
 
 
@@ -45,12 +71,13 @@ class _GoodBaseline(BaselineBase):
         ]
 
 
-def test_d14_success_promotes_to_results_dir(tmp_path):
+def test_d14_success_promotes_to_results_dir(tmp_path, monkeypatch):
     fid = "leningrad_devarim_shema_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_kraken": 1},
     )
+    _seed_manifest_for_run(tmp_path, monkeypatch, "biblia_kraken")
     bl = _ctor(tmp_path, manifest, _GoodBaseline)
     rc = bl.run()
     assert rc == 0
@@ -59,9 +86,10 @@ def test_d14_success_promotes_to_results_dir(tmp_path):
     final_pred = tmp_path / "biblia_kraken" / f"{fid}.json"
     final_meta = tmp_path / "biblia_kraken" / "run_meta.json"
     assert final_pred.exists(), "prediction must be promoted"
-    assert final_meta.exists(), "run_meta must be promoted"
+    assert final_meta.exists(), "run_meta must be in final dir (A-01)"
 
-    # Sandbox dir is gone (or empty)
+    # Sandbox dir is gone (or empty) -- per-folio promote drained it; run_meta
+    # writes directly to final dir per A-01 amendment.
     sandbox = tmp_path / ".in_progress" / "biblia_kraken"
     if sandbox.exists():
         assert not any(sandbox.iterdir()), f"sandbox should be empty, has {list(sandbox.iterdir())}"
@@ -85,12 +113,13 @@ class _BoomBaseline(BaselineBase):
         raise RuntimeError("boom")
 
 
-def test_d14_abort_leaves_sandbox_for_inspection(tmp_path):
+def test_d14_abort_leaves_sandbox_for_inspection(tmp_path, monkeypatch):
     fid = "leningrad_devarim_shema_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_kraken": 1},
     )
+    _seed_manifest_for_run(tmp_path, monkeypatch, "biblia_kraken")
     bl = _ctor(tmp_path, manifest, _BoomBaseline)
 
     with pytest.raises(RuntimeError, match="boom"):
@@ -125,10 +154,15 @@ class _UnderCounterBaseline(BaselineBase):
         ]
 
 
-def test_d15_off_by_one_prevents_promote(tmp_path):
-    """expected_reports_for declares 2 but only 1 folio is iterated.
-    validate_expected_total_reports raises BEFORE sandbox.promote() —
-    results/<bl>/ stays untouched, .in_progress/<bl>/ left for inspection."""
+def test_d15_off_by_one_raises_after_per_folio_promote(tmp_path, monkeypatch):
+    """A-01 amendment: per-folio promote means D-15 check happens at the
+    end-of-run, AFTER all folios already promoted. The folio that did
+    promote is in results/<bl>/; the validate raises BaselineError because
+    1 != 2. Off-by-one D-15 is now detected post-promote rather than
+    pre-promote (the per-folio invariant subsumed the pre-promote check).
+    The CI-side `test_results_dir_count_equals_manifest_expected_reports`
+    is the cross-run gate that flags the persistent inconsistency.
+    """
     from baselines._errors import BaselineError
 
     fid = "leningrad_devarim_shema_fixture"
@@ -136,20 +170,20 @@ def test_d15_off_by_one_prevents_promote(tmp_path):
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_kraken": 2},  # declares 2, only 1 folio in scope
     )
+    _seed_manifest_for_run(tmp_path, monkeypatch, "biblia_kraken")
     bl = _ctor(tmp_path, manifest, _UnderCounterBaseline)
 
     with pytest.raises(BaselineError, match=r"D-15.*mismatch"):
         bl.run()
 
-    assert not (tmp_path / "biblia_kraken").exists()
-    sandbox = tmp_path / ".in_progress" / "biblia_kraken"
-    assert sandbox.exists()
-    # At least one prediction should be in the sandbox
-    pred_files = [p for p in sandbox.glob("*.json") if p.name != "run_meta.json"]
-    assert len(pred_files) == 1
+    # A-01 amendment: per-folio promote landed the single folio in results/<bl>/
+    # before the end-of-run D-15 mismatch raised. The cross-run CI gate
+    # surfaces the persistent inconsistency; this in-run check is a
+    # defensive double-check.
+    assert (tmp_path / "biblia_kraken" / f"{fid}.json").exists()
 
 
-def test_d15_unknown_baseline_raises_baselineerror(tmp_path):
+def test_d15_unknown_baseline_raises_baselineerror(tmp_path, monkeypatch):
     """Manifest declares mapping for some baselines but not this one ->
     KeyError -> wrapped as BaselineError with D-15 context."""
     from baselines._errors import BaselineError
@@ -159,6 +193,7 @@ def test_d15_unknown_baseline_raises_baselineerror(tmp_path):
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"other_baseline": 1},
     )
+    _seed_manifest_for_run(tmp_path, monkeypatch, "biblia_kraken")
     bl = _ctor(tmp_path, manifest, _GoodBaseline)
 
     with pytest.raises(BaselineError, match=r"D-15.*does not declare expected reports"):

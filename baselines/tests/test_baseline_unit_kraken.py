@@ -122,9 +122,13 @@ def test_kraken_run_writes_valid_prediction_and_run_meta(tmp_path, monkeypatch):
 # ----------------------------------------------------------------------
 
 
-def test_kraken_d15_off_by_one_prevents_promote(tmp_path):
-    """Manifest declares 2 expected; only 1 folio in scope -> D-15 raises;
-    results/biblia_kraken/ NOT created; .in_progress/ left for inspection."""
+def test_kraken_d15_off_by_one_raises_after_per_folio_promote(tmp_path):
+    """A-01 amendment: per-folio promote means D-15 mismatch is detected
+    AFTER all folios already promoted. Manifest declares 2 expected, only
+    1 folio in scope -> the single folio promotes, then end-of-run D-15
+    raises BaselineError because 1 != 2. The CI-side
+    test_results_dir_count_equals_manifest_expected_reports gate catches
+    the persistent inconsistency across runs."""
     from baselines._errors import BaselineError
 
     fid = "leningrad_devarim_shema_fixture"
@@ -145,11 +149,9 @@ def test_kraken_d15_off_by_one_prevents_promote(tmp_path):
         with pytest.raises(BaselineError, match=r"D-15.*mismatch"):
             bl.run()
 
-    assert not (tmp_path / "biblia_kraken").exists()
-    sandbox = tmp_path / ".in_progress" / "biblia_kraken"
-    assert sandbox.exists()
-    pred_files = [p for p in sandbox.glob("*.json") if p.name != "run_meta.json"]
-    assert len(pred_files) == 1
+    # A-01 amendment: per-folio promote landed the single folio in
+    # results/<bl>/ before end-of-run D-15 mismatch raised.
+    assert (tmp_path / "biblia_kraken" / f"{fid}.json").exists()
 
 
 # ----------------------------------------------------------------------

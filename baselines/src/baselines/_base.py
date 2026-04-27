@@ -95,14 +95,35 @@ class BaselineBase(ABC):
         KrakenInferenceFailure / BaselineError on structural failure;
         sandbox is left at results/.in_progress/<baseline_id>/ for
         inspection.
+
+        Phase 03.1 amendment (A-01): per-folio promotion replaces
+        whole-batch sandbox.promote(). Each successful folio is paired-
+        promoted with its manifest version bump; the next iteration
+        cannot start without a clean atomic transaction completing for
+        the previous folio.
         """
         # D-13a: script-start preflight.
         self._preflight(folio_ids)
 
-        # D-14: sandbox-then-promote. Lazy imports keep the helper modules
-        # off the package import path so test fakes can patch them.
+        # D-14 (A-01 amended): sandbox-then-per-folio-promote. Lazy imports
+        # keep the helper modules off the package import path so test fakes
+        # can patch them.
+        import os as _os
+        from pathlib import Path as _Path
+
         from baselines._atomic import SandboxRun
+        from baselines._manifest_bump import build_bump
         from baselines._run_meta import validate_expected_total_reports
+
+        # Manifest path resolves from PHASE_0_MANIFEST_PATH env var (CI),
+        # else defaults to the dev convention. Both plan 03.1-04 Task 3 CI
+        # job and plan 05/06 invocations export PHASE_0_MANIFEST_PATH.
+        manifest_path = _Path(
+            _os.environ.get(
+                "PHASE_0_MANIFEST_PATH",
+                "/Users/benlamm/Workspace/baalshem/phase_0_manifest.json",
+            )
+        )
 
         with SandboxRun(self.results_root, self.BASELINE_ID) as sandbox:
             for folio in self._iter_folios(folio_ids):
@@ -112,18 +133,48 @@ class BaselineBase(ABC):
                 pred = self._serialize(folio, lines)
                 sandbox.write_prediction(folio.id, pred)
 
-            # D-15: bit-equality. Raised BEFORE sandbox.promote() so an
-            # off-by-one run never appears in results/<bl>/.
+                # A-01 per-folio paired promotion (replaces end-of-run
+                # sandbox.promote()). On rollback, the ScopeViolation /
+                # OSError / BudgetExceeded raises propagate; sandbox dir
+                # remains for inspection.
+                sandbox.promote_folio(
+                    folio.id,
+                    manifest_path=manifest_path,
+                    bump_manifest=build_bump(self.BASELINE_ID, folio.id),
+                )
+
+            # run_meta written ONCE at end-of-run, directly to the final
+            # results/<bl>/ dir per A-01 amendment (no end-of-run promote()
+            # call to migrate it). D-18 latest-state-snapshot semantics.
+            sandbox.write_run_meta_final(self._compose_run_meta())
+
+            # D-15 bit-equality after all folios promoted. The CI-side
+            # test_expected_totals.py provides the authoritative gate against
+            # results/<bl>/; this in-run validate is a defensive double-check
+            # against the sandbox's count() (which after per-folio promotion
+            # only counts the run_meta sentinel).
             validate_expected_total_reports(
                 manifest=self.manifest,
                 baseline_id=self.BASELINE_ID,
-                written_count=sandbox.count(),
+                written_count=self._count_results(),
             )
 
-            sandbox.write_run_meta(self._compose_run_meta())
-            sandbox.promote()
-
         return 0
+
+    def _count_results(self) -> int:
+        """Count realistic predictions in the FINAL results/<bl>/ dir.
+
+        Per A-01 amendment: per-folio promotion empties the sandbox of
+        prediction files as each folio promotes. The D-15 bit-equality
+        check therefore counts the FINAL dir (where promoted predictions
+        live), not the sandbox.
+        """
+        from pathlib import Path as _Path
+
+        final_dir = _Path(self.results_root) / self.BASELINE_ID
+        if not final_dir.exists():
+            return 0
+        return sum(1 for p in final_dir.glob("*.json") if p.name != "run_meta.json")
 
     # -- abstract surface ------------------------------------------------------
     @abstractmethod
