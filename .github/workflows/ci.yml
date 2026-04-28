@@ -257,11 +257,57 @@ jobs:
       - name: Run live baseline tests (real API spend; surfaces drift)
         run: pytest baselines/tests/ -q -m "live_baselines or live_kraken" --tb=short
 
-      - name: Phase 3.1 real fixture generation (DEFERRED — placeholder)
-        # Phase 3 ships scaffolding + replay discipline + paper-defensible
-        # methodology. Real predictions on the 5 IAA folios for BL-01..BL-04
-        # are deferred to Phase 3.1. When Phase 3.1 plans land, replace this
-        # echo with the actual end-to-end fixture-generation step. continue-
-        # on-error: true at job level means a missing IAA fixture pass does
-        # NOT fail this job today.
-        run: echo "Phase 3.1 deferred — see .planning/STATE.md and 03-08 SUMMARY"
+      - name: Preflight - cost caps must be seeded in manifest
+        env:
+          PHASE_0_MANIFEST_PATH: ${{ github.workspace }}/../baalshem/phase_0_manifest.json
+        run: python baselines/scripts/preflight_cost_caps.py
+
+      - name: Phase 03.1 real fixture generation - all 4 baselines
+        # Phase 03.1 D-08: real predictions on the IAA folios via the
+        # baselines.run CLI module (created by plan 03.1-04 Task 3).
+        # Sequential per D-03: BL-02 (Kraken) -> BL-01 (LLM, [YOSEF-REVIEW]
+        # gate) -> BL-03 (Nakdimon chain) -> BL-04 (DictaBERT chain).
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          RUN_LIVE_BASELINES: "1"
+          PHASE_0_MANIFEST_PATH: ${{ github.workspace }}/../baalshem/phase_0_manifest.json
+        run: |
+          python -m baselines.run --baseline biblia_kraken
+          python -m baselines.run --baseline llm_vision
+          python -m baselines.run --baseline biblia_nakdimon
+          python -m baselines.run --baseline biblia_char_menaked
+
+  # ----------------------------------------------------------------------------
+  # Phase 03.1 A-03 two-tier review gate. The first-of-kind BL-01 PR (any PR
+  # adding files under results/llm_vision/ when main has none) MUST carry the
+  # [YOSEF-REVIEW] prefix in its PR title; subsequent BL-01 PRs auto-merge.
+  # The gate ONLY runs on pull_request events; no manual nor scheduled trigger.
+  # ----------------------------------------------------------------------------
+
+  check-yosef-review-gate:
+    name: Yosef-review gate (folio-1 BL-01 only)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Detect first-of-kind LLM-vision result
+        id: detect
+        run: |
+          git fetch origin main:main
+          MAIN_COUNT=$(git ls-tree -r main --name-only | grep -E '^results/llm_vision/[^/]+\.json$' | wc -l | tr -d ' ')
+          PR_COUNT=$(git diff main..HEAD --name-only --diff-filter=A | grep -E '^results/llm_vision/[^/]+\.json$' | wc -l | tr -d ' ')
+          echo "main_count=$MAIN_COUNT" >> "$GITHUB_OUTPUT"
+          echo "pr_adds=$PR_COUNT" >> "$GITHUB_OUTPUT"
+      - name: Enforce [YOSEF-REVIEW] prefix on first-of-kind PR
+        if: steps.detect.outputs.main_count == '0' && steps.detect.outputs.pr_adds != '0'
+        run: |
+          TITLE="${{ github.event.pull_request.title }}"
+          if [[ "$TITLE" != "[YOSEF-REVIEW]"* ]]; then
+            echo "::error::First BL-01 LLM-vision PR requires [YOSEF-REVIEW] prefix in title (per Phase 3.1 A-03)."
+            echo "::error::Current title: $TITLE"
+            exit 1
+          fi
+          echo "First-of-kind PR with [YOSEF-REVIEW] prefix - gate satisfied."

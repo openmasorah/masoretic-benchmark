@@ -176,6 +176,45 @@ def test_violator_run_override_would_be_detected():
     assert has_run_override, "Synthetic violator must declare def run; sanity check failed"
 
 
+def test_run_body_calls_promote_folio_not_promote():
+    """I-4 (Phase 03.1 A-01 amendment): BaselineBase.run body MUST call
+    sandbox.promote_folio (per-folio paired promotion) and MUST NOT call
+    sandbox.promote (whole-batch promotion). Locks the A-01 amendment
+    structurally so a future regression to the Phase 3 D-14 form is
+    caught by AST walk."""
+    base_path = BASELINES_SRC / "_base.py"
+    tree = ast.parse(base_path.read_text(encoding="utf-8"))
+    run_func = None
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ClassDef) and node.name == "BaselineBase":
+            for child in node.body:
+                if isinstance(child, ast.FunctionDef) and child.name == "run":
+                    run_func = child
+                    break
+            break
+    assert run_func is not None, "BaselineBase.run not found in _base.py"
+
+    promote_folio_calls = 0
+    promote_calls = 0
+    for sub in ast.walk(run_func):
+        if isinstance(sub, ast.Call) and isinstance(sub.func, ast.Attribute):
+            if isinstance(sub.func.value, ast.Name) and sub.func.value.id == "sandbox":
+                if sub.func.attr == "promote_folio":
+                    promote_folio_calls += 1
+                elif sub.func.attr == "promote":
+                    promote_calls += 1
+
+    assert promote_folio_calls >= 1, (
+        "I-4 (A-01 amendment): BaselineBase.run body MUST call "
+        "sandbox.promote_folio at least once (per-folio paired promotion)."
+    )
+    assert promote_calls == 0, (
+        "I-4 (A-01 amendment): BaselineBase.run body MUST NOT call "
+        f"sandbox.promote (whole-batch promotion); found {promote_calls} "
+        "call(s). The Phase 3 D-14 form was amended by Phase 03.1 A-01."
+    )
+
+
 def test_violator_missing_baseline_id_would_be_detected():
     """Test 3: a synthetic file that omits BASELINE_ID WOULD trip I-2."""
     classes = _walk_temp(_NO_BASELINE_ID_SRC)

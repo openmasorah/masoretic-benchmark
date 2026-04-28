@@ -26,9 +26,7 @@ class FakeFolio:
     # real Folio carries an image_url; the FakeFolio mirrors that surface so
     # baselines that fetch images (BL-02/03/04) can be unit-tested without a
     # custom subclass. Default points at the dry-run Shema folio fixture URL.
-    image_url: str = (
-        "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F195A.jpg"
-    )
+    image_url: str = "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F195A.jpg"
 
 
 @dataclass
@@ -38,12 +36,13 @@ class FakeManifest:
     expected_total_reports: int | None = None
     scorer_version: str = "v0.1.0-scorer"
     manifest_hash: str | None = "fake-manifest-hash"
+    # Phase 03.1 A-02: cost_caps_usd is authoritative at runtime. FakeManifest
+    # carries it as a direct attribute; real Manifest exposes via _raw doc.
+    # Default = the A-02 locked values so tests have realistic caps to enforce.
+    cost_caps_usd: dict = field(default_factory=lambda: {"per_folio": 5.00, "per_run": 30.00})
 
     def frozen_leningrad_folios(self) -> list[FakeFolio]:
-        return [
-            f for f in self.folios
-            if f.manuscript == "leningrad" and f.in_frozen_scope
-        ]
+        return [f for f in self.folios if f.manuscript == "leningrad" and f.in_frozen_scope]
 
     def expected_reports_for(self, baseline_id: str) -> int:
         # Plan 03-01 precedence rule (Issue 5 fix): mapping wins iff non-empty.

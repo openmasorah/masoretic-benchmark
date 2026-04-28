@@ -14,6 +14,7 @@ Per A-1 precedence rule, the per-baseline mapping is canonical for v0.2;
 the legacy scalar `expected_total_reports` is preserved for v0.1 readers
 but is NOT consulted by this assertion.
 """
+
 from __future__ import annotations
 
 import json
@@ -66,6 +67,39 @@ def test_manifest_declares_expected_reports_per_baseline_for_every_baseline_id()
     )
 
 
+def test_results_dir_count_equals_manifest_expected_reports():
+    """A-01 D-14 amendment: len(results/<bl>/) must equal
+    manifest.expected_reports_per_baseline[<bl>] after every promotion.
+    Checked on EVERY CI invocation (not just at end-of-run).
+
+    Path resolution per BLOCKER-2 (post-revision):
+      Path(__file__) = .../baselines/tests/test_expected_totals.py
+      parents[0]     = baselines/tests/
+      parents[1]     = baselines/
+      parents[2]     = masoretic-benchmark/   <-- sibling repo root
+    Matches the convention pinned in test_invariants.py:33.
+    """
+    SIBLING_RESULTS = Path(__file__).resolve().parents[2] / "results"
+    if not SIBLING_RESULTS.exists():
+        pytest.skip("results/ tree not yet seeded (Phase 03.1 W4/W5 in progress)")
+
+    if not BAALSHEM_MANIFEST.exists():
+        pytest.skip("baalshem manifest not present (running outside expected layout)")
+
+    m = json.loads(BAALSHEM_MANIFEST.read_text(encoding="utf-8"))
+    per_baseline = m["expected_reports_per_baseline"]
+    for bid, expected in per_baseline.items():
+        bl_dir = SIBLING_RESULTS / bid
+        if not bl_dir.exists():
+            assert expected == 0, f"{bid}: manifest expects {expected} but results/{bid}/ missing"
+            continue
+        actual = sum(1 for p in bl_dir.glob("*.json") if p.name != "run_meta.json")
+        assert actual == expected, (
+            f"D-15 (A-01-amended) bit-equality: results/{bid}/ has {actual} "
+            f"files, manifest expects {expected}"
+        )
+
+
 @pytest.mark.skipif(
     not BAALSHEM_MANIFEST.exists(),
     reason="baalshem manifest not present in this CI sandbox",
@@ -78,6 +112,5 @@ def test_manifest_version_is_v02():
     m = json.loads(BAALSHEM_MANIFEST.read_text(encoding="utf-8"))
     version = m.get("version", "")
     assert version.startswith("v0.2"), (
-        f"D-15 expects v0.2 manifest with per-baseline mapping; "
-        f"manifest version is {version!r}"
+        f"D-15 expects v0.2 manifest with per-baseline mapping; manifest version is {version!r}"
     )

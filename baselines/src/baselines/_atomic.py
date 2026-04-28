@@ -14,6 +14,7 @@ from __future__ import annotations
 import json
 import os
 import shutil
+from collections.abc import Callable
 from pathlib import Path
 
 from baselines._schema import validate_prediction, validate_run_meta
@@ -76,17 +77,31 @@ class SandboxRun:
         self._atomic_write_json(path, payload)
         return path
 
+    def write_run_meta_final(self, payload: dict) -> Path:
+        """A-01 amendment: write run_meta directly to results/<bl>/ at
+        end-of-run, after all folios have already been per-folio promoted.
+
+        Phase 3 D-18: run_meta is a latest-state snapshot, single-file,
+        rewritten on each promotion. Per A-01 (per-folio promotion), there
+        is no end-of-run promote() call to migrate sandbox/run_meta.json
+        into results/<bl>/. We therefore write directly to the final dir
+        (the dir already exists because per-folio promote_folio created
+        it). Validation runs BEFORE the atomic temp+rename write so an
+        off-shape payload never lands.
+        """
+        validate_run_meta(payload)
+        self.final_dir.mkdir(parents=True, exist_ok=True)
+        path = self.final_dir / "run_meta.json"
+        self._atomic_write_json(path, payload)
+        return path
+
     def count(self) -> int:
         """Count of REALISTIC predictions (top-level *.json), not diagnostics
         and not run_meta.json. D-15 bit-equality compares this to
         manifest.expected_reports_for(baseline_id)."""
         if not self.sandbox_dir.exists():
             return 0
-        return sum(
-            1
-            for p in self.sandbox_dir.glob("*.json")
-            if p.name != "run_meta.json"
-        )
+        return sum(1 for p in self.sandbox_dir.glob("*.json") if p.name != "run_meta.json")
 
     def promote(self) -> None:
         """Atomic rename: move every file from sandbox to final dir.
@@ -118,6 +133,102 @@ class SandboxRun:
         except OSError:
             pass
         self._promoted = True
+
+    def promote_folio(
+        self,
+        folio_id: str,
+        *,
+        manifest_path: Path,
+        bump_manifest: Callable[[dict], dict],
+    ) -> None:
+        """A-01 per-folio paired promotion (Phase 03.1 amendment to D-14).
+
+        Operations (paired success-or-paired-rollback):
+          1. os.replace(.in_progress/<bl>/<folio>.json, results/<bl>/<folio>.json)
+          2. (BL-01 only -- if .in_progress/<bl>/<folio>/ exists)
+             os.replace(.in_progress/<bl>/<folio>/, results/<bl>/<folio>/)
+          3. Manifest version bump:
+             - read manifest_path JSON
+             - call bump_manifest(prev) -> new_manifest_dict
+             - atomic temp+rename write via _atomic_write_json
+          4. fsync parent dirs of (1), (2), (3) for crash-durability (Pitfall 3)
+
+        Rollback:
+          - If (1) succeeds but (3) fails -> rename results/<bl>/<folio>.json BACK
+            and (BL-01) rename results/<bl>/<folio>/ BACK; re-raise.
+          - If (1) fails -> never call (3); re-raise.
+          - If (2) fails -> rollback (1); re-raise.
+
+        Args:
+            folio_id: the folio_id being promoted.
+            manifest_path: absolute path to phase_0_manifest.json.
+            bump_manifest: callable taking the prev manifest dict and returning
+                the new manifest dict (with incremented expected_reports_per_baseline,
+                updated frozen_at, appended manifest_changelog row).
+
+        Raises:
+            FileNotFoundError if .in_progress/<bl>/<folio>.json does not exist.
+            Any OSError from os.replace or fsync; or any exception from bump_manifest.
+        """
+        src_pred = self.sandbox_dir / f"{folio_id}.json"
+        src_dir = self.sandbox_dir / folio_id  # BL-01 only -- may not exist for BL-02/03/04
+        # BL-03/BL-04 GT-fed diagnostic per folio (D-01); written by
+        # SandboxRun.write_diagnostic into <sandbox>/diagnostic/<folio>.gt_fed.json.
+        # Promoted alongside the realistic prediction file so the per-folio
+        # transaction stays paired across the chain.
+        src_diag = self.sandbox_dir / "diagnostic" / f"{folio_id}.gt_fed.json"
+        if not src_pred.exists():
+            raise FileNotFoundError(f"promote_folio: {src_pred} does not exist")
+
+        self.final_dir.mkdir(parents=True, exist_ok=True)
+        dst_pred = self.final_dir / f"{folio_id}.json"
+        dst_dir = self.final_dir / folio_id
+        dst_diag = self.final_dir / "diagnostic" / f"{folio_id}.gt_fed.json"
+
+        moved_pred = False
+        moved_dir = False
+        moved_diag = False
+
+        try:
+            os.replace(src_pred, dst_pred)
+            moved_pred = True
+            self._fsync_parent(dst_pred)
+
+            if src_dir.is_dir():
+                if dst_dir.exists():
+                    shutil.rmtree(dst_dir)
+                os.replace(src_dir, dst_dir)
+                moved_dir = True
+                self._fsync_parent(dst_dir)
+
+            if src_diag.exists():
+                dst_diag.parent.mkdir(parents=True, exist_ok=True)
+                os.replace(src_diag, dst_diag)
+                moved_diag = True
+                self._fsync_parent(dst_diag)
+
+            prev = json.loads(manifest_path.read_text(encoding="utf-8"))
+            new = bump_manifest(prev)
+            self._atomic_write_json(manifest_path, new)
+            self._fsync_parent(manifest_path)
+
+        except Exception:
+            if moved_diag and dst_diag.exists():
+                os.replace(dst_diag, src_diag)
+            if moved_dir and dst_dir.is_dir():
+                os.replace(dst_dir, src_dir)
+            if moved_pred and dst_pred.exists():
+                os.replace(dst_pred, src_pred)
+            raise
+
+    @staticmethod
+    def _fsync_parent(path: Path) -> None:
+        """Pitfall 3: rename is not crash-durable without parent-dir fsync."""
+        fd = os.open(str(path.parent), os.O_RDONLY)
+        try:
+            os.fsync(fd)
+        finally:
+            os.close(fd)
 
     @staticmethod
     def _atomic_write_json(path: Path, payload: dict) -> None:

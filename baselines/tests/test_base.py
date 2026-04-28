@@ -37,18 +37,35 @@ def test_cannot_instantiate_without_infer_folio(tmp_path):
         BaselineBase(tmp_path / "manifest.json", tmp_path)  # type: ignore[abstract]
 
 
-def test_run_calls_template_methods_in_order(tmp_path, mocker):
-    """Verify the locked call order: preflight -> scope_check (per folio)
-    -> infer_folio -> validate_expected_total_reports -> write_run_meta
-    -> sandbox.promote.
+def test_run_calls_template_methods_in_order(tmp_path, mocker, monkeypatch):
+    """Verify the locked call order (Phase 03.1 A-01 amended):
+    preflight -> [for each folio: scope_check -> infer_folio ->
+    sandbox.promote_folio] -> sandbox.write_run_meta_final ->
+    validate_expected_total_reports.
 
     We monkey-patch the helpers to log call order; the locked run()
-    drives them in the order BaselineBase declares (D-12)."""
+    drives them in the order BaselineBase declares (D-12 + A-01).
+    """
     fid = "leningrad_devarim_shema_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_kraken": 1},
     )
+    # A-01: BaselineBase.run reads manifest from PHASE_0_MANIFEST_PATH per folio.
+    import json as _json
+
+    mp = tmp_path / "phase_0_manifest.json"
+    mp.write_text(
+        _json.dumps(
+            {
+                "version": "v0.2.0",
+                "frozen_at": "2026-04-25T16:30:44Z",
+                "expected_reports_per_baseline": {"biblia_kraken": 0},
+                "manifest_changelog": [],
+            }
+        )
+    )
+    monkeypatch.setenv("PHASE_0_MANIFEST_PATH", str(mp))
 
     call_order: list[str] = []
 
@@ -81,7 +98,7 @@ def test_run_calls_template_methods_in_order(tmp_path, mocker):
     bl.results_root = tmp_path
     bl.replay = False
 
-    # Spy on the validator + write_run_meta + sandbox.promote
+    # Spy on the validator + write_run_meta_final + sandbox.promote_folio
     import baselines._run_meta as rm
 
     real_validate = rm.validate_expected_total_reports
@@ -94,21 +111,23 @@ def test_run_calls_template_methods_in_order(tmp_path, mocker):
 
     import baselines._atomic as atomic
 
-    real_promote = atomic.SandboxRun.promote
+    real_promote_folio = atomic.SandboxRun.promote_folio
 
-    def spy_promote(self):
-        call_order.append("sandbox.promote")
-        return real_promote(self)
+    def spy_promote_folio(self, folio_id, *, manifest_path, bump_manifest):
+        call_order.append(f"sandbox.promote_folio({folio_id})")
+        return real_promote_folio(
+            self, folio_id, manifest_path=manifest_path, bump_manifest=bump_manifest
+        )
 
-    mocker.patch.object(atomic.SandboxRun, "promote", spy_promote)
+    mocker.patch.object(atomic.SandboxRun, "promote_folio", spy_promote_folio)
 
-    real_write_run_meta = atomic.SandboxRun.write_run_meta
+    real_write_run_meta_final = atomic.SandboxRun.write_run_meta_final
 
-    def spy_write_run_meta(self, payload):
-        call_order.append("sandbox.write_run_meta")
-        return real_write_run_meta(self, payload)
+    def spy_write_run_meta_final(self, payload):
+        call_order.append("sandbox.write_run_meta_final")
+        return real_write_run_meta_final(self, payload)
 
-    mocker.patch.object(atomic.SandboxRun, "write_run_meta", spy_write_run_meta)
+    mocker.patch.object(atomic.SandboxRun, "write_run_meta_final", spy_write_run_meta_final)
 
     # _base.py imports validate_expected_total_reports inside run() so the
     # monkeypatch on rm.validate_expected_total_reports is picked up at
@@ -120,9 +139,9 @@ def test_run_calls_template_methods_in_order(tmp_path, mocker):
         "preflight",
         f"scope_check({fid})",
         f"infer_folio({fid})",
+        f"sandbox.promote_folio({fid})",
+        "sandbox.write_run_meta_final",
         "validate_expected_total_reports",
-        "sandbox.write_run_meta",
-        "sandbox.promote",
     ], f"unexpected order: {call_order}"
 
 
@@ -151,7 +170,7 @@ def test_baseline_id_required(tmp_path):
             raise BaselineError("subclass must set BASELINE_ID")
 
 
-def test_run_meta_includes_required_fields(tmp_path):
+def test_run_meta_includes_required_fields(tmp_path, monkeypatch):
     """run_meta payload contains schema_version, baseline_id, scorer_version,
     completed_at_iso, replay_mode."""
     import json
@@ -162,6 +181,18 @@ def test_run_meta_includes_required_fields(tmp_path):
         expected_reports_per_baseline={"biblia_kraken": 1},
         scorer_version="v0.1.0-scorer",
     )
+    mp = tmp_path / "phase_0_manifest.json"
+    mp.write_text(
+        json.dumps(
+            {
+                "version": "v0.2.0",
+                "frozen_at": "2026-04-25T16:30:44Z",
+                "expected_reports_per_baseline": {"biblia_kraken": 0},
+                "manifest_changelog": [],
+            }
+        )
+    )
+    monkeypatch.setenv("PHASE_0_MANIFEST_PATH", str(mp))
 
     class GoodBaseline(BaselineBase):
         BASELINE_ID = "biblia_kraken"
@@ -192,7 +223,7 @@ def test_run_meta_includes_required_fields(tmp_path):
     assert meta["replay_mode"] is False
 
 
-def test_serialize_includes_optional_fields_when_set(tmp_path):
+def test_serialize_includes_optional_fields_when_set(tmp_path, monkeypatch):
     """LineRecord with kraken_confidence / llm_winner set must include
     them in the serialized JSON."""
     import json
@@ -202,6 +233,18 @@ def test_serialize_includes_optional_fields_when_set(tmp_path):
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_kraken": 1},
     )
+    mp = tmp_path / "phase_0_manifest.json"
+    mp.write_text(
+        json.dumps(
+            {
+                "version": "v0.2.0",
+                "frozen_at": "2026-04-25T16:30:44Z",
+                "expected_reports_per_baseline": {"biblia_kraken": 0},
+                "manifest_changelog": [],
+            }
+        )
+    )
+    monkeypatch.setenv("PHASE_0_MANIFEST_PATH", str(mp))
 
     class Provenanced(BaselineBase):
         BASELINE_ID = "biblia_kraken"

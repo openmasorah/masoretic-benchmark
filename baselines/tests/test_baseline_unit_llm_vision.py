@@ -107,6 +107,9 @@ def _ctor(tmp_path: Path, manifest: FakeManifest, replay: bool = False):
     bl._used_total_usd = 0.0
     bl._tie_breaks_total = 0
     bl._winners = {"claude": 0, "gemini": 0}
+    # Phase 03.1 A-02: __init__ would read cost_caps from manifest; mirror
+    # that here since we bypass __init__.
+    bl._cost_caps = bl._resolve_cost_caps()
     return bl
 
 
