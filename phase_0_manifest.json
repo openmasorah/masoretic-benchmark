@@ -1,0 +1,36 @@
+{
+  "version": "v0.2.0",
+  "frozen_at": "2026-04-29T02:41:41Z",
+  "scorer_version": "0.1.0",
+  "nakdimon_model_hash": "",
+  "expected_total_reports": 1,
+  "iaa_subset": [],
+  "baselines_seeded": [],
+  "expected_reports_per_baseline": {
+    "biblia_kraken": 1,
+    "biblia_nakdimon": 1,
+    "biblia_char_menaked": 1,
+    "llm_vision": 1
+  },
+  "folios": [
+    {
+      "id": "leningrad_devarim_shema_fixture",
+      "manuscript": "leningrad",
+      "book": "devarim",
+      "folio": "F195A",
+      "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F195A.jpg",
+      "iaa_folio": false,
+      "gt_hash": null,
+      "in_frozen_scope": true
+    }
+  ],
+  "baselines": {},
+  "fuses_fired": [],
+  "manifest_changelog": [
+    {
+      "prev_frozen_at": "2026-04-25T16:30:44Z",
+      "new_frozen_at": "2026-04-29T02:41:41Z",
+      "reason": "phase 03.1 W3.5: import from baalshem@bc7255ecaa3eb872885467d3a59e9e6352d5668a; values preserved verbatim"
+    }
+  ]
+}
