@@ -9,7 +9,7 @@ LOCKED CLI SURFACE (Phase 03.1 D-08 + plan 04 BLOCKER-4 fix):
                 unfinished folios per A-01 (manifest set MINUS already-promoted).
 
 Manifest path: PHASE_0_MANIFEST_PATH env var (CI override) or
-               /Users/benlamm/Workspace/baalshem/phase_0_manifest.json (dev).
+               /Users/benlamm/Workspace/masoretic-benchmark/phase_0_manifest.json (dev).
                Same convention as BaselineBase.run (consistent resolution).
 
 Exit codes:
@@ -81,13 +81,13 @@ def main(argv: list[str] | None = None) -> int:
     manifest_path = Path(
         os.environ.get(
             "PHASE_0_MANIFEST_PATH",
-            "/Users/benlamm/Workspace/baalshem/phase_0_manifest.json",
+            "/Users/benlamm/Workspace/masoretic-benchmark/phase_0_manifest.json",
         )
     )
     if not manifest_path.exists():
         print(
             f"ERROR: manifest not found at {manifest_path}. "
-            "Set PHASE_0_MANIFEST_PATH env var or run from baalshem dev layout.",
+            "Set PHASE_0_MANIFEST_PATH env var or run from masoretic-benchmark dev layout.",
             file=sys.stderr,
         )
         return 1

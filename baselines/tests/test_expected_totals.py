@@ -22,7 +22,7 @@ from pathlib import Path
 
 import pytest
 
-BAALSHEM_MANIFEST = Path("/Users/benlamm/Workspace/baalshem/phase_0_manifest.json")
+BAALSHEM_MANIFEST = Path(__file__).resolve().parents[2] / "phase_0_manifest.json"
 KNOWN_BASELINE_IDS = (
     "llm_vision",
     "biblia_kraken",
