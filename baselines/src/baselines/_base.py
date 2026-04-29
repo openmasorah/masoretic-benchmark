@@ -121,7 +121,7 @@ class BaselineBase(ABC):
         manifest_path = _Path(
             _os.environ.get(
                 "PHASE_0_MANIFEST_PATH",
-                "/Users/benlamm/Workspace/baalshem/phase_0_manifest.json",
+                "/Users/benlamm/Workspace/masoretic-benchmark/phase_0_manifest.json",
             )
         )
 

@@ -259,7 +259,7 @@ jobs:
 
       - name: Preflight - cost caps must be seeded in manifest
         env:
-          PHASE_0_MANIFEST_PATH: ${{ github.workspace }}/../baalshem/phase_0_manifest.json
+          PHASE_0_MANIFEST_PATH: ${{ github.workspace }}/phase_0_manifest.json
         run: python baselines/scripts/preflight_cost_caps.py
 
       - name: Phase 03.1 real fixture generation - all 4 baselines
@@ -271,7 +271,7 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           RUN_LIVE_BASELINES: "1"
-          PHASE_0_MANIFEST_PATH: ${{ github.workspace }}/../baalshem/phase_0_manifest.json
+          PHASE_0_MANIFEST_PATH: ${{ github.workspace }}/phase_0_manifest.json
         run: |
           python -m baselines.run --baseline biblia_kraken
           python -m baselines.run --baseline llm_vision

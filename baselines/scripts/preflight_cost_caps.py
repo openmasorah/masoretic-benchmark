@@ -19,13 +19,13 @@ from pathlib import Path
 
 
 def main() -> int:
-    # Manifest lives in baalshem repo; CI runs from sibling. Use env var
-    # PHASE_0_MANIFEST_PATH if set (CI), else default to the conventional
-    # local-dev path.
+    # Manifest lives in this repo (relocated from baalshem in Phase 03.1 W3.5).
+    # Use env var PHASE_0_MANIFEST_PATH if set (CI override), else default to
+    # the in-repo location.
     manifest_path = Path(
         os.environ.get(
             "PHASE_0_MANIFEST_PATH",
-            "/Users/benlamm/Workspace/baalshem/phase_0_manifest.json",
+            "/Users/benlamm/Workspace/masoretic-benchmark/phase_0_manifest.json",
         )
     )
     if not manifest_path.exists():
