@@ -93,10 +93,13 @@ class BibliaKrakenBaseline(BaselineBase):
 
         # D-04 + D-21 (Phase 03.1): dual-format cache for BL-03/BL-04 chain
         # consumption. Cache key includes folio_id + KRAKEN_MODEL_HASH so a
-        # Kraken pin bump invalidates BOTH files. Cache lives under
-        # baselines/.cache/kraken/ which is gitignored (~16MB Kraken model
-        # already excluded; growth here is line-crops only).
-        cache_dir = REPO_ROOT / "baselines" / ".cache" / "kraken" / folio.id
+        # Kraken pin bump invalidates BOTH files. Cache lives next to
+        # ``image_cache`` (which tests redirect to tmp_path) so test runs
+        # never touch the real-repo .cache/kraken/<folio>/ subtrees. In
+        # production, image_cache=<repo>/baselines/.cache/images so the
+        # cache parent is <repo>/baselines/.cache and the kraken cache
+        # lands at <repo>/baselines/.cache/kraken/<folio_id>/ as expected.
+        cache_dir = self.image_cache.parent / "kraken" / folio.id
         cache_dir.mkdir(parents=True, exist_ok=True)
 
         # JSON cache (D-04) — diagnostic + per-line confidence inspection.
