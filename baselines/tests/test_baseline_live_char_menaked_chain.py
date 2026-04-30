@@ -25,8 +25,8 @@ from pathlib import Path
 import pytest
 
 GT_CANDIDATES = [
-    Path("/Users/benlamm/Workspace/baalshem/gt-infra/exports/leningrad_devarim_shema_fixture.json"),
-    Path("/Users/benlamm/Workspace/baalshem/tests/fixtures/leningrad_devarim_shema_fixture.json"),
+    Path("/Users/benlamm/Workspace/baalshem/gt-infra/exports/leningrad_devarim_F118B_fixture.json"),
+    Path("/Users/benlamm/Workspace/baalshem/tests/fixtures/leningrad_devarim_F118B_fixture.json"),
 ]
 
 
@@ -48,9 +48,9 @@ def test_live_char_menaked_chain_realistic_only(tmp_path):
     # Real-run skeleton (filled in by future plan when GT lands):
     #   manifest_path = ...  # phase_0_manifest.json (real)
     #   bl = BibliaCharMenakedBaseline(manifest_path, tmp_path / "results")
-    #   rc = bl.run(folio_ids=["leningrad_devarim_shema_fixture"])
+    #   rc = bl.run(folio_ids=["leningrad_devarim_F118B_fixture"])
     #   assert rc == 0
     #   pred = json.loads((tmp_path / "results" / "biblia_char_menaked" /
-    #                      "leningrad_devarim_shema_fixture.json").read_text())
+    #                      "leningrad_devarim_F118B_fixture.json").read_text())
     #   assert pred["baseline_id"] == "biblia_char_menaked"
     pytest.skip("GT fixture present — but live-run scaffold deferred to a future plan")

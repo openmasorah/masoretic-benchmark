@@ -114,7 +114,7 @@ def test_recognize_lines_returns_line_records_with_kraken_confidence(monkeypatch
         out = recognize_lines(
             Path("/tmp/fake.jpg"),
             Path("/tmp/fake.mlmodel"),
-            folio_id="leningrad_devarim_F195A",
+            folio_id="leningrad_devarim_F118B",
         )
 
     assert isinstance(out, list)
@@ -123,7 +123,7 @@ def test_recognize_lines_returns_line_records_with_kraken_confidence(monkeypatch
     assert out[0].tier1 == "שמע"
     assert 0.0 <= out[0].kraken_confidence <= 1.0
     assert abs(out[0].kraken_confidence - (0.9 + 0.85 + 0.95) / 3) < 1e-3
-    assert out[0].line_id.startswith("leningrad_devarim_F195A_L")
+    assert out[0].line_id.startswith("leningrad_devarim_F118B_L")
     # tier1=tier2=tier3 — scorer derives consonantal/nikkud/trop tiers later.
     assert out[0].tier1 == out[0].tier2 == out[0].tier3
     # Kraken doesn't emit metamarks
@@ -202,8 +202,8 @@ def test_fetch_image_caches_and_skips_second_call(tmp_path):
     """First call writes to cache; second call hits cache, no urlretrieve."""
     from baselines import _images
 
-    folio_id = "leningrad_devarim_F195A"
-    url = "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F195A.jpg"
+    folio_id = "leningrad_devarim_F118B"
+    url = "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F118B.jpg"
     cache_dir = tmp_path / "images"
 
     fake_payload = b"\xff\xd8\xff\xe0fakejpeg"

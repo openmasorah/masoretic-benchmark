@@ -26,7 +26,7 @@ class FakeFolio:
     # real Folio carries an image_url; the FakeFolio mirrors that surface so
     # baselines that fetch images (BL-02/03/04) can be unit-tested without a
     # custom subclass. Default points at the dry-run Shema folio fixture URL.
-    image_url: str = "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F195A.jpg"
+    image_url: str = "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F118B.jpg"
 
 
 @dataclass

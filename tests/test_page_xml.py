@@ -37,7 +37,7 @@ def _minimal_page_xml(lines: list[tuple[int, str, str, float | None]]) -> bytes:
     page = etree.SubElement(
         pcgts,
         f"{{{PAGE_NS}}}Page",
-        imageFilename="BIB_LENCDX_F195A.jpg",
+        imageFilename="BIB_LENCDX_F118B.jpg",
         imageWidth="1200",
         imageHeight="1800",
     )
@@ -71,7 +71,7 @@ def test_parse_page_xml_shape(tmp_path: Path) -> None:
             (2, "Deut.6.5", "וְאָהַבְתָּ", 0.87),
         ]
     )
-    p = tmp_path / "F195A.xml"
+    p = tmp_path / "F118B.xml"
     p.write_bytes(xml_bytes)
     lines = parse_page_xml(p)
     assert len(lines) == 2

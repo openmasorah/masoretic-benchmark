@@ -124,11 +124,11 @@ def test_schema_validates_a_full_v02_document():
         },
         "folios": [
             {
-                "id": "leningrad_devarim_shema_fixture",
+                "id": "leningrad_devarim_F118B_fixture",
                 "manuscript": "leningrad",
                 "book": "devarim",
-                "folio": "F195A",
-                "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F195A.jpg",
+                "folio": "F118B",
+                "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F118B.jpg",
                 "in_frozen_scope": True,
             }
         ],
@@ -210,11 +210,11 @@ V01_DOC = {
     "expected_total_reports": 1,
     "folios": [
         {
-            "id": "leningrad_devarim_shema_fixture",
+            "id": "leningrad_devarim_F118B_fixture",
             "manuscript": "leningrad",
             "book": "devarim",
-            "folio": "F195A",
-            "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F195A.jpg",
+            "folio": "F118B",
+            "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F118B.jpg",
             "iaa_folio": False,
             "gt_hash": None,
             "in_frozen_scope": True,
@@ -241,11 +241,11 @@ V02_DOC = {
     },
     "folios": [
         {
-            "id": "leningrad_devarim_shema_fixture",
+            "id": "leningrad_devarim_F118B_fixture",
             "manuscript": "leningrad",
             "book": "devarim",
-            "folio": "F195A",
-            "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F195A.jpg",
+            "folio": "F118B",
+            "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F118B.jpg",
             "iaa_folio": False,
             "gt_hash": None,
             "in_frozen_scope": True,
@@ -315,7 +315,7 @@ def test_manifest_load_malformed_doc_raises(tmp_path):
             "id": "x",
             "manuscript": "leningrad",
             "book": "devarim",
-            "folio": "F195A",
+            "folio": "F118B",
             "in_frozen_scope": True,
             # missing image_url
         }
@@ -375,7 +375,7 @@ def test_frozen_leningrad_folios_filters_to_in_scope_leningrad(tmp_path):
             "id": "in_scope_len",
             "manuscript": "leningrad",
             "book": "devarim",
-            "folio": "F195A",
+            "folio": "F118B",
             "image_url": "https://example.org/a.jpg",
             "iaa_folio": False,
             "gt_hash": None,

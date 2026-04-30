@@ -46,7 +46,7 @@ def test_run_calls_template_methods_in_order(tmp_path, mocker, monkeypatch):
     We monkey-patch the helpers to log call order; the locked run()
     drives them in the order BaselineBase declares (D-12 + A-01).
     """
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_kraken": 1},
@@ -147,7 +147,7 @@ def test_run_calls_template_methods_in_order(tmp_path, mocker, monkeypatch):
 
 def test_baseline_id_required(tmp_path):
     """Subclass missing BASELINE_ID raises BaselineError on construction."""
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_kraken": 1},
@@ -175,7 +175,7 @@ def test_run_meta_includes_required_fields(tmp_path, monkeypatch):
     completed_at_iso, replay_mode."""
     import json
 
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_kraken": 1},
@@ -228,7 +228,7 @@ def test_serialize_includes_optional_fields_when_set(tmp_path, monkeypatch):
     them in the serialized JSON."""
     import json
 
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_kraken": 1},

@@ -186,7 +186,7 @@ def test_llm_vision_agreement_writes_prediction_and_replay_log(tmp_path, monkeyp
     monkeypatch.setenv("ANTHROPIC_API_KEY", "dummy-claude-key")
     monkeypatch.setenv("GOOGLE_API_KEY", "dummy-gemini-key")
 
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"llm_vision": 1},
@@ -266,7 +266,7 @@ def test_llm_vision_disagreement_claude_wins_no_tier_mixing(tmp_path, monkeypatc
     monkeypatch.setenv("ANTHROPIC_API_KEY", "k")
     monkeypatch.setenv("GOOGLE_API_KEY", "k")
 
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"llm_vision": 1},
@@ -314,7 +314,7 @@ def test_llm_vision_budget_cap_fires_and_preserves_sandbox(tmp_path, monkeypatch
     monkeypatch.setenv("ANTHROPIC_API_KEY", "k")
     monkeypatch.setenv("GOOGLE_API_KEY", "k")
 
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"llm_vision": 1},
@@ -360,7 +360,7 @@ def test_llm_vision_scope_violation_fires_before_llm_clients(tmp_path, monkeypat
     monkeypatch.setenv("ANTHROPIC_API_KEY", "k")
     monkeypatch.setenv("GOOGLE_API_KEY", "k")
 
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"llm_vision": 1},

@@ -58,8 +58,8 @@ def test_live_kraken_shema_fixture_emits_schema_valid_prediction(tmp_path):
 
     from tests._fake_manifest import FakeManifest
 
-    fid = "leningrad_devarim_shema_fixture"
-    image_url = "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F195A.jpg"
+    fid = "leningrad_devarim_F118B_fixture"
+    image_url = "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F118B.jpg"
     # FakeFolio doesn't carry an image_url field; FakeFolio is frozen=True so
     # setattr won't work — use a small concrete subclass below instead.
     from dataclasses import dataclass

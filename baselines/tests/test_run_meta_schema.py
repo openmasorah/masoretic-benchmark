@@ -58,7 +58,7 @@ def valid_run_meta() -> dict:
             "tie_break_winners": None,
         },
         "folios": {
-            "leningrad_devarim_shema_fixture": {
+            "leningrad_devarim_F118B_fixture": {
                 "budget_used": None,
                 "replay_used": None,
                 "line_count": 5,
@@ -189,14 +189,14 @@ def test_pins_inner_keys_required(run_meta_validator, valid_run_meta):
 def test_folio_inner_required(run_meta_validator, valid_run_meta):
     for key in ["budget_used", "replay_used", "line_count", "scope_check_passed_at_iso"]:
         payload = deepcopy(valid_run_meta)
-        del payload["folios"]["leningrad_devarim_shema_fixture"][key]
+        del payload["folios"]["leningrad_devarim_F118B_fixture"][key]
         with pytest.raises(jsonschema.ValidationError):
             run_meta_validator.validate(payload)
 
 
 def test_folio_line_count_must_be_nonnegative(run_meta_validator, valid_run_meta):
     payload = deepcopy(valid_run_meta)
-    payload["folios"]["leningrad_devarim_shema_fixture"]["line_count"] = -1
+    payload["folios"]["leningrad_devarim_F118B_fixture"]["line_count"] = -1
     with pytest.raises(jsonschema.ValidationError):
         run_meta_validator.validate(payload)
 

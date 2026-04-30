@@ -44,7 +44,7 @@ def gt_fixture(tmp_path):
     expects."""
     gt = tmp_path / "gt"
     gt.mkdir()
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     (gt / f"{fid}.json").write_text(
         json.dumps(
             {
@@ -64,7 +64,7 @@ def gt_fixture(tmp_path):
 
 @pytest.fixture
 def manifest_with_shema_fixture():
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     return FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={
@@ -114,7 +114,7 @@ def _kraken_lines(folio_id: str) -> list[LineRecord]:
 def test_char_menaked_chain_runs_realistic_and_diagnostic(
     tmp_path, manifest_with_shema_fixture, gt_fixture
 ):
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     fake_lines = _kraken_lines(fid)
     fake_image_path = tmp_path / "image-cache" / f"{fid}.jpg"
 
@@ -146,7 +146,7 @@ def test_char_menaked_chain_runs_realistic_and_diagnostic(
 
 
 def test_char_menaked_tier1_kraken_vs_gt(tmp_path, manifest_with_shema_fixture, gt_fixture):
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     # Distinguishable strings so we can tell which path we're looking at.
     kraken_text = "ש0מע יש0ראל"  # Kraken's noisy output
     fake_lines = [
@@ -202,7 +202,7 @@ def test_char_menaked_tier1_kraken_vs_gt(tmp_path, manifest_with_shema_fixture, 
 
 
 def test_char_menaked_run_meta_pins(tmp_path, manifest_with_shema_fixture, gt_fixture):
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     fake_lines = _kraken_lines(fid)
     fake_image_path = tmp_path / "image-cache" / f"{fid}.jpg"
 
@@ -247,7 +247,7 @@ def test_char_menaked_diagnostic_not_counted_for_d15(
     expected_reports_per_baseline check would see 2 instead of 1 for a
     1-folio run and the run would falsely fail. This test pins the policy:
     diagnostic does NOT count."""
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     fake_lines = _kraken_lines(fid)
     fake_image_path = tmp_path / "image-cache" / f"{fid}.jpg"
 

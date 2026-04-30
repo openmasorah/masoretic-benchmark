@@ -74,7 +74,7 @@ def _fake_lines(folio_id: str, n: int = 1) -> list[LineRecord]:
 
 
 def test_kraken_run_writes_valid_prediction_and_run_meta(tmp_path, monkeypatch):
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_kraken": 1},
@@ -131,7 +131,7 @@ def test_kraken_d15_off_by_one_raises_after_per_folio_promote(tmp_path):
     the persistent inconsistency across runs."""
     from baselines._errors import BaselineError
 
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_kraken": 2},  # mismatch
@@ -165,7 +165,7 @@ def test_kraken_d13a_scope_violation_fires_before_model_load(tmp_path):
     _kraken._load_model are both never called."""
     from baselines._errors import ScopeViolation
 
-    fid_in_scope = "leningrad_devarim_shema_fixture"
+    fid_in_scope = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid_in_scope)],
         expected_reports_per_baseline={"biblia_kraken": 1},
@@ -196,7 +196,7 @@ def test_kraken_d04_inference_failure_leaves_sandbox(tmp_path):
     not created; .in_progress/biblia_kraken/ preserved for inspection."""
     from baselines._errors import KrakenInferenceFailure
 
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_kraken": 1},
@@ -228,7 +228,7 @@ def test_kraken_d04_inference_failure_leaves_sandbox(tmp_path):
 def test_kraken_confidence_flows_into_prediction_lines(tmp_path):
     """Per-line LineRecord.kraken_confidence is serialized into per-line
     records in the prediction JSON (D-04 + D-17)."""
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_kraken": 1},

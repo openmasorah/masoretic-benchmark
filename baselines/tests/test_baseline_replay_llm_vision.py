@@ -34,7 +34,7 @@ FIXTURE_PATH = (
     Path(__file__).resolve().parent
     / "fixtures"
     / "llm_calls"
-    / "leningrad_devarim_shema_fixture.replay.jsonl"
+    / "leningrad_devarim_F118B_fixture.replay.jsonl"
 )
 
 
@@ -172,7 +172,7 @@ def test_replay_mode_uses_logged_responses_not_live_clients(tmp_path, monkeypatc
     monkeypatch.setenv("ANTHROPIC_API_KEY", "k")
     monkeypatch.setenv("GOOGLE_API_KEY", "k")
 
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"llm_vision": 1},
@@ -258,7 +258,7 @@ def test_replay_mode_raises_on_missing_fixture(tmp_path, monkeypatch):
     monkeypatch.setenv("ANTHROPIC_API_KEY", "k")
     monkeypatch.setenv("GOOGLE_API_KEY", "k")
 
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"llm_vision": 1},

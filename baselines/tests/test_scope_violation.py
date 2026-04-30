@@ -61,7 +61,7 @@ def test_d13a_preflight_rejects_non_leningrad_folio_id(tmp_path):
     """Script-start preflight: --folio-id outside frozen-Leningrad set raises
     ScopeViolation BEFORE any infer_folio call."""
     manifest = FakeManifest(
-        folios=[FakeFolio(id="leningrad_devarim_shema_fixture")],
+        folios=[FakeFolio(id="leningrad_devarim_F118B_fixture")],
         expected_reports_per_baseline={"biblia_kraken": 1},
     )
     bl = _ctor(tmp_path, manifest)
@@ -81,7 +81,7 @@ def test_d13a_preflight_rejects_non_leningrad_folio_id(tmp_path):
 
 def test_d13a_preflight_accepts_in_scope_folio_id(tmp_path):
     """Sanity: a folio_id that IS in the Leningrad-frozen set passes preflight."""
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_kraken": 1},
@@ -97,7 +97,7 @@ def test_d13b_per_folio_recheck_catches_manuscript_mutation(tmp_path):
     folio's manuscript flips to non-leningrad, ScopeViolation fires
     BEFORE infer_folio runs.
     """
-    fid_ok = "leningrad_devarim_shema_fixture"
+    fid_ok = "leningrad_devarim_F118B_fixture"
     fid_bad = "cairo_shmuel_smuggle"
 
     manifest = FakeManifest(
@@ -150,7 +150,7 @@ def test_d13b_per_folio_recheck_catches_in_frozen_scope_flip(tmp_path):
     """Per-folio re-check: in_frozen_scope: true -> false trips
     ScopeViolation. Phase-1 01-12 narrowing rule allows this flip;
     Phase-3 baselines refuse to score outside the frozen set."""
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_kraken": 1},

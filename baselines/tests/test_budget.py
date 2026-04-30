@@ -26,7 +26,7 @@ def test_per_folio_cap_raises_at_5_01(tmp_path):
     from baselines.llm_vision import LLMVisionBaseline
 
     manifest = FakeManifest(
-        folios=[FakeFolio(id="leningrad_devarim_shema_fixture")],
+        folios=[FakeFolio(id="leningrad_devarim_F118B_fixture")],
         expected_reports_per_baseline={"llm_vision": 1},
     )
 
@@ -41,7 +41,7 @@ def test_per_folio_cap_raises_at_5_01(tmp_path):
 
     # Simulate folio_used = $5.01 just past the cap.
     with pytest.raises(BudgetExceeded, match=r"per-folio.*5\.0"):
-        bl._enforce_budget(5.01, folio_id="leningrad_devarim_shema_fixture")
+        bl._enforce_budget(5.01, folio_id="leningrad_devarim_F118B_fixture")
 
 
 # ---------------------------------------------------------------------------
@@ -56,7 +56,7 @@ def test_per_run_cap_raises_at_30_01(tmp_path):
     from baselines.llm_vision import LLMVisionBaseline
 
     manifest = FakeManifest(
-        folios=[FakeFolio(id="leningrad_devarim_shema_fixture")],
+        folios=[FakeFolio(id="leningrad_devarim_F118B_fixture")],
         expected_reports_per_baseline={"llm_vision": 1},
     )
 
@@ -70,7 +70,7 @@ def test_per_run_cap_raises_at_30_01(tmp_path):
     bl._cost_caps = bl._resolve_cost_caps()
 
     with pytest.raises(BudgetExceeded, match=r"per-run.*30\.0"):
-        bl._enforce_budget(0.01, folio_id="leningrad_devarim_shema_fixture")
+        bl._enforce_budget(0.01, folio_id="leningrad_devarim_F118B_fixture")
 
 
 # ---------------------------------------------------------------------------
@@ -184,7 +184,7 @@ def test_manifest_lacks_cost_caps_raises_budgetexceeded(tmp_path):
 
     # FakeManifest with cost_caps_usd explicitly cleared.
     manifest = FakeManifest(
-        folios=[FakeFolio(id="leningrad_devarim_shema_fixture")],
+        folios=[FakeFolio(id="leningrad_devarim_F118B_fixture")],
         expected_reports_per_baseline={"llm_vision": 1},
         cost_caps_usd=None,  # type: ignore[arg-type]
     )

@@ -19,7 +19,7 @@ when no candidate GT path exists; the realistic-chain prediction still
 runs end-to-end against Kraken + Nakdimon when both gates pass.
 
 # TODO(phase-1-gt-export): unblock the diagnostic-chain section below
-# when Phase 1 emits per-line GT for `leningrad_devarim_shema_fixture`
+# when Phase 1 emits per-line GT for `leningrad_devarim_F118B_fixture`
 # at one of the GT_CANDIDATES paths. Until then, the diagnostic chain
 # code path is exercised only by the mocked-unit tier
 # (test_baseline_unit_nakdimon_chain.py).
@@ -41,8 +41,8 @@ DEFAULT_KRAKEN_MODEL = SIBLING_ROOT / "baselines" / ".cache" / "kraken" / "BiblI
 
 # GT-fixture candidates for the diagnostic-chain assertion (Issue 2 fix).
 GT_CANDIDATES = [
-    BAALSHEM_ROOT / "gt-infra" / "exports" / "leningrad_devarim_shema_fixture.json",
-    BAALSHEM_ROOT / "tests" / "fixtures" / "leningrad_devarim_shema_fixture.json",
+    BAALSHEM_ROOT / "gt-infra" / "exports" / "leningrad_devarim_F118B_fixture.json",
+    BAALSHEM_ROOT / "tests" / "fixtures" / "leningrad_devarim_F118B_fixture.json",
 ]
 
 
@@ -75,7 +75,7 @@ def test_live_realistic_chain_on_shema_fixture(tmp_path):
 
     from tests._fake_manifest import FakeFolio, FakeManifest
 
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_nakdimon": 1},

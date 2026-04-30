@@ -26,12 +26,12 @@ def valid_prediction() -> dict:
     return {
         "schema_version": "0.1.0",
         "baseline_id": "biblia_kraken",
-        "folio_id": "leningrad_devarim_shema_fixture",
+        "folio_id": "leningrad_devarim_F118B_fixture",
         "manifest_hash": "sha256:abc",
         "run_meta_ref": "run_meta.json",
         "lines": [
             {
-                "line_id": "leningrad_devarim_shema_fixture_L001",
+                "line_id": "leningrad_devarim_F118B_fixture_L001",
                 "bbox": [10, 20, 500, 60],
                 "tier1": "שמע ישראל",
                 "tier2": "שְׁמַע יִשְׂרָאֵל",
@@ -72,7 +72,7 @@ def valid_run_meta() -> dict:
             "tie_break_winners": None,
         },
         "folios": {
-            "leningrad_devarim_shema_fixture": {
+            "leningrad_devarim_F118B_fixture": {
                 "budget_used": None,
                 "replay_used": None,
                 "line_count": 5,
@@ -134,7 +134,7 @@ def test_sandbox_write_prediction_validates_before_write(tmp_path, valid_predict
 
     with SandboxRun(tmp_path, "biblia_kraken") as sb:
         with pytest.raises(jsonschema.ValidationError):
-            sb.write_prediction("leningrad_devarim_shema_fixture", bad)
+            sb.write_prediction("leningrad_devarim_F118B_fixture", bad)
         # Sandbox dir exists (entered) but no folio file landed.
         sandbox_files = sorted(p.name for p in sb.sandbox_dir.glob("*.json"))
         assert sandbox_files == []
@@ -149,7 +149,7 @@ def test_sandbox_write_prediction_validates_before_write(tmp_path, valid_predict
 
 def test_sandbox_write_prediction_succeeds_for_valid(tmp_path, valid_prediction):
     with SandboxRun(tmp_path, "biblia_kraken") as sb:
-        path = sb.write_prediction("leningrad_devarim_shema_fixture", valid_prediction)
+        path = sb.write_prediction("leningrad_devarim_F118B_fixture", valid_prediction)
         assert path.exists()
         assert path.parent == sb.sandbox_dir
 
@@ -161,7 +161,7 @@ def test_sandbox_write_diagnostic_validates_before_write(tmp_path, valid_predict
 
     with SandboxRun(tmp_path, "biblia_nakdimon") as sb:
         with pytest.raises(jsonschema.ValidationError):
-            sb.write_diagnostic("leningrad_devarim_shema_fixture", bad)
+            sb.write_diagnostic("leningrad_devarim_F118B_fixture", bad)
         diag_dir = sb.sandbox_dir / "diagnostic"
         # diag_dir may or may not exist (mkdir runs before validation),
         # but no .json file should be inside it.
@@ -196,7 +196,7 @@ def test_run_meta_writer_validates_before_write(tmp_path, valid_run_meta):
     """baselines._run_meta.write_run_meta is the second call site
     (separate from SandboxRun); validators run there too."""
     bad = deepcopy(valid_run_meta)
-    del bad["folios"]["leningrad_devarim_shema_fixture"]["line_count"]
+    del bad["folios"]["leningrad_devarim_F118B_fixture"]["line_count"]
 
     target = tmp_path / "run_meta.json"
     with pytest.raises(jsonschema.ValidationError):

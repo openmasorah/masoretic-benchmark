@@ -162,7 +162,7 @@ def test_chain_runs_realistic_and_diagnostic(monkeypatch, tmp_path):
     _stub_nakdimon_oss(monkeypatch)
     from baselines.biblia_nakdimon import BibliaNakdimonBaseline  # noqa: WPS433
 
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_nakdimon": 1},
@@ -215,7 +215,7 @@ def test_chain_diagnostic_not_counted_toward_expected_total(monkeypatch, tmp_pat
     _stub_nakdimon_oss(monkeypatch)
     from baselines.biblia_nakdimon import BibliaNakdimonBaseline  # noqa: WPS433
 
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_nakdimon": 1},
@@ -248,7 +248,7 @@ def test_run_meta_pins_nakdimon_hash_set_others_null(monkeypatch, tmp_path):
     from baselines._kraken import KRAKEN_MODEL_HASH  # noqa: WPS433
     from baselines.biblia_nakdimon import BibliaNakdimonBaseline  # noqa: WPS433
 
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_nakdimon": 1},
@@ -327,7 +327,7 @@ def test_load_gt_consonants_raises_when_missing(monkeypatch, tmp_path):
     from baselines._errors import BaselineError  # noqa: WPS433
     from baselines.biblia_nakdimon import BibliaNakdimonBaseline  # noqa: WPS433
 
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_nakdimon": 1},

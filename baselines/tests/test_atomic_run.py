@@ -72,7 +72,7 @@ class _GoodBaseline(BaselineBase):
 
 
 def test_d14_success_promotes_to_results_dir(tmp_path, monkeypatch):
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_kraken": 1},
@@ -114,7 +114,7 @@ class _BoomBaseline(BaselineBase):
 
 
 def test_d14_abort_leaves_sandbox_for_inspection(tmp_path, monkeypatch):
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_kraken": 1},
@@ -165,7 +165,7 @@ def test_d15_off_by_one_raises_after_per_folio_promote(tmp_path, monkeypatch):
     """
     from baselines._errors import BaselineError
 
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"biblia_kraken": 2},  # declares 2, only 1 folio in scope
@@ -188,7 +188,7 @@ def test_d15_unknown_baseline_raises_baselineerror(tmp_path, monkeypatch):
     KeyError -> wrapped as BaselineError with D-15 context."""
     from baselines._errors import BaselineError
 
-    fid = "leningrad_devarim_shema_fixture"
+    fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
         expected_reports_per_baseline={"other_baseline": 1},

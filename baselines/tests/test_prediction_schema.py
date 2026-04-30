@@ -36,12 +36,12 @@ def valid_prediction() -> dict:
     return {
         "schema_version": "0.1.0",
         "baseline_id": "biblia_kraken",
-        "folio_id": "leningrad_devarim_shema_fixture",
+        "folio_id": "leningrad_devarim_F118B_fixture",
         "manifest_hash": "sha256:abc123",
         "run_meta_ref": "run_meta.json",
         "lines": [
             {
-                "line_id": "leningrad_devarim_shema_fixture_L001",
+                "line_id": "leningrad_devarim_F118B_fixture_L001",
                 "bbox": [10, 20, 500, 60],
                 "tier1": "שמע ישראל",
                 "tier2": "שְׁמַע יִשְׂרָאֵל",
