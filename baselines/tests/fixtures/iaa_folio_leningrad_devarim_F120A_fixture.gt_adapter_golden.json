@@ -1,0 +1,29 @@
+{
+  "folio_id": "leningrad_devarim_F120A_fixture",
+  "provisional": true,
+  "_provenance": {
+    "phase": "03.2",
+    "method": "UXLC-derived via gt_infra.uxlc_import.build_baseline_page_xml + baselines._gt_adapter.load_tier1_per_line",
+    "uxlc_source": "tanach.us Deuteronomy.xml (cached at baselines/tests/fixtures/_uxlc_cache/Deuteronomy.xml; re-fetch via gt_infra.uxlc_import.fetch_uxlc.fetch_uxlc_book)",
+    "verse_range_first": "Deut.34.1",
+    "verse_range_last": "Deut.34.12",
+    "verse_count": 12,
+    "image_w": 4416,
+    "image_h": 5291,
+    "yosef_review_status": "deferred to Plan 03.1-05 [YOSEF-REVIEW] gate per CONTEXT.md R4"
+  },
+  "lines": [
+    "ויעל משה מערבת מואב אל־ הר נבו ראש הפסגה אשר על־ פני ירחו ויראהו יהוה את־ כל־ הארץ את־ הגלעד עד־ דן",
+    "ואת כל־ נפתלי ואת־ ארץ אפרים ומנשה ואת כל־ ארץ יהודה עד הים האחרון",
+    "ואת־ הנגב ואת־ הככר בקעת ירחו עיר התמרים עד־ צער",
+    "ויאמר יהוה אליו זאת הארץ אשר נשבעתי לאברהם ליצחק וליעקב לאמר לזרעך אתננה הראיתיך בעיניך ושמה לא תעבר",
+    "וימת שם משה עבד־ יהוה בארץ מואב על־ פי יהוה",
+    "ויקבר אתו בגי בארץ מואב מול בית פעור ולא־ ידע איש את־ קברתו עד היום הזה",
+    "ומשה בן־ מאה ועשרים שנה במתו לא־ כהתה עינו ולא־ נס לחה",
+    "ויבכו בני ישראל את־ משה בערבת מואב שלשים יום ויתמו ימי בכי אבל משה",
+    "ויהושע בן־ נון מלא רוח חכמה כי־ סמך משה את־ ידיו עליו וישמעו אליו בני־ ישראל ויעשו כאשר צוה יהוה את־ משה",
+    "ולא־ קם נביא עוד בישראל כמשה אשר ידעו יהוה פנים אל־ פנים",
+    "לכל־ האתות והמופתים אשר שלחו יהוה לעשות בארץ מצרים לפרעה ולכל־ עבדיו ולכל־ ארצו",
+    "ולכל היד החזקה ולכל המורא הגדול אשר עשה משה לעיני כל־ ישראל"
+  ]
+}

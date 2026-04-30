@@ -23,3 +23,8 @@ scans/
 # image cache grows with folio coverage). KRAKEN_PIN.md tracks the pinned
 # sha256; re-fetch via baselines/scripts/fetch_biblia_kraken_model.py.
 baselines/.cache/
+# Phase 03.2 baselines: UXLC source cache (fetched from tanach.us via
+# gt_infra.uxlc_import.fetch_uxlc.fetch_uxlc_book). Reproducible — re-fetch
+# at any time. Keeps the repo lean while preserving deterministic provenance
+# (each gt_adapter golden's _provenance block records the source).
+baselines/tests/fixtures/_uxlc_cache/
