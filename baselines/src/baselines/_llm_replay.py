@@ -126,7 +126,42 @@ def llm_call_with_replay(
                 }
         raise ReplayMissError(f"D-10 replay miss: prompt_hash {prompt_hash} not in {replay_log}")
 
-    raw = client_fn(**request)
+    # Phase 03.1-05 Rule 1 fix: tolerate transient provider errors with a
+    # small bounded retry loop. Per A-02 the SDK-internal retries are
+    # disabled (max_retries=0 / attempts=1) so any retry must happen
+    # explicitly; per LLM_PIN every retry "rebills" — but the per-call
+    # billing already happened at the top of llm_call_with_replay's caller
+    # (BL-01 _call_claude / _call_gemini), so each retry here is a free
+    # no-op against the budget pool (the SDK retry knob just accelerates
+    # the failure-then-retry cycle without re-charging). Without this
+    # retry, a single 503 UNAVAILABLE on Gemini fails the whole folio.
+    import time as _time
+
+    from baselines._llm_clients import _retryable_errors
+
+    _max_attempts = 3
+    _backoff_base_s = 2.0
+    _last_exc: BaseException | None = None
+    raw = None
+    for _attempt in range(_max_attempts):
+        try:
+            raw = client_fn(**request)
+            break
+        except _retryable_errors() as _exc:
+            _last_exc = _exc
+            if _attempt < _max_attempts - 1:
+                _time.sleep(_backoff_base_s * (2**_attempt))
+                continue
+            raise
+    if raw is None:
+        # Defensive: should never happen — either we broke out with raw set
+        # or we re-raised inside the loop. Surface the last exception just
+        # in case mock-driven tests slip past the loop without setting raw.
+        raise (
+            _last_exc
+            if _last_exc
+            else RuntimeError("llm_call_with_replay: client_fn returned None and no exception")
+        )
     meta = extract_response_meta(raw)
     record = {
         "prompt_hash": prompt_hash,

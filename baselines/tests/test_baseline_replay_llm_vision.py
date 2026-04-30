@@ -80,14 +80,18 @@ def _stub_pil(monkeypatch):
 
 
 def _claude_request(crop_sha: str) -> dict:
-    """Mirror llm_vision._call_claude.request shape exactly."""
+    """Mirror llm_vision._call_claude.request shape exactly.
+
+    Phase 03.1-04.6 hot-fix: claude-opus-4-7 deprecated ``temperature``
+    (API returns 400 invalid_request_error). The Anthropic request dict
+    no longer carries the temperature key; this helper mirrors that.
+    Locked by test_llm_vision_anthropic_request_omits_temperature."""
     from baselines._llm_clients import ANTHROPIC_MODEL_ID, INFERENCE_CFG
     from baselines.llm_vision import PROMPT_TEXT
 
     return {
         "model": ANTHROPIC_MODEL_ID,
         "max_tokens": INFERENCE_CFG["max_output_tokens"],
-        "temperature": INFERENCE_CFG["temperature"],
         "image_bytes_ref": f"sha256:{crop_sha}",
         "prompt": PROMPT_TEXT,
     }

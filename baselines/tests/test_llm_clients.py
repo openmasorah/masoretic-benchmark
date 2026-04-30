@@ -173,3 +173,39 @@ def test_no_dot_get_fallback_for_api_keys():
     # Positive: BOTH bracket-form lookups are present
     assert 'os.environ["ANTHROPIC_API_KEY"]' in text
     assert 'os.environ["GOOGLE_API_KEY"]' in text
+
+
+# ----------------------------------------------------------------------
+# T7 (Phase 03.1-04.6 hot-fix): gemini_client constructed with attempts=1
+# ----------------------------------------------------------------------
+
+
+def test_gemini_client_retry_options_attempts_1():
+    """A-02 Pitfall 4: gemini_client must construct google-genai with
+    ``http_options={"retry_options": {"attempts": 1}}`` — single attempt,
+    no SDK-internal retries. Custom retry/billing happens in
+    _llm_replay.llm_call_with_replay.
+
+    Phase 03.1-04.6 hot-fix: google-genai 1.73 renamed ``retry_count`` →
+    ``retry_options`` with ``HttpRetryOptions(attempts=N)`` semantics.
+    Source-grep is sufficient: catch any future regression that drops
+    the knob or reverts to the old name.
+    """
+    text = CLIENTS_PY.read_text(encoding="utf-8")
+    assert "retry_options" in text, (
+        "A-02: gemini_client must pass http_options.retry_options to disable SDK retries"
+    )
+    assert "attempts" in text, "A-02: retry_options must carry attempts=1 (no SDK retries)"
+    # Specifically: the attempts value must be 1 in source. Match a flexible
+    # pattern that tolerates whitespace + key-quoting style.
+    assert re.search(
+        r'"retry_options"\s*:\s*\{\s*"attempts"\s*:\s*1\s*\}',
+        text,
+    ), "A-02: retry_options must be exactly {'attempts': 1}"
+    # Negative: the old SDK 1.x knob ``retry_count`` must NOT appear as a
+    # code-path identifier (kwarg or dict key). The docstring may MENTION
+    # the old name in historical context; what matters is no live binding.
+    assert not re.search(
+        r'"retry_count"\s*:|retry_count\s*=',
+        text,
+    ), "A-02: google-genai 1.73 removed retry_count; remove the live binding"

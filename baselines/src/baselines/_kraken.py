@@ -140,7 +140,21 @@ def recognize_lines(
         mean_conf = (sum(confs) / len(confs)) if confs else 0.0
         # Kraken's record exposes line geometry under one of a few attribute
         # names depending on version; tolerate the common shapes.
-        bbox_raw = getattr(rec, "line_bbox", None) or getattr(rec, "bbox", None) or (0, 0, 0, 0)
+        # Phase 03.1-05 Rule 1 fix: ``BaselineOCRRecord`` (the type rpred
+        # yields under blla segmentation) has no ``line_bbox`` / ``bbox``
+        # attribute — it carries ``boundary`` (the line polygon) and
+        # ``baseline`` (point list along the line). Derive a tight bbox
+        # from the boundary polygon when present, falling back to the
+        # baseline points, then to legacy bbox attrs, then (0,0,0,0).
+        bbox_raw = getattr(rec, "line_bbox", None) or getattr(rec, "bbox", None)
+        if not bbox_raw:
+            poly = getattr(rec, "boundary", None) or getattr(rec, "baseline", None)
+            if poly:
+                xs = [p[0] for p in poly]
+                ys = [p[1] for p in poly]
+                bbox_raw = (min(xs), min(ys), max(xs), max(ys))
+        if not bbox_raw:
+            bbox_raw = (0, 0, 0, 0)
         x0, y0, x1, y1 = (
             int(bbox_raw[0]),
             int(bbox_raw[1]),
