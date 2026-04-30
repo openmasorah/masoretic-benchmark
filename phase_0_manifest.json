@@ -1,6 +1,6 @@
 {
   "version": "v0.2.0",
-  "frozen_at": "2026-04-29T02:42:08Z",
+  "frozen_at": "2026-04-30T13:21:24Z",
   "scorer_version": "0.1.0",
   "nakdimon_model_hash": "",
   "expected_total_reports": 0,
@@ -18,12 +18,42 @@
   },
   "folios": [
     {
-      "id": "leningrad_devarim_shema_fixture",
+      "id": "leningrad_devarim_F118B_fixture",
       "manuscript": "leningrad",
       "book": "devarim",
-      "folio": "F195A",
-      "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F195A.jpg",
-      "iaa_folio": false,
+      "folio": "F118B",
+      "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F118B.jpg",
+      "iaa_folio": true,
+      "gt_hash": null,
+      "in_frozen_scope": true
+    },
+    {
+      "id": "leningrad_devarim_F119A_fixture",
+      "manuscript": "leningrad",
+      "book": "devarim",
+      "folio": "F119A",
+      "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F119A.jpg",
+      "iaa_folio": true,
+      "gt_hash": null,
+      "in_frozen_scope": true
+    },
+    {
+      "id": "leningrad_devarim_F119B_fixture",
+      "manuscript": "leningrad",
+      "book": "devarim",
+      "folio": "F119B",
+      "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F119B.jpg",
+      "iaa_folio": true,
+      "gt_hash": null,
+      "in_frozen_scope": true
+    },
+    {
+      "id": "leningrad_devarim_F120A_fixture",
+      "manuscript": "leningrad",
+      "book": "devarim",
+      "folio": "F120A",
+      "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F120A.jpg",
+      "iaa_folio": true,
       "gt_hash": null,
       "in_frozen_scope": true
     }
@@ -40,6 +70,11 @@
       "prev_frozen_at": "2026-04-29T02:41:41Z",
       "new_frozen_at": "2026-04-29T02:42:08Z",
       "reason": "phase 03.1 W3.5: regime change — reset expected_reports_per_baseline.* to 0 + seed cost_caps_usd ahead of W4 promotions (A-01-amended D-14 + A-02 lock)"
+    },
+    {
+      "prev_frozen_at": "2026-04-29T02:42:08Z",
+      "new_frozen_at": "2026-04-30T13:21:24Z",
+      "reason": "phase 03.2: IAA set finalized to last 4 sides of L Devarim per Yosef 2026-04-30"
     }
   ]
 }
