@@ -10,7 +10,7 @@
     "biblia_char_menaked": 0,
     "biblia_kraken": 1,
     "biblia_nakdimon": 0,
-    "llm_vision": 0
+    "llm_vision": 1
   },
   "expected_total_reports": 0,
   "folios": [
@@ -55,7 +55,7 @@
       "manuscript": "leningrad"
     }
   ],
-  "frozen_at": "2026-04-30T19:58:28Z",
+  "frozen_at": "2026-04-30T22:56:48Z",
   "fuses_fired": [],
   "iaa_subset": [
     "leningrad_devarim_F118B_fixture",
@@ -89,6 +89,11 @@
       "new_frozen_at": "2026-04-30T19:58:28Z",
       "prev_frozen_at": "2026-04-30T17:00:00Z",
       "reason": "phase 3.1: biblia_kraken leningrad_devarim_F118B_fixture promoted"
+    },
+    {
+      "new_frozen_at": "2026-04-30T22:56:48Z",
+      "prev_frozen_at": "2026-04-30T19:58:28Z",
+      "reason": "phase 3.1: llm_vision leningrad_devarim_F118B_fixture promoted"
     }
   ],
   "nakdimon_model_hash": "8fd7722b8002a690",
