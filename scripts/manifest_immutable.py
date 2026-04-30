@@ -10,13 +10,20 @@ Allowed mutations:
     (a fuse event narrowing scope).
   - Append to ``fuses_fired[]``.
   - Update top-level ``frozen_at`` timestamp (fuse events bump it).
+  - Remove a folio entry IFF the staged commit appends exactly one new
+    ``manifest_changelog`` row whose ``reason`` matches ``^phase \\d+(\\.\\d+)?: ``
+    AND the removed folio in HEAD has ``iaa_folio: false`` AND
+    ``gt_hash: null`` (a fuse-event regime change retiring a scaffold folio
+    that never carried adjudicated GT).
 
 Rejected mutations:
   - Change any of :data:`IMMUTABLE_FIELDS` on an existing folio entry.
   - Flip ``in_frozen_scope`` ``false -> true`` (a narrowed scope cannot be
     restored; the folio is out forever and only a new entry with a new id
     can re-include work).
-  - Remove a previously-committed folio entry.
+  - Remove a previously-committed folio entry, except under the
+    fuse-event exemption above (which is narrow on purpose: it never
+    permits removing a folio whose GT has been hashed in).
 
 Usage in sibling repo's ``.pre-commit-config.yaml``::
 
@@ -31,6 +38,7 @@ Usage in sibling repo's ``.pre-commit-config.yaml``::
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -69,12 +77,41 @@ def main(manifest_path: str = "phase_0_manifest.json") -> int:
 
     errors: list[str] = []
 
-    # Detect removals.
-    for fid in head_ids:
-        if fid not in staged_ids:
-            errors.append(
-                f"REJECT: folio {fid!r} was removed; phase_0_manifest.json is append-only-immutable"
-            )
+    # Detect removals (with narrow fuse-event exemption).
+    removed_ids = [fid for fid in head_ids if fid not in staged_ids]
+    if removed_ids:
+        head_changelog = head.get("manifest_changelog", [])
+        staged_changelog = staged.get("manifest_changelog", [])
+        new_rows = staged_changelog[len(head_changelog) :]
+        is_fuse_event = (
+            len(new_rows) == 1
+            and isinstance(new_rows[0], dict)
+            and isinstance(new_rows[0].get("reason"), str)
+            and re.match(r"^phase \d+(\.\d+)?: ", new_rows[0]["reason"]) is not None
+        )
+        for fid in removed_ids:
+            fhead = head_ids[fid]
+            removed_iaa = fhead.get("iaa_folio")
+            removed_hash = fhead.get("gt_hash")
+            if not is_fuse_event:
+                errors.append(
+                    f"REJECT: folio {fid!r} was removed without a fuse-event "
+                    f"manifest_changelog row; phase_0_manifest.json is "
+                    f"append-only-immutable except under fuse-event exemption "
+                    f"(reason must match '^phase NN: ')"
+                )
+            elif removed_iaa is True:
+                errors.append(
+                    f"REJECT: folio {fid!r} cannot be removed under "
+                    f"fuse-event exemption: iaa_folio=true (folio carries "
+                    f"or will carry adjudicated GT)"
+                )
+            elif removed_hash is not None:
+                errors.append(
+                    f"REJECT: folio {fid!r} cannot be removed under "
+                    f"fuse-event exemption: gt_hash is non-null "
+                    f"(folio's GT has been hashed in)"
+                )
 
     # Detect field mutations + illegal scope flips on existing entries.
     for fid, fstaged in staged_ids.items():
