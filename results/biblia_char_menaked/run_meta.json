@@ -1,0 +1,35 @@
+{
+  "baseline_id": "biblia_char_menaked",
+  "budget": {
+    "cap_per_folio": null,
+    "cap_run": null,
+    "rate_table_snapshot": null,
+    "used_total": null
+  },
+  "combine": {
+    "tie_break_total": null,
+    "tie_break_winners": null
+  },
+  "completed_at_iso": "2026-05-01T03:18:50+00:00",
+  "folios": {
+    "leningrad_devarim_F118B_fixture": {
+      "budget_used": null,
+      "line_count": 109,
+      "replay_used": null,
+      "scope_check_passed_at_iso": "2026-05-01T03:18:50+00:00"
+    }
+  },
+  "hostname": "bens-MacBook-Air.local",
+  "manifest_hash": null,
+  "pins": {
+    "dictabert_model_revision": "d311fbf7c403e50b040440e4859ac78064d025d0",
+    "kraken_model_hash": "8514a0c7cc2b5b45",
+    "llm_pin_md_hash": null,
+    "nakdimon_model_hash": null
+  },
+  "replay_mode": false,
+  "schema_version": "0.1.0",
+  "scorer_version": "0.1.0",
+  "sibling_git_sha": "98c3836985a0",
+  "started_at_iso": "2026-05-01T03:18:13+00:00"
+}

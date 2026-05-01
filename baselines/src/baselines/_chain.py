@@ -51,6 +51,7 @@ from pathlib import Path
 from baselines._atomic import SandboxRun
 from baselines._base import BaselineBase, LineRecord
 from baselines._errors import BaselineError
+from baselines._gt_adapter import load_tier1_per_line
 from baselines._images import fetch_image
 from baselines._kraken import KRAKEN_MODEL_HASH, recognize_lines
 
@@ -202,9 +203,19 @@ class ChainBaseline(BaselineBase):
     def _load_gt_consonants(self, folio) -> list[tuple[str, tuple[int, int, int, int], str]]:
         """Load frozen GT consonants for the diagnostic chain.
 
-        Reads from `<gt_root>/<folio_id>.json` first, then from a fallback
-        `tests/fixtures/<folio_id>.json` for the Shema golden fixture
-        (Phase 1 dry-run). The expected file shape is:
+        Phase 03.1 D-21 (locked 2026-04-27): primary source is PAGE-XML at
+        ``<gt_root>/<folio_id>.page.xml`` consumed via
+        ``baselines._gt_adapter.load_tier1_per_line`` — symmetric with the
+        realistic-chain branch's tier-1 extraction over BL-02's PAGE-XML
+        Kraken cache. PAGE-XML records carry no bbox; bbox is emitted as
+        ``(0,0,0,0)`` per line and ``line_id`` is reconstructed as
+        ``<folio_id>_L<line_num>``. This is acceptable for the GT-fed
+        diagnostic stream — the diagnostic is paper-only (D-01), not
+        consumed by per-line CER (which is deferred to v0.2 anyway), and
+        the prediction-schema validator accepts ``bbox=[0,0,0,0]``.
+
+        JSON fallback retained for unit tests (and Phase 1's pre-PAGE-XML
+        per-line export shape). The JSON shape is:
 
             {"lines": [
                 {"line_id": "...", "bbox": [x0,y0,x1,y1], "tier1": "..."},
@@ -213,16 +224,31 @@ class ChainBaseline(BaselineBase):
 
         Returns: list of (line_id, bbox-tuple, tier1) tuples.
 
-        Raises: BaselineError if the GT file is missing for `folio.id`.
-        Issue 2 fix (plan 03-05): Phase 1 has not yet emitted the per-line
-        GT export; live tests skip on this condition, mocked unit tests
-        pass a tmp_path GT fixture so the chain code path is exercised.
+        Raises: BaselineError if neither PAGE-XML nor JSON is present for
+        ``folio.id`` at any candidate path.
         """
-        candidates = [
+        # Primary: PAGE-XML at <gt_root>/<folio_id>.page.xml (D-21).
+        page_xml_candidates = [
+            self.gt_root / f"{folio.id}.page.xml",
+        ]
+        for path in page_xml_candidates:
+            if path.exists():
+                tier1_lines = load_tier1_per_line(folio.id, path)
+                return [
+                    (
+                        f"{folio.id}_L{idx + 1:03d}",
+                        (0, 0, 0, 0),
+                        tier1,
+                    )
+                    for idx, tier1 in enumerate(tier1_lines)
+                ]
+
+        # Fallback: per-line JSON shape (unit-test compat + Phase 1 dry-run).
+        json_candidates = [
             self.gt_root / f"{folio.id}.json",
             BAALSHEM_FIXTURE_DIR / f"{folio.id}.json",
         ]
-        for path in candidates:
+        for path in json_candidates:
             if path.exists():
                 data = json.loads(path.read_text(encoding="utf-8"))
                 return [
@@ -233,9 +259,10 @@ class ChainBaseline(BaselineBase):
                     )
                     for entry in data["lines"]
                 ]
+        all_candidates = page_xml_candidates + json_candidates
         raise BaselineError(
             f"D-01 diagnostic chain: no GT for folio {folio.id} found at any "
-            f"of {[str(p) for p in candidates]!r}"
+            f"of {[str(p) for p in all_candidates]!r}"
         )
 
     # -- run_meta extension --------------------------------------------------
