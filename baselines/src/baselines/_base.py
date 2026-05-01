@@ -300,7 +300,7 @@ class BaselineBase(ABC):
             "schema_version": self.SCHEMA_VERSION,
             "baseline_id": self.BASELINE_ID,
             "folio_id": folio.id,
-            "manifest_hash": getattr(self.manifest, "manifest_hash", None),
+            "manifest_hash": self.manifest.manifest_hash,
             "run_meta_ref": "run_meta.json",
             "lines": [
                 {
@@ -346,7 +346,7 @@ class BaselineBase(ABC):
         return {
             "schema_version": self.SCHEMA_VERSION,
             "baseline_id": self.BASELINE_ID,
-            "manifest_hash": getattr(self.manifest, "manifest_hash", None),
+            "manifest_hash": self.manifest.manifest_hash,
             "scorer_version": getattr(self.manifest, "scorer_version", None),
             "started_at_iso": getattr(self, "_started_at", None)
             or datetime.now(UTC).isoformat(timespec="seconds"),

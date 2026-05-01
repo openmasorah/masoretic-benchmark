@@ -29,7 +29,10 @@ def serialize(
     result: ScoreResult,
     prediction_id: str,
     gt_version: str,
+    manifest_hash: str,
 ) -> dict[str, Any]:
+    if not manifest_hash:
+        raise ValueError("manifest_hash must be a non-empty string")
     t1 = result.tiers["tier1"]
     t2 = result.tiers["tier2"]
     t3 = result.tiers["tier3"]
@@ -38,6 +41,7 @@ def serialize(
     return {
         "prediction_id": prediction_id,
         "gt_version": gt_version,
+        "manifest_hash": manifest_hash,
         "scorer_version": __version__,
         "normalization": "NFD (scoring) / LC-order (raw GT)",
         "denominator_policy": {

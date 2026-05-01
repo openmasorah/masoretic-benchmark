@@ -3,6 +3,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from masoretic_eval.manifest import Manifest
+
 FIXTURES = Path(__file__).parent / "fixtures"
 MANIFEST_FIXTURE = FIXTURES / "phase_0_manifest_sample.json"
 
@@ -13,6 +15,7 @@ def _run_score(
     out: Path,
     *,
     manifest: Path | None = MANIFEST_FIXTURE,
+    cwd: Path | None = None,
 ) -> subprocess.CompletedProcess[str]:
     cmd = [
         sys.executable,
@@ -33,6 +36,7 @@ def _run_score(
     return subprocess.run(
         cmd,
         capture_output=True,
+        cwd=cwd,
         text=True,
     )
 
@@ -46,9 +50,21 @@ def test_cli_score_writes_output(tmp_path):
     assert rc.returncode == 0, rc.stderr
     data = json.loads(out.read_text())
     assert data["prediction_id"] == "leningrad_devarim_f237b"
-    assert data["manifest_hash"]
+    assert data["manifest_hash"] == Manifest.load(MANIFEST_FIXTURE).manifest_hash
     assert data["scorer_version"] == "0.2.0"
     assert "tier1" in data["tiers"]
+
+
+def test_cli_requires_manifest_when_default_missing(tmp_path):
+    gt = FIXTURES / "cli_gt.json"
+    pred = FIXTURES / "cli_pred.json"
+    out = tmp_path / "result.json"
+
+    rc = _run_score(gt, pred, out, manifest=None, cwd=tmp_path)
+
+    assert rc.returncode != 0
+    assert "manifest required" in rc.stderr
+    assert not out.exists()
 
 
 def test_cli_rejects_gt_missing_text_without_writing_output(tmp_path):

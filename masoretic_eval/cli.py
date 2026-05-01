@@ -10,6 +10,7 @@ import click
 from jsonschema import Draft202012Validator, ValidationError
 
 from masoretic_eval.composite import Scorer
+from masoretic_eval.manifest import Manifest, ManifestValidationError
 from masoretic_eval.output_schema import serialize
 from masoretic_eval.uxlc_loader import MetaMarkRecord
 
@@ -51,6 +52,22 @@ def _deserialize_input(path: Path, role: str) -> dict[str, Any]:
     return data
 
 
+def _load_manifest_hash(manifest_path: Path | None) -> str:
+    path = manifest_path
+    if path is None:
+        default_path = Path("phase_0_manifest.json")
+        if not default_path.exists():
+            raise click.ClickException(
+                "manifest required: pass --manifest or run from a directory "
+                "containing phase_0_manifest.json"
+            )
+        path = default_path
+    try:
+        return Manifest.load(path).manifest_hash
+    except (OSError, ManifestValidationError, json.JSONDecodeError) as exc:
+        raise click.ClickException(f"failed to load manifest {path}: {exc}") from exc
+
+
 @click.group()
 def main() -> None:
     """masoretic-eval: 4-tier CER scorer for medieval Hebrew."""
@@ -62,6 +79,16 @@ def main() -> None:
 @click.option("--folio-id", required=True, type=str)
 @click.option("--gt-version", default="v0.1.0", type=str)
 @click.option("--out", "out_path", required=True, type=click.Path(path_type=Path))
+@click.option(
+    "--manifest",
+    "manifest_path",
+    required=False,
+    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+    help=(
+        "phase_0_manifest.json used for this scoring run. Defaults to "
+        "./phase_0_manifest.json when present."
+    ),
+)
 @click.option("--nakdimon-disagreement-rate", default=None, type=float)
 @click.option("--dicta-disagreement-rate", default=None, type=float)
 def score(
@@ -70,10 +97,12 @@ def score(
     folio_id: str,
     gt_version: str,
     out_path: Path,
+    manifest_path: Path | None,
     nakdimon_disagreement_rate: float | None,
     dicta_disagreement_rate: float | None,
 ) -> None:
     """Score a prediction against ground truth and write a JSON report."""
+    manifest_hash = _load_manifest_hash(manifest_path)
     gt = _deserialize_input(gt_path, "--gt")
     pred = _deserialize_input(pred_path, "--pred")
     s = Scorer.from_config("v0.1")
@@ -87,6 +116,7 @@ def score(
         result=result,
         prediction_id=folio_id,
         gt_version=gt_version,
+        manifest_hash=manifest_hash,
     )
     out_path.write_text(json.dumps(obj, indent=2, ensure_ascii=False), encoding="utf-8")
     click.echo(f"wrote {out_path}")
