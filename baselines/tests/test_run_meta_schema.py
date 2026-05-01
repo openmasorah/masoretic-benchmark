@@ -215,6 +215,13 @@ def test_additional_top_level_property_rejected(run_meta_validator, valid_run_me
         run_meta_validator.validate(payload)
 
 
+def test_manifest_hash_null_rejected(run_meta_validator, valid_run_meta):
+    payload = deepcopy(valid_run_meta)
+    payload["manifest_hash"] = None
+    with pytest.raises(jsonschema.ValidationError):
+        run_meta_validator.validate(payload)
+
+
 def test_zero_folios_allowed(run_meta_validator, valid_run_meta):
     payload = deepcopy(valid_run_meta)
     payload["folios"] = {}

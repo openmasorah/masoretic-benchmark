@@ -1,3 +1,5 @@
+import hashlib
+import json
 from pathlib import Path
 
 import pytest
@@ -51,3 +53,46 @@ def test_get_folio_by_id():
     f = m.get_folio("leningrad_devarim_f237b")
     assert f.book == "devarim"
     assert f.iaa_folio is True
+
+
+def test_manifest_hash_is_stable_16_hex_from_canonical_raw_json(tmp_path):
+    raw_doc = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text(
+        json.dumps(raw_doc, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+    manifest = Manifest.load(manifest_path)
+    expected = hashlib.sha256(
+        json.dumps(
+            raw_doc,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()[:16]
+
+    assert manifest.manifest_hash == expected
+    assert len(manifest.manifest_hash) == 16
+    assert manifest.manifest_hash == manifest.manifest_hash.lower()
+    assert all(c in "0123456789abcdef" for c in manifest.manifest_hash)
+
+
+def test_manifest_hash_ignores_whitespace_and_top_level_key_order(tmp_path):
+    raw_doc = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    reordered_doc = dict(reversed(list(raw_doc.items())))
+    compact_path = tmp_path / "compact.json"
+    reordered_path = tmp_path / "reordered.json"
+    compact_path.write_text(
+        json.dumps(raw_doc, ensure_ascii=False, separators=(",", ":")),
+        encoding="utf-8",
+    )
+    reordered_path.write_text(
+        json.dumps(reordered_doc, ensure_ascii=False, indent=4),
+        encoding="utf-8",
+    )
+
+    assert Manifest.load(compact_path).manifest_hash == Manifest.load(
+        reordered_path
+    ).manifest_hash

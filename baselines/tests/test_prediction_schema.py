@@ -183,10 +183,11 @@ def test_tier4_record_ordinal_must_be_positive(prediction_validator, valid_predi
         prediction_validator.validate(payload)
 
 
-def test_manifest_hash_nullable(prediction_validator, valid_prediction):
+def test_manifest_hash_null_rejected(prediction_validator, valid_prediction):
     payload = deepcopy(valid_prediction)
     payload["manifest_hash"] = None
-    prediction_validator.validate(payload)
+    with pytest.raises(jsonschema.ValidationError):
+        prediction_validator.validate(payload)
 
 
 def test_empty_lines_array_allowed(prediction_validator, valid_prediction):
