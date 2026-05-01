@@ -36,6 +36,12 @@ repos:
         language: python
         pass_filenames: true
 
+      - id: reject-private-paths
+        name: "Reject private baalshem workspace and local user path leaks"
+        entry: python scripts/reject_private_paths.py
+        language: python
+        pass_filenames: true
+
       - id: manifest-append-only
         name: "Enforce phase_0_manifest.json append-only immutability"
         entry: python scripts/manifest_immutable.py
