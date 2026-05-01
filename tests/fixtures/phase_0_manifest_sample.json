@@ -35,5 +35,18 @@
   "expected_total_reports": 8,
   "scorer_version": "0.1.0",
   "nakdimon_model_hash": "8fd7722b8002a690",
-  "notes": "Sample manifest for scorer tests"
+  "kraken_model_hash": "8514a0c7cc2b5b45",
+  "dictabert_model_revision": "d311fbf7c403e50b040440e4859ac78064d025d0",
+  "cost_caps_usd": {
+    "per_folio": 5.0,
+    "per_run": 30.0
+  },
+  "manifest_changelog": [
+    {
+      "prev_frozen_at": "2026-05-25T00:00:00Z",
+      "new_frozen_at": "2026-05-26T00:00:00Z",
+      "reason": "phase 03.3: sample manifest fixture"
+    }
+  ],
+  "baselines": {}
 }

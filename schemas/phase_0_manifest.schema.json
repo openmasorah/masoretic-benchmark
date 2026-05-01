@@ -15,7 +15,7 @@
     "expected_reports_per_baseline",
     "nakdimon_model_hash"
   ],
-  "additionalProperties": true,
+  "additionalProperties": false,
   "properties": {
     "version": {
       "type": "string",
@@ -30,6 +30,29 @@
     },
     "nakdimon_model_hash": {
       "type": "string"
+    },
+    "kraken_model_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "dictabert_model_revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "cost_caps_usd": {
+      "type": "object",
+      "required": ["per_folio", "per_run"],
+      "additionalProperties": false,
+      "properties": {
+        "per_folio": {
+          "type": "number",
+          "minimum": 0
+        },
+        "per_run": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
     },
     "expected_total_reports": {
       "oneOf": [
@@ -107,12 +130,37 @@
       }
     },
     "baselines": {
-      "type": "object"
+      "type": "object",
+      "additionalProperties": {
+        "type": "object"
+      }
     },
     "fuses_fired": {
       "type": "array",
       "items": {
         "type": "object"
+      }
+    },
+    "manifest_changelog": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["reason", "prev_frozen_at", "new_frozen_at"],
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "prev_frozen_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "new_frozen_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
       }
     }
   }

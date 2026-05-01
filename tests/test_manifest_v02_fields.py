@@ -66,9 +66,30 @@ def test_schema_required_includes_new_fields():
     } <= required
 
 
+def test_schema_rejects_unknown_top_level_fields():
+    schema = _load_schema()
+    assert schema["additionalProperties"] is False
+
+
 def test_nakdimon_model_hash_is_required_string_not_nullable():
     schema = _load_schema()
     assert schema["properties"]["nakdimon_model_hash"] == {"type": "string"}
+
+
+def test_safety_critical_top_level_fields_have_declared_types():
+    schema = _load_schema()
+    props = schema["properties"]
+    assert props["cost_caps_usd"]["properties"]["per_folio"]["type"] == "number"
+    assert props["cost_caps_usd"]["properties"]["per_run"]["type"] == "number"
+    assert props["kraken_model_hash"]["type"] == "string"
+    assert props["dictabert_model_revision"]["type"] == "string"
+    assert props["manifest_changelog"]["items"]["required"] == [
+        "reason",
+        "prev_frozen_at",
+        "new_frozen_at",
+    ]
+    assert props["baselines"]["type"] == "object"
+    assert props["fuses_fired"]["type"] == "array"
 
 
 def test_expected_total_reports_oneof_int_or_mapping():
@@ -122,6 +143,16 @@ def test_schema_validates_a_full_v02_document():
             "biblia_char_menaked": 1,
             "llm_vision": 1,
         },
+        "cost_caps_usd": {"per_folio": 5.0, "per_run": 30.0},
+        "kraken_model_hash": "8514a0c7cc2b5b45",
+        "dictabert_model_revision": "d311fbf7c403e50b040440e4859ac78064d025d0",
+        "manifest_changelog": [
+            {
+                "prev_frozen_at": "2026-04-25T12:00:00Z",
+                "new_frozen_at": "2026-04-25T13:00:00Z",
+                "reason": "phase 03.3: test row",
+            }
+        ],
         "folios": [
             {
                 "id": "leningrad_devarim_F118B_fixture",
@@ -132,6 +163,8 @@ def test_schema_validates_a_full_v02_document():
                 "in_frozen_scope": True,
             }
         ],
+        "baselines": {},
+        "fuses_fired": [],
     }
     jsonschema.validate(doc, schema)  # no raise
 
@@ -177,6 +210,12 @@ def test_schema_accepts_legacy_scalar_form_of_expected_total_reports():
         "iaa_subset": [],
         "baselines_seeded": [],
         "expected_reports_per_baseline": {},
+        "cost_caps_usd": {"per_folio": 5.0, "per_run": 30.0},
+        "kraken_model_hash": "8514a0c7cc2b5b45",
+        "dictabert_model_revision": "d311fbf7c403e50b040440e4859ac78064d025d0",
+        "manifest_changelog": [],
+        "baselines": {},
+        "fuses_fired": [],
         "folios": [],
     }
     jsonschema.validate(doc, schema)
@@ -193,6 +232,12 @@ def test_schema_accepts_per_baseline_mapping_form_of_expected_total_reports():
         "iaa_subset": [],
         "baselines_seeded": [],
         "expected_reports_per_baseline": {},
+        "cost_caps_usd": {"per_folio": 5.0, "per_run": 30.0},
+        "kraken_model_hash": "8514a0c7cc2b5b45",
+        "dictabert_model_revision": "d311fbf7c403e50b040440e4859ac78064d025d0",
+        "manifest_changelog": [],
+        "baselines": {},
+        "fuses_fired": [],
         "folios": [],
     }
     jsonschema.validate(doc, schema)
@@ -253,6 +298,10 @@ V02_DOC = {
         "biblia_char_menaked": 1,
         "llm_vision": 1,
     },
+    "cost_caps_usd": {"per_folio": 5.0, "per_run": 30.0},
+    "kraken_model_hash": "8514a0c7cc2b5b45",
+    "dictabert_model_revision": "d311fbf7c403e50b040440e4859ac78064d025d0",
+    "manifest_changelog": [],
     "folios": [
         {
             "id": "leningrad_devarim_F118B_fixture",
