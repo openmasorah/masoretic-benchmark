@@ -52,42 +52,117 @@ IMMUTABLE_FIELDS: tuple[str, ...] = (
     "gt_hash",
 )
 
+TOP_LEVEL_TRACKED_FIELDS: tuple[str, ...] = (
+    "cost_caps_usd",
+    "kraken_model_hash",
+    "dictabert_model_revision",
+    "scorer_version",
+    "nakdimon_model_hash",
+    "baselines",
+    "baselines_seeded",
+    "expected_reports_per_baseline",
+    "expected_total_reports",
+)
 
-def main(manifest_path: str = "phase_0_manifest.json") -> int:
-    """Return 0 if the staged manifest is a legal successor of HEAD, 1 otherwise."""
-    path = Path(manifest_path)
-    if not path.exists():
-        # Nothing to check (the file was deleted or never existed).
-        return 0
+CHANGELOG_REASON_RE = re.compile(r"^phase \d+(\.\d+)?: ")
 
-    staged = json.loads(path.read_text())
-    try:
-        head_raw = subprocess.check_output(
-            ["git", "show", f"HEAD:{manifest_path}"],
-            text=True,
-            stderr=subprocess.DEVNULL,
+
+def _manifest_changelog_rows(doc: dict[str, object]) -> list[object]:
+    rows = doc.get("manifest_changelog", [])
+    return rows if isinstance(rows, list) else []
+
+
+def _appended_changelog_rows(
+    head: dict[str, object], staged: dict[str, object], errors: list[str]
+) -> list[object]:
+    head_changelog = _manifest_changelog_rows(head)
+    staged_changelog = _manifest_changelog_rows(staged)
+
+    if len(staged_changelog) < len(head_changelog):
+        errors.append("REJECT: removed changelog row from manifest_changelog")
+        return []
+
+    staged_prefix = staged_changelog[: len(head_changelog)]
+    if staged_prefix != head_changelog:
+        errors.append(
+            "REJECT: edited changelog prefix row; manifest_changelog is append-only"
         )
-    except subprocess.CalledProcessError:
-        # First commit of the manifest: nothing to diff against.
-        return 0
+        return staged_changelog[len(head_changelog) :]
 
-    head = json.loads(head_raw)
+    return staged_changelog[len(head_changelog) :]
+
+
+def _has_phase_reason(row: object) -> bool:
+    if not isinstance(row, dict):
+        return False
+    reason = row.get("reason")
+    if not isinstance(reason, str):
+        return False
+    return reason.startswith("phase 03.3:") or CHANGELOG_REASON_RE.match(reason) is not None
+
+
+def _validate_changelog_chain(
+    head: dict[str, object], staged: dict[str, object], new_rows: list[object], errors: list[str]
+) -> None:
+    expected_prev = head.get("frozen_at")
+    for index, row in enumerate(new_rows, start=1):
+        if not isinstance(row, dict):
+            errors.append(f"REJECT: manifest_changelog appended row {index} is not an object")
+            continue
+        prev_frozen_at = row.get("prev_frozen_at")
+        new_frozen_at = row.get("new_frozen_at")
+        if prev_frozen_at is not None and prev_frozen_at != expected_prev:
+            errors.append(
+                "REJECT: manifest_changelog prev_frozen_at chain mismatch "
+                f"at appended row {index}: expected {expected_prev!r}, got {prev_frozen_at!r}"
+            )
+        if new_frozen_at is not None:
+            expected_prev = new_frozen_at
+
+    if new_rows and expected_prev != staged.get("frozen_at"):
+        errors.append(
+            "REJECT: manifest_changelog new_frozen_at chain does not end at "
+            f"staged frozen_at {staged.get('frozen_at')!r}"
+        )
+
+
+def validate_manifest_successor(
+    head: dict[str, object], staged: dict[str, object]
+) -> list[str]:
+    """Return rejection messages for illegal manifest mutations."""
     head_ids: dict[str, dict[str, object]] = {f["id"]: f for f in head.get("folios", [])}
     staged_ids: dict[str, dict[str, object]] = {f["id"]: f for f in staged.get("folios", [])}
 
     errors: list[str] = []
+    new_rows = _appended_changelog_rows(head, staged, errors)
+    _validate_changelog_chain(head, staged, new_rows, errors)
+
+    changed_tracked_fields = [
+        field
+        for field in TOP_LEVEL_TRACKED_FIELDS
+        if head.get(field) != staged.get(field)
+    ]
+    if changed_tracked_fields:
+        if not new_rows:
+            errors.append(
+                "REJECT: tracked top-level field change requires an appended "
+                "manifest_changelog row: "
+                + ", ".join(changed_tracked_fields)
+            )
+        elif not any(_has_phase_reason(row) for row in new_rows):
+            errors.append(
+                "REJECT: tracked top-level field change requires a new "
+                "manifest_changelog reason beginning with 'phase 03.3:' or "
+                "matching '^phase N(.N)?: '"
+            )
 
     # Detect removals (with narrow fuse-event exemption).
     removed_ids = [fid for fid in head_ids if fid not in staged_ids]
     if removed_ids:
-        head_changelog = head.get("manifest_changelog", [])
-        staged_changelog = staged.get("manifest_changelog", [])
-        new_rows = staged_changelog[len(head_changelog) :]
         is_fuse_event = (
             len(new_rows) == 1
             and isinstance(new_rows[0], dict)
-            and isinstance(new_rows[0].get("reason"), str)
-            and re.match(r"^phase \d+(\.\d+)?: ", new_rows[0]["reason"]) is not None
+            and _has_phase_reason(new_rows[0])
         )
         for fid in removed_ids:
             fhead = head_ids[fid]
@@ -117,7 +192,7 @@ def main(manifest_path: str = "phase_0_manifest.json") -> int:
     for fid, fstaged in staged_ids.items():
         fhead = head_ids.get(fid)
         if fhead is None:
-            # New folio — allowed.
+            # New folio -- allowed.
             continue
         for field in IMMUTABLE_FIELDS:
             prev = fhead.get(field)
@@ -133,6 +208,30 @@ def main(manifest_path: str = "phase_0_manifest.json") -> int:
                 f"REJECT: folio {fid!r} cannot restore in_frozen_scope "
                 "true after a fuse flipped it false"
             )
+
+    return errors
+
+
+def main(manifest_path: str = "phase_0_manifest.json") -> int:
+    """Return 0 if the staged manifest is a legal successor of HEAD, 1 otherwise."""
+    path = Path(manifest_path)
+    if not path.exists():
+        # Nothing to check (the file was deleted or never existed).
+        return 0
+
+    staged = json.loads(path.read_text())
+    try:
+        head_raw = subprocess.check_output(
+            ["git", "show", f"HEAD:{manifest_path}"],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        )
+    except subprocess.CalledProcessError:
+        # First commit of the manifest: nothing to diff against.
+        return 0
+
+    head = json.loads(head_raw)
+    errors = validate_manifest_successor(head, staged)
 
     if errors:
         for e in errors:
