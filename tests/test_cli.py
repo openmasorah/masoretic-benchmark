@@ -4,24 +4,34 @@ import sys
 from pathlib import Path
 
 FIXTURES = Path(__file__).parent / "fixtures"
+MANIFEST_FIXTURE = FIXTURES / "phase_0_manifest_sample.json"
 
 
-def _run_score(gt: Path, pred: Path, out: Path) -> subprocess.CompletedProcess[str]:
+def _run_score(
+    gt: Path,
+    pred: Path,
+    out: Path,
+    *,
+    manifest: Path | None = MANIFEST_FIXTURE,
+) -> subprocess.CompletedProcess[str]:
+    cmd = [
+        sys.executable,
+        "-m",
+        "masoretic_eval.cli",
+        "score",
+        "--gt",
+        str(gt),
+        "--pred",
+        str(pred),
+        "--folio-id",
+        "leningrad_devarim_f237b",
+        "--out",
+        str(out),
+    ]
+    if manifest is not None:
+        cmd.extend(["--manifest", str(manifest)])
     return subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "masoretic_eval.cli",
-            "score",
-            "--gt",
-            str(gt),
-            "--pred",
-            str(pred),
-            "--folio-id",
-            "leningrad_devarim_f237b",
-            "--out",
-            str(out),
-        ],
+        cmd,
         capture_output=True,
         text=True,
     )
@@ -36,6 +46,7 @@ def test_cli_score_writes_output(tmp_path):
     assert rc.returncode == 0, rc.stderr
     data = json.loads(out.read_text())
     assert data["prediction_id"] == "leningrad_devarim_f237b"
+    assert data["manifest_hash"]
     assert data["scorer_version"] == "0.2.0"
     assert "tier1" in data["tiers"]
 

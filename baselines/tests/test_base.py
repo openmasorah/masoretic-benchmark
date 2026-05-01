@@ -277,6 +277,25 @@ def test_serialize_includes_optional_fields_when_set(tmp_path, monkeypatch):
     assert line["llm_tie_breaks"] == 1
 
 
+def test_serialize_requires_manifest_hash_attribute(tmp_path):
+    fid = "leningrad_devarim_F118B_fixture"
+
+    class ManifestWithoutHash:
+        scorer_version = "v0.1.0-scorer"
+
+    class Provenanced(BaselineBase):
+        BASELINE_ID = "biblia_kraken"
+
+        def infer_folio(self, folio):
+            return []
+
+    bl = Provenanced.__new__(Provenanced)
+    bl.manifest = ManifestWithoutHash()
+
+    with pytest.raises(AttributeError, match="manifest_hash"):
+        bl._serialize(FakeFolio(id=fid), [])
+
+
 def test_run_signature_is_documented_locked(tmp_path):
     """Sanity check that run() accepts folio_ids: list[str] | None kw-only."""
     sig = inspect.signature(BaselineBase.run)
