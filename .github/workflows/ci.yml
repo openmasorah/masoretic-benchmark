@@ -9,8 +9,12 @@
 name: CI
 
 on:
+  # Run on push only for the protected branch — every PR-branch push is already
+  # covered by the `pull_request` trigger below, and running both events doubles
+  # CI minutes for zero added signal. Branch protection consumes pull_request
+  # checks; push-event checks are not required for merge.
   push:
-    branches: ["**"]
+    branches: [main]
   pull_request:
     branches: [main]
   schedule:
