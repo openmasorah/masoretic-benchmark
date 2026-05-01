@@ -2,13 +2,13 @@
   "baselines": {},
   "baselines_seeded": [],
   "cost_caps_usd": {
-    "per_folio": 5.0,
-    "per_run": 30.0
+    "per_folio": 5.00,
+    "per_run": 30.00
   },
   "dictabert_model_revision": "d311fbf7c403e50b040440e4859ac78064d025d0",
   "expected_reports_per_baseline": {
     "biblia_char_menaked": 0,
-    "biblia_kraken": 1,
+    "biblia_kraken": 2,
     "biblia_nakdimon": 0,
     "llm_vision": 1
   },
@@ -55,7 +55,7 @@
       "manuscript": "leningrad"
     }
   ],
-  "frozen_at": "2026-04-30T22:56:48Z",
+  "frozen_at": "2026-05-01T02:19:06Z",
   "fuses_fired": [],
   "iaa_subset": [
     "leningrad_devarim_F118B_fixture",
@@ -94,6 +94,16 @@
       "new_frozen_at": "2026-04-30T22:56:48Z",
       "prev_frozen_at": "2026-04-30T19:58:28Z",
       "reason": "phase 3.1: llm_vision leningrad_devarim_F118B_fixture promoted"
+    },
+    {
+      "new_frozen_at": "2026-05-01T02:16:27Z",
+      "prev_frozen_at": "2026-04-30T22:56:48Z",
+      "reason": "phase 3.1: biblia_kraken leningrad_devarim_F118B_fixture promoted"
+    },
+    {
+      "prev_frozen_at": "2026-05-01T02:16:27Z",
+      "new_frozen_at": "2026-05-01T02:19:06Z",
+      "reason": "phase 03.1: evaluation protocol pre-registered per BL-07 (whole-folio macro-averaged CER tiers 1-3 / F1 tier 4 as headline; per-line CER, zone-restricted CER, segmentation-merge variants deferred to v0.2 pending IAA). Scoring methodology frozen in baselines/EVALUATION_PROTOCOL.md."
     }
   ],
   "nakdimon_model_hash": "8fd7722b8002a690",

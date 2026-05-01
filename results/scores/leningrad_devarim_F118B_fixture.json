@@ -1,0 +1,72 @@
+{
+  "folio_id": "leningrad_devarim_F118B_fixture",
+  "manuscript": "leningrad",
+  "book": "devarim",
+  "verse_range": "Deut 31:28 (mid-verse) – Deut 32:22 (mid-verse)",
+  "physical_line_count": 26,
+  "gt_source": {
+    "path": "baselines/tests/fixtures/iaa_folio_leningrad_devarim_F118B_fixture.gt_adapter_golden.json",
+    "annotator": "Ben Lamm (operator)",
+    "method": "hand-transcribed from photograph (PDM 1.0 archive.org scan)",
+    "tiers_provided": ["tier1"],
+    "tiers_deferred": ["tier2", "tier3", "tier4"]
+  },
+  "evaluation_protocol": {
+    "doc": "baselines/EVALUATION_PROTOCOL.md",
+    "row": "2026-04-30",
+    "headline_metric": "Macro-averaged whole-folio CER (tiers 1–3) / F1 (tier 4) per BL-07",
+    "computed_via": "spike at /Users/benlamm/Workspace/baalshem/spikes/03.1-05-cer-methodology/spike.py method1_whole_folio (uses masoretic_eval.tiers.tier1_consonantal.Tier1Consonantal normalization + Levenshtein CER)"
+  },
+  "scores": {
+    "biblia_kraken": {
+      "tier1_cer": 0.9162,
+      "tier1_cer_pp": 91.62,
+      "tier2_cer": null,
+      "tier3_cer": null,
+      "tier4_f1": null,
+      "macro_avg_cer_tiers_1_3": 0.9162,
+      "diagnostics": {
+        "n_pred_lines": 109,
+        "gt_chars_normalized": 1421,
+        "pred_chars_normalized": 2107,
+        "kraken_model_hash": "8514a0c7cc2b5b45",
+        "result_file": "results/biblia_kraken/leningrad_devarim_F118B_fixture.json",
+        "result_commit": "b319b81",
+        "known_issue": "Result file carries bbox=[0,0,0,0] for all lines (pre-477ea68 boundary-polygon-derivation regression). Whole-folio CER unaffected (text concatenation does not consume bboxes; reading-order falls back to line_id when all bboxes are zero). v0.2 cleanup."
+      }
+    },
+    "llm_vision": {
+      "tier1_cer": 0.6662,
+      "tier1_cer_pp": 66.62,
+      "tier2_cer": null,
+      "tier3_cer": null,
+      "tier4_f1": null,
+      "macro_avg_cer_tiers_1_3": 0.6662,
+      "diagnostics": {
+        "n_pred_lines": 109,
+        "gt_chars_normalized": 1421,
+        "pred_chars_normalized": 4153,
+        "claude_model": "claude-opus-4-7",
+        "gemini_model": "gemini-2.5-pro",
+        "actual_spend_usd": 0.2867,
+        "result_file": "results/llm_vision/leningrad_devarim_F118B_fixture.json",
+        "result_commit": "8fd544a",
+        "llm_pin_md_hash": "92baf322dab6c222"
+      }
+    },
+    "biblia_nakdimon": "deferred to Phase 03.1 plan 06",
+    "biblia_char_menaked": "deferred to Phase 03.1 plan 06"
+  },
+  "limitations": [
+    "Tier-1-only GT (Ben hand transcribed; tiers 2/3/4 await Yosef's deeper review pending eScriptorium pipeline restart)",
+    "Single annotator (no second-annotator IAA; GT-11/GT-12 F8 gate deferred to v0.2)",
+    "BL-02 zero-bbox regression in result file (whole-folio CER unaffected; per-line CER blocked until v0.2 re-promote)",
+    "BL-03 / BL-04 chain baselines not yet run (Phase 03.1 plan 06)"
+  ],
+  "next_steps": [
+    "Phase 03.1 plan 06 — BL-03 (Kraken→Nakdimon) + BL-04 (Kraken→DictaBERT) chain runs on F118B",
+    "F119A / F119B / F120A — apply EVALUATION_PROTOCOL.md row 2026-04-30 cold (no per-folio tuning)",
+    "Phase 1 GT-INFRA continuation — eScriptorium pipeline restart for tier 2/3/4 GT + second-annotator IAA",
+    "v0.2 plan 03.1-04.7 — y-clustering merge + per-line CER as supplementary diagnostic (currently deferred-to-v0.2)"
+  ]
+}
