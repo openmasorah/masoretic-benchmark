@@ -54,17 +54,36 @@
         "llm_pin_md_hash": "92baf322dab6c222"
       }
     },
-    "biblia_nakdimon": "deferred to Phase 03.1 plan 06",
-    "biblia_char_menaked": "deferred to Phase 03.1 plan 06"
+    "biblia_nakdimon": "deferred — Nakdimon TF 2.15 SIGABRTs on macOS arm64+Rosetta (Pitfall 1); BL-03 must run on Linux infrastructure (CI nightly cron or EC2 devbox)",
+    "biblia_char_menaked": {
+      "tier1_cer": 0.5965,
+      "tier1_cer_pp": 59.65,
+      "tier2_cer": null,
+      "tier3_cer": null,
+      "tier4_f1": null,
+      "macro_avg_cer_tiers_1_3": 0.5965,
+      "diagnostics": {
+        "n_pred_lines": 109,
+        "gt_chars_normalized": 1421,
+        "pred_chars_normalized": 2107,
+        "dictabert_model_revision": "d311fbf7c403e50b040440e4859ac78064d025d0",
+        "kraken_model_hash": "8514a0c7cc2b5b45",
+        "result_file": "results/biblia_char_menaked/leningrad_devarim_F118B_fixture.json",
+        "result_commit": "5425160",
+        "diagnostic_file": "results/biblia_char_menaked/diagnostic/leningrad_devarim_F118B_fixture.gt_fed.json",
+        "negative_result_baseline": true,
+        "off_label_disclaimer": "dictabert-large-char-menaked is trained on modern Hebrew and is off-label for pre-modern Tiberian text. Used here only as a publishable negative-result baseline (Baseline 4). Do not interpret outputs as oracle-grade diacritization."
+      }
+    }
   },
   "limitations": [
     "Tier-1-only GT (Ben hand transcribed; tiers 2/3/4 await Yosef's deeper review pending eScriptorium pipeline restart)",
     "Single annotator (no second-annotator IAA; GT-11/GT-12 F8 gate deferred to v0.2)",
     "BL-02 zero-bbox regression in result file (whole-folio CER unaffected; per-line CER blocked until v0.2 re-promote)",
-    "BL-03 / BL-04 chain baselines not yet run (Phase 03.1 plan 06)"
+    "BL-03 (Kraken→Nakdimon) blocked locally — Nakdimon TF 2.15 wheel requires AVX (x86_64), unavailable on Apple M2 (arm64+Rosetta). Must run on Linux+Py3.11 infrastructure."
   ],
   "next_steps": [
-    "Phase 03.1 plan 06 — BL-03 (Kraken→Nakdimon) + BL-04 (Kraken→DictaBERT) chain runs on F118B",
+    "BL-03 (Kraken→Nakdimon) on F118B — must execute on Linux infrastructure (CI nightly cron or EC2 devbox); wiring landed in cd82adb",
     "F119A / F119B / F120A — apply EVALUATION_PROTOCOL.md row 2026-04-30 cold (no per-folio tuning)",
     "Phase 1 GT-INFRA continuation — eScriptorium pipeline restart for tier 2/3/4 GT + second-annotator IAA",
     "v0.2 plan 03.1-04.7 — y-clustering merge + per-line CER as supplementary diagnostic (currently deferred-to-v0.2)"
