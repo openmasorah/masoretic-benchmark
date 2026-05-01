@@ -145,9 +145,24 @@ def test_llm_winner_claude_accepted(prediction_validator, valid_prediction):
 def test_tier4_record_shape_enforced(prediction_validator, valid_prediction):
     payload = deepcopy(valid_prediction)
     payload["lines"][0]["tier4_records"] = [
-        {"type": "LARGE", "verse_ref": "Deut.6.4", "ordinal": 1}
+        {"type": "large_letter", "verse_ref": "Deut.6.4", "ordinal": 1}
     ]
     prediction_validator.validate(payload)
+
+
+@pytest.mark.parametrize(
+    "legacy_type",
+    ["PE", "SAMEKH", "LARGE", "SMALL", "INV_NUN", "PUNCTA", "SUSPENDED"],
+)
+def test_tier4_record_legacy_uppercase_types_rejected(
+    prediction_validator, valid_prediction, legacy_type
+):
+    payload = deepcopy(valid_prediction)
+    payload["lines"][0]["tier4_records"] = [
+        {"type": legacy_type, "verse_ref": "Deut.6.4", "ordinal": 1}
+    ]
+    with pytest.raises(jsonschema.ValidationError):
+        prediction_validator.validate(payload)
 
 
 def test_tier4_record_unknown_type_rejected(prediction_validator, valid_prediction):
@@ -162,7 +177,7 @@ def test_tier4_record_unknown_type_rejected(prediction_validator, valid_predicti
 def test_tier4_record_ordinal_must_be_positive(prediction_validator, valid_prediction):
     payload = deepcopy(valid_prediction)
     payload["lines"][0]["tier4_records"] = [
-        {"type": "LARGE", "verse_ref": "Deut.6.4", "ordinal": 0}
+        {"type": "large_letter", "verse_ref": "Deut.6.4", "ordinal": 0}
     ]
     with pytest.raises(jsonschema.ValidationError):
         prediction_validator.validate(payload)

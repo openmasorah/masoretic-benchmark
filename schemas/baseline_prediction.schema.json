@@ -85,13 +85,14 @@
                 "type": {
                   "type": "string",
                   "enum": [
-                    "LARGE",
-                    "SMALL",
-                    "PE",
-                    "SAMEKH",
-                    "INV_NUN",
-                    "PUNCTA",
-                    "SUSPENDED"
+                    "pe",
+                    "samekh",
+                    "reversednun",
+                    "puncta",
+                    "large_letter",
+                    "small_letter",
+                    "suspended_letter",
+                    "inverted_nun"
                   ]
                 },
                 "verse_ref": {
