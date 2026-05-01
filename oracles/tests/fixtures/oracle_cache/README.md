@@ -21,7 +21,7 @@ hits live DICTA during PR-blocking CI.
 Standard (Linux + Python 3.11 + nakdimon installed):
 
 ```bash
-cd /Users/benlamm/Workspace/masoretic-benchmark
+cd <masoretic-benchmark checkout>
 RUN_LIVE_ORACLES=1 python oracles/scripts/regenerate_golden_oracle_cache.py
 git add oracles/tests/fixtures/oracle_cache/golden_fixture_oracles.json
 git commit -m "chore(oracles): regenerate golden fixture oracle cache (<reason>)"
