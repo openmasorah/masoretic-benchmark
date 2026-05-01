@@ -84,9 +84,7 @@ def _appended_changelog_rows(
 
     staged_prefix = staged_changelog[: len(head_changelog)]
     if staged_prefix != head_changelog:
-        errors.append(
-            "REJECT: edited changelog prefix row; manifest_changelog is append-only"
-        )
+        errors.append("REJECT: edited changelog prefix row; manifest_changelog is append-only")
         return staged_changelog[len(head_changelog) :]
 
     return staged_changelog[len(head_changelog) :]
@@ -126,9 +124,7 @@ def _validate_changelog_chain(
         )
 
 
-def validate_manifest_successor(
-    head: dict[str, object], staged: dict[str, object]
-) -> list[str]:
+def validate_manifest_successor(head: dict[str, object], staged: dict[str, object]) -> list[str]:
     """Return rejection messages for illegal manifest mutations."""
     head_ids: dict[str, dict[str, object]] = {f["id"]: f for f in head.get("folios", [])}
     staged_ids: dict[str, dict[str, object]] = {f["id"]: f for f in staged.get("folios", [])}
@@ -138,16 +134,13 @@ def validate_manifest_successor(
     _validate_changelog_chain(head, staged, new_rows, errors)
 
     changed_tracked_fields = [
-        field
-        for field in TOP_LEVEL_TRACKED_FIELDS
-        if head.get(field) != staged.get(field)
+        field for field in TOP_LEVEL_TRACKED_FIELDS if head.get(field) != staged.get(field)
     ]
     if changed_tracked_fields:
         if not new_rows:
             errors.append(
                 "REJECT: tracked top-level field change requires an appended "
-                "manifest_changelog row: "
-                + ", ".join(changed_tracked_fields)
+                "manifest_changelog row: " + ", ".join(changed_tracked_fields)
             )
         elif not any(_has_phase_reason(row) for row in new_rows):
             errors.append(
@@ -160,9 +153,7 @@ def validate_manifest_successor(
     removed_ids = [fid for fid in head_ids if fid not in staged_ids]
     if removed_ids:
         is_fuse_event = (
-            len(new_rows) == 1
-            and isinstance(new_rows[0], dict)
-            and _has_phase_reason(new_rows[0])
+            len(new_rows) == 1 and isinstance(new_rows[0], dict) and _has_phase_reason(new_rows[0])
         )
         for fid in removed_ids:
             fhead = head_ids[fid]
@@ -212,7 +203,7 @@ def validate_manifest_successor(
     return errors
 
 
-def main(manifest_path: str = "phase_0_manifest.json") -> int:
+def main(manifest_path: str = "phase_0_manifest.json", base_ref: str = "HEAD") -> int:
     """Return 0 if the staged manifest is a legal successor of HEAD, 1 otherwise."""
     path = Path(manifest_path)
     if not path.exists():
@@ -222,7 +213,7 @@ def main(manifest_path: str = "phase_0_manifest.json") -> int:
     staged = json.loads(path.read_text())
     try:
         head_raw = subprocess.check_output(
-            ["git", "show", f"HEAD:{manifest_path}"],
+            ["git", "show", f"{base_ref}:{manifest_path}"],
             text=True,
             stderr=subprocess.DEVNULL,
         )
@@ -242,4 +233,5 @@ def main(manifest_path: str = "phase_0_manifest.json") -> int:
 
 if __name__ == "__main__":  # pragma: no cover - exercised via pre-commit
     arg = sys.argv[1] if len(sys.argv) > 1 else "phase_0_manifest.json"
-    sys.exit(main(arg))
+    base = sys.argv[2] if len(sys.argv) > 2 else "HEAD"
+    sys.exit(main(arg, base))

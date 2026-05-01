@@ -28,6 +28,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -46,7 +48,12 @@ jobs:
           PY
 
       - name: Enforce manifest append-only immutability
-        run: python scripts/manifest_immutable.py phase_0_manifest.json
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            python scripts/manifest_immutable.py phase_0_manifest.json origin/${{ github.base_ref }}
+          else
+            python scripts/manifest_immutable.py phase_0_manifest.json HEAD~1
+          fi
 
       - name: Reject binaries and oversized files
         run: python scripts/reject_binaries.py $(git ls-files)
@@ -256,10 +263,6 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.11"]   # Pitfall 1: Linux + Py3.11 for real Nakdimon
-    env:
-      RUN_LIVE_BASELINES: "1"
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-      GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
     steps:
       - uses: actions/checkout@v4
 
@@ -288,13 +291,18 @@ jobs:
       - name: Fetch BiblIA Kraken model (idempotent; skips if cached)
         run: python baselines/scripts/fetch_biblia_kraken_model.py
 
-      - name: Run live baseline tests (real API spend; surfaces drift)
-        run: pytest baselines/tests/ -q -m "live_baselines or live_kraken" --tb=short
-
       - name: Preflight - cost caps must be seeded in manifest
         env:
           PHASE_0_MANIFEST_PATH: ${{ github.workspace }}/phase_0_manifest.json
         run: python baselines/scripts/preflight_cost_caps.py
+
+      - name: Run live baseline tests (real API spend; surfaces drift)
+        env:
+          RUN_LIVE_BASELINES: "1"
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          PHASE_0_MANIFEST_PATH: ${{ github.workspace }}/phase_0_manifest.json
+        run: pytest baselines/tests/ -q -m "live_baselines or live_kraken" --tb=short
 
       - name: Phase 03.1 real fixture generation - all 4 baselines
         # Phase 03.1 D-08: real predictions on the IAA folios via the

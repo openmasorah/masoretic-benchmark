@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import copy
+import json
+import subprocess
 
-from scripts.manifest_immutable import validate_manifest_successor
+from scripts.manifest_immutable import main, validate_manifest_successor
 
 
 def _manifest() -> dict:
@@ -114,3 +116,23 @@ def test_new_changelog_reason_must_match_phase_prefix_for_tracked_change():
     errors = validate_manifest_successor(head, staged)
 
     assert any("tracked top-level field" in error and "reason" in error for error in errors)
+
+
+def test_main_can_compare_against_explicit_base_ref(tmp_path, monkeypatch):
+    head = _manifest()
+    staged = copy.deepcopy(head)
+    staged["kraken_model_hash"] = "newhash"
+    manifest_path = tmp_path / "phase_0_manifest.json"
+    manifest_path.write_text(json.dumps(staged), encoding="utf-8")
+
+    calls = []
+
+    def fake_check_output(args, **kwargs):
+        calls.append(args)
+        assert args == ["git", "show", f"origin/main:{manifest_path}"]
+        return json.dumps(head)
+
+    monkeypatch.setattr(subprocess, "check_output", fake_check_output)
+
+    assert main(str(manifest_path), "origin/main") == 1
+    assert calls == [["git", "show", f"origin/main:{manifest_path}"]]
