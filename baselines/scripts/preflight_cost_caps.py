@@ -19,13 +19,13 @@ from pathlib import Path
 
 
 def main() -> int:
-    # Manifest lives in this repo (relocated from baalshem in Phase 03.1 W3.5).
-    # Use env var PHASE_0_MANIFEST_PATH if set (CI override), else default to
-    # the in-repo location.
+    # Use PHASE_0_MANIFEST_PATH when set (CI override), else default to the
+    # in-repo manifest.
+    repo_root = Path(__file__).resolve().parents[2]
     manifest_path = Path(
         os.environ.get(
             "PHASE_0_MANIFEST_PATH",
-            "/Users/benlamm/Workspace/masoretic-benchmark/phase_0_manifest.json",
+            str(repo_root / "phase_0_manifest.json"),
         )
     )
     if not manifest_path.exists():

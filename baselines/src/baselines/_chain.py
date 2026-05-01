@@ -42,6 +42,7 @@ unit tier never imports the real Nakdimon stack.
 from __future__ import annotations
 
 import json
+import os
 import socket
 import subprocess
 from abc import abstractmethod
@@ -62,14 +63,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_KRAKEN_MODEL = REPO_ROOT / "baselines" / ".cache" / "kraken" / "BiblIA_01.mlmodel"
 DEFAULT_IMAGE_CACHE = REPO_ROOT / "baselines" / ".cache" / "images"
 
-# Default GT roots for the diagnostic chain. Real Phase 1 has only a
-# single-text-blob fixture (`gt-infra/exports/<folio>.json` is not yet
-# emitted with the per-line `{lines:[{line_id,bbox,tier1}]}` shape this
-# loader needs — see Issue 2 fix in plan 03-05). Mocked unit tests pass
-# their own tmp_path GT root so the loader code path is exercised
-# regardless. Live tier skips when no candidate exists.
-BAALSHEM_GT_DIR_DEFAULT = Path("/Users/benlamm/Workspace/baalshem/gt-infra/exports")
-BAALSHEM_FIXTURE_DIR = Path("/Users/benlamm/Workspace/baalshem/tests/fixtures")
+GT_EXPORT_PATH_ENV = "BAALSHEM_GT_EXPORT_JSON"
 
 
 class ChainBaseline(BaselineBase):
@@ -93,12 +87,12 @@ class ChainBaseline(BaselineBase):
         replay: bool = False,
         kraken_model_path: Path = DEFAULT_KRAKEN_MODEL,
         image_cache: Path = DEFAULT_IMAGE_CACHE,
-        gt_root: Path = BAALSHEM_GT_DIR_DEFAULT,
+        gt_root: Path | None = None,
     ) -> None:
         super().__init__(manifest_path, results_root, replay=replay)
         self.kraken_model_path = Path(kraken_model_path)
         self.image_cache = Path(image_cache)
-        self.gt_root = Path(gt_root)
+        self.gt_root = Path(gt_root) if gt_root is not None else None
         # Per-folio meta accumulated during run() and emitted by
         # _compose_run_meta into run_meta.folios.<folio_id>.
         self._folio_meta: dict[str, dict] = {}
@@ -227,10 +221,15 @@ class ChainBaseline(BaselineBase):
         Raises: BaselineError if neither PAGE-XML nor JSON is present for
         ``folio.id`` at any candidate path.
         """
+        exact_gt_path = os.environ.get(GT_EXPORT_PATH_ENV)
+        explicit_gt = Path(exact_gt_path) if exact_gt_path else None
+
         # Primary: PAGE-XML at <gt_root>/<folio_id>.page.xml (D-21).
-        page_xml_candidates = [
-            self.gt_root / f"{folio.id}.page.xml",
-        ]
+        page_xml_candidates = []
+        if self.gt_root is not None:
+            page_xml_candidates.append(self.gt_root / f"{folio.id}.page.xml")
+        if explicit_gt is not None and explicit_gt.suffix == ".xml":
+            page_xml_candidates.append(explicit_gt)
         for path in page_xml_candidates:
             if path.exists():
                 tier1_lines = load_tier1_per_line(folio.id, path)
@@ -244,10 +243,11 @@ class ChainBaseline(BaselineBase):
                 ]
 
         # Fallback: per-line JSON shape (unit-test compat + Phase 1 dry-run).
-        json_candidates = [
-            self.gt_root / f"{folio.id}.json",
-            BAALSHEM_FIXTURE_DIR / f"{folio.id}.json",
-        ]
+        json_candidates = []
+        if self.gt_root is not None:
+            json_candidates.append(self.gt_root / f"{folio.id}.json")
+        if explicit_gt is not None and explicit_gt.suffix == ".json":
+            json_candidates.append(explicit_gt)
         for path in json_candidates:
             if path.exists():
                 data = json.loads(path.read_text(encoding="utf-8"))
@@ -262,7 +262,8 @@ class ChainBaseline(BaselineBase):
         all_candidates = page_xml_candidates + json_candidates
         raise BaselineError(
             f"D-01 diagnostic chain: no GT for folio {folio.id} found at any "
-            f"of {[str(p) for p in all_candidates]!r}"
+            f"of {[str(p) for p in all_candidates]!r}; set {GT_EXPORT_PATH_ENV} "
+            "or pass gt_root to enable the optional diagnostic chain"
         )
 
     # -- run_meta extension --------------------------------------------------

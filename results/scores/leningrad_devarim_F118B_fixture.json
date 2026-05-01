@@ -15,7 +15,7 @@
     "doc": "baselines/EVALUATION_PROTOCOL.md",
     "row": "2026-04-30",
     "headline_metric": "Macro-averaged whole-folio CER (tiers 1–3) / F1 (tier 4) per BL-07",
-    "computed_via": "spike at /Users/benlamm/Workspace/baalshem/spikes/03.1-05-cer-methodology/spike.py method1_whole_folio (uses masoretic_eval.tiers.tier1_consonantal.Tier1Consonantal normalization + Levenshtein CER)"
+    "computed_via": "phase 03.1-05 whole-folio CER methodology spike (method1_whole_folio)"
   },
   "scores": {
     "biblia_kraken": {

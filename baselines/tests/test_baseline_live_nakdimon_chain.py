@@ -8,42 +8,35 @@ on Mac it is gated to skip via:
   - the `live_baselines` marker (Phase 2 D-24 inheritance) — skipped
     unless RUN_LIVE_BASELINES=1;
   - additional skipif checks for the cached BiblIA Kraken model and the
-    diagnostic-chain GT fixture.
+    diagnostic-chain GT fixture path supplied by env var.
 
 Issue 2 fix (plan 03-05): Phase 1 has not yet emitted a per-line GT
 export `{lines:[{line_id,bbox,tier1}]}` for the Shema fixture (Phase 1's
 golden fixture is a single-text-blob shape — see 01-13b SUMMARY,
 gt-infra/exports does not exist with the line-level shape this loader
 needs). The diagnostic-chain assertion is wrapped with a pytest.skip
-when no candidate GT path exists; the realistic-chain prediction still
-runs end-to-end against Kraken + Nakdimon when both gates pass.
+when BAALSHEM_GT_EXPORT_JSON is unset; the realistic-chain prediction
+still runs end-to-end against Kraken + Nakdimon when both gates pass.
 
 # TODO(phase-1-gt-export): unblock the diagnostic-chain section below
 # when Phase 1 emits per-line GT for `leningrad_devarim_F118B_fixture`
-# at one of the GT_CANDIDATES paths. Until then, the diagnostic chain
-# code path is exercised only by the mocked-unit tier
-# (test_baseline_unit_nakdimon_chain.py).
+# via BAALSHEM_GT_EXPORT_JSON. Until then, the diagnostic chain code path
+# is exercised only by the mocked-unit tier (test_baseline_unit_nakdimon_chain.py).
 """
 
 from __future__ import annotations
 
+import os
 from datetime import UTC
 from pathlib import Path
 
 import pytest
 
-# Sibling-repo + baalshem path roots.
 _THIS = Path(__file__).resolve()
 SIBLING_ROOT = _THIS.parents[2]
-BAALSHEM_ROOT = Path("/Users/benlamm/Workspace/baalshem")
 
 DEFAULT_KRAKEN_MODEL = SIBLING_ROOT / "baselines" / ".cache" / "kraken" / "BiblIA_01.mlmodel"
-
-# GT-fixture candidates for the diagnostic-chain assertion (Issue 2 fix).
-GT_CANDIDATES = [
-    BAALSHEM_ROOT / "gt-infra" / "exports" / "leningrad_devarim_F118B_fixture.json",
-    BAALSHEM_ROOT / "tests" / "fixtures" / "leningrad_devarim_F118B_fixture.json",
-]
+GT_EXPORT_PATH_ENV = "BAALSHEM_GT_EXPORT_JSON"
 
 
 @pytest.mark.live_baselines
@@ -90,21 +83,18 @@ def test_live_realistic_chain_on_shema_fixture(tmp_path):
     bl._started_at = datetime.now(UTC).isoformat(timespec="seconds")
     bl._folio_meta = {}
 
-    # Issue 2 fix: if no GT fixture is available, skip the diagnostic-chain
-    # assertion (and the realistic-chain assertion, since infer_folio writes
-    # both in one pass and a missing GT would raise BaselineError).
-    gt_present = any(p.exists() for p in GT_CANDIDATES)
-    if not gt_present:
-        pytest.skip(
-            "GT fixture not provisioned until Phase 1 line-level GT export "
-            "lands at one of: " + ", ".join(str(p) for p in GT_CANDIDATES)
-        )
+    # Issue 2 fix: if no explicit GT fixture is available, skip the
+    # diagnostic-chain assertion (and the realistic-chain assertion, since
+    # infer_folio writes both in one pass and a missing GT would raise
+    # BaselineError).
+    gt_path = os.environ.get(GT_EXPORT_PATH_ENV)
+    if not gt_path:
+        pytest.skip(f"set {GT_EXPORT_PATH_ENV} to run live diagnostic-chain fixture")
 
-    # Use the first available GT candidate.
-    for cand in GT_CANDIDATES:
-        if cand.exists():
-            bl.gt_root = cand.parent
-            break
+    gt_fixture = Path(gt_path)
+    if not gt_fixture.exists():
+        pytest.skip(f"{GT_EXPORT_PATH_ENV} does not exist: {gt_fixture}")
+    bl.gt_root = gt_fixture.parent
 
     rc = bl.run()
     assert rc == 0

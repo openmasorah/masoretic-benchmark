@@ -8,9 +8,9 @@ LOCKED CLI SURFACE (Phase 03.1 D-08 + plan 04 BLOCKER-4 fix):
   --folio       Optional. Run only the specified folio_id; default = all
                 unfinished folios per A-01 (manifest set MINUS already-promoted).
 
-Manifest path: PHASE_0_MANIFEST_PATH env var (CI override) or
-               /Users/benlamm/Workspace/masoretic-benchmark/phase_0_manifest.json (dev).
-               Same convention as BaselineBase.run (consistent resolution).
+Manifest path: PHASE_0_MANIFEST_PATH env var (CI override) or repo-root
+               phase_0_manifest.json. Same convention as BaselineBase.run
+               (consistent resolution).
 
 Exit codes:
   0  success (folios promoted; sandbox empty)
@@ -76,12 +76,13 @@ def main(argv: list[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
 
-    # Resolve manifest_path: CI env var first, then dev default. Matches
-    # BaselineBase.run's resolution exactly.
+    # Resolve manifest_path: CI env var first, then repo-root default.
+    # Matches BaselineBase.run's resolution exactly.
+    sibling_root = Path(__file__).resolve().parents[3]
     manifest_path = Path(
         os.environ.get(
             "PHASE_0_MANIFEST_PATH",
-            "/Users/benlamm/Workspace/masoretic-benchmark/phase_0_manifest.json",
+            str(sibling_root / "phase_0_manifest.json"),
         )
     )
     if not manifest_path.exists():
@@ -99,7 +100,6 @@ def main(argv: list[str] | None = None) -> int:
     #   parents[1] = baselines/src
     #   parents[2] = baselines
     #   parents[3] = sibling repo root (masoretic-benchmark)
-    sibling_root = Path(__file__).resolve().parents[3]
     results_root = sibling_root / "results"
 
     cls = _load_subclass(args.baseline)

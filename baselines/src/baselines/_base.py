@@ -116,12 +116,14 @@ class BaselineBase(ABC):
         from baselines._run_meta import validate_expected_total_reports
 
         # Manifest path resolves from PHASE_0_MANIFEST_PATH env var (CI),
-        # else defaults to the dev convention. Both plan 03.1-04 Task 3 CI
-        # job and plan 05/06 invocations export PHASE_0_MANIFEST_PATH.
+        # else defaults to the repo-root phase_0_manifest.json. Both plan
+        # 03.1-04 Task 3 CI job and plan 05/06 invocations export
+        # PHASE_0_MANIFEST_PATH.
+        repo_root = _Path(__file__).resolve().parents[3]
         manifest_path = _Path(
             _os.environ.get(
                 "PHASE_0_MANIFEST_PATH",
-                "/Users/benlamm/Workspace/masoretic-benchmark/phase_0_manifest.json",
+                str(repo_root / "phase_0_manifest.json"),
             )
         )
 

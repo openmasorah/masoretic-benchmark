@@ -6,14 +6,12 @@ Set RUN_LIVE_BASELINES=1 to opt in.
 
 Phase 03.1 A-01 safety net: BaselineBase.run reads PHASE_0_MANIFEST_PATH
 from the env to know where to write per-folio manifest bumps. If a unit
-test calls bl.run() without seeding this env var, the dev default
-(/Users/benlamm/Workspace/masoretic-benchmark/phase_0_manifest.json,
-relocated from baalshem in W3.5) would silently mutate the real production
-manifest. This conftest installs an autouse fixture that points the env
-at a tmp file BEFORE every test, so a forgotten ``monkeypatch.setenv(...)``
-in a test cannot pollute the real manifest. Tests that explicitly want a
-different path use ``monkeypatch.setenv`` to override this default in
-their own scope.
+test calls bl.run() without seeding this env var, the repo-root default
+would mutate the real production manifest. This conftest installs an
+autouse fixture that points the env at a tmp file BEFORE every test, so a
+forgotten ``monkeypatch.setenv(...)`` in a test cannot pollute the real
+manifest. Tests that explicitly want a different path use
+``monkeypatch.setenv`` to override this default in their own scope.
 """
 
 import json

@@ -80,12 +80,12 @@ agreement (IAA) is established and Yosef has bandwidth for tier 2/3/4 review.
   any folio. Operator's hand transcription is tier-1-only; tier 4 awaits Yosef's
   deeper review via the eScriptorium pipeline (Phase 1 GT-INFRA).
 
-The spike at `/Users/benlamm/Workspace/baalshem/spikes/03.1-05-cer-methodology/`
-already computed sensitivity analysis across whole-folio, zone-restricted, and
-bucketed-per-line CER under three threshold settings. Per Hamming's
-recommendation, that data is the "Reviewer-2 sensitivity number" referenced in
-the paper's methodology section; full diagnostic table is supplementary
-material in v0.2.
+The phase 03.1-05 whole-folio CER methodology spike
+(`method1_whole_folio`) already computed sensitivity analysis across
+whole-folio, zone-restricted, and bucketed-per-line CER under three threshold
+settings. Per Hamming's recommendation, that data is the "Reviewer-2
+sensitivity number" referenced in the paper's methodology section; full
+diagnostic table is supplementary material in v0.2.
 
 ## Reviewer-2 mitigations
 
