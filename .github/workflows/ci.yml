@@ -33,8 +33,29 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Validate root phase_0_manifest.json
+        run: |
+          python - <<'PY'
+          import json
+          import jsonschema
+
+          manifest = json.loads(open("phase_0_manifest.json", encoding="utf-8").read())
+          schema = json.loads(open("schemas/phase_0_manifest.schema.json", encoding="utf-8").read())
+          jsonschema.Draft202012Validator(schema).validate(manifest)
+          print("phase_0_manifest.json validates against schema")
+          PY
+
+      - name: Enforce manifest append-only immutability
+        run: python scripts/manifest_immutable.py phase_0_manifest.json
+
+      - name: Reject binaries and oversized files
+        run: python scripts/reject_binaries.py $(git ls-files)
+
       - name: Reject private path leaks
         run: python scripts/reject_private_paths.py
+
+      - name: Detect hardcoded secrets
+        uses: gitleaks/gitleaks-action@v2
 
   test:
     runs-on: ubuntu-latest
@@ -71,15 +92,10 @@ jobs:
         run: |
           python -c "
           import json, jsonschema
-          # Validate the committed sample fixture against the canonical schema.
-          # The canonical phase_0_manifest.json (per CLAUDE.md scope-freeze rule)
-          # has not landed at repo root yet — Phase 1 manifest-init writer ships
-          # to a different path. Validation against the fixture proves schema +
-          # validator are mutually consistent until the canonical file exists.
-          manifest = json.loads(open('tests/fixtures/phase_0_manifest_sample.json').read())
+          manifest = json.loads(open('phase_0_manifest.json').read())
           schema = json.loads(open('schemas/phase_0_manifest.schema.json').read())
           jsonschema.Draft202012Validator(schema).validate(manifest)
-          print('manifest fixture validates against schema')
+          print('phase_0_manifest.json validates against schema')
           "
 
   # ----------------------------------------------------------------------------

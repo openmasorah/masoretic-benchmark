@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:masoretic:phase_0_manifest.schema:v0.2",
+  "title": "phase_0_manifest.json",
+  "description": "Single source of truth for the frozen Phase 0 scope of the masoretic-benchmark sibling public repo. Append-only-immutable in git (see manifest_immutable.py). v0.2 (2026-04-25) adds iaa_subset, baselines_seeded, expected_reports_per_baseline; promotes nakdimon_model_hash to required string; expected_total_reports accepts both legacy scalar and per-baseline mapping (mapping is canonical when non-empty per A-1).",
+  "type": "object",
+  "required": [
+    "version",
+    "frozen_at",
+    "folios",
+    "scorer_version",
+    "expected_total_reports",
+    "iaa_subset",
+    "baselines_seeded",
+    "expected_reports_per_baseline",
+    "nakdimon_model_hash"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^v\\d+\\.\\d+(\\.\\d+)?$"
+    },
+    "frozen_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "scorer_version": {
+      "type": "string"
+    },
+    "nakdimon_model_hash": {
+      "type": "string"
+    },
+    "kraken_model_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "dictabert_model_revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "cost_caps_usd": {
+      "type": "object",
+      "required": ["per_folio", "per_run"],
+      "additionalProperties": false,
+      "properties": {
+        "per_folio": {
+          "type": "number",
+          "minimum": 0
+        },
+        "per_run": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "expected_total_reports": {
+      "oneOf": [
+        { "type": "integer", "minimum": 0 },
+        {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        }
+      ]
+    },
+    "iaa_subset": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "baselines_seeded": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "llm_vision",
+          "biblia_kraken",
+          "biblia_nakdimon",
+          "biblia_char_menaked"
+        ]
+      }
+    },
+    "expected_reports_per_baseline": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "folios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "manuscript",
+          "book",
+          "folio",
+          "image_url",
+          "in_frozen_scope"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "manuscript": {
+            "type": "string",
+            "enum": ["leningrad", "cairo_shmuel", "el_codice", "other"]
+          },
+          "book": {
+            "type": "string",
+            "minLength": 1
+          },
+          "folio": {
+            "type": "string",
+            "pattern": "^F\\d{3}[AB]$"
+          },
+          "image_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "iaa_folio": {
+            "type": "boolean"
+          },
+          "gt_hash": {
+            "type": ["string", "null"]
+          },
+          "in_frozen_scope": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "baselines": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object"
+      }
+    },
+    "fuses_fired": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "manifest_changelog": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["reason", "prev_frozen_at", "new_frozen_at"],
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "prev_frozen_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "new_frozen_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  }
+}

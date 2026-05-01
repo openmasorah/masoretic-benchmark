@@ -15,10 +15,11 @@ Coercion rules (v0.1 -> v0.2 in-memory only):
   * ``expected_reports_per_baseline``  missing -> ``{}``
   * ``nakdimon_model_hash: null``      -> ``""``
 
-The v0.2 JSON Schema (``schemas/phase_0_manifest.schema.json``) is the
-authoritative validator. After in-memory coercion, every loaded document
-is re-validated against the v0.2 schema; truly malformed documents
-(e.g. v0.2 doc missing ``iaa_subset`` outright -- not a v0.1 doc) raise
+The package-local v0.2 JSON Schema
+(``masoretic_eval/schemas/phase_0_manifest.schema.json``) is the
+authoritative validator. After in-memory coercion, every loaded document is
+re-validated against the v0.2 schema; truly malformed documents (e.g. v0.2
+doc missing ``iaa_subset`` outright -- not a v0.1 doc) raise
 ``ManifestValidationError`` with the missing-field name.
 """
 
@@ -32,7 +33,7 @@ from typing import Any
 
 import jsonschema
 
-SCHEMA_PATH = Path(__file__).resolve().parents[1] / "schemas" / "phase_0_manifest.schema.json"
+SCHEMA_PATH = Path(__file__).parent / "schemas" / "phase_0_manifest.schema.json"
 
 
 class ManifestValidationError(Exception):
