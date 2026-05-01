@@ -136,6 +136,20 @@ def test_schema_validates_a_full_v02_document():
     jsonschema.validate(doc, schema)  # no raise
 
 
+def test_schema_validates_actual_root_manifest():
+    schema = _load_schema()
+    manifest = json.loads((REPO_ROOT / "phase_0_manifest.json").read_text(encoding="utf-8"))
+    jsonschema.validate(manifest, schema)  # no raise
+
+
+def test_schema_rejects_unknown_top_level_fields_in_actual_manifest():
+    schema = _load_schema()
+    manifest = json.loads((REPO_ROOT / "phase_0_manifest.json").read_text(encoding="utf-8"))
+    manifest["unexpected"] = True
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(manifest, schema)
+
+
 def test_schema_rejects_v01_document_missing_iaa_subset():
     schema = _load_schema()
     legacy = {
