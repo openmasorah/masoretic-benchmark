@@ -20,7 +20,7 @@
     }
   },
   "hostname": "ip-172-31-31-6",
-  "manifest_hash": null,
+  "manifest_hash": "c9a578520ce2f4e5",
   "pins": {
     "dictabert_model_revision": null,
     "kraken_model_hash": "8514a0c7cc2b5b45",
