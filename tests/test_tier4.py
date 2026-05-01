@@ -74,6 +74,51 @@ def test_example5_false_positive_pure():
     assert r.f1 == 0.0
 
 
+def test_extra_prediction_at_exact_match_counts_as_false_positive():
+    t = Tier4MetaMarks()
+    gt = [_rec("inverted_nun", "Num.10.35", 1)]
+    pred = [
+        _rec("inverted_nun", "Num.10.35", 1),
+        _rec("inverted_nun", "Num.10.35", 2),
+    ]
+    r = t.score(gt, pred)
+    assert r.diagnostics["tp_exact"] == 1
+    assert r.diagnostics["tp_partial"] == 0
+    assert r.diagnostics["fp"] == 1
+    assert r.diagnostics["fn"] == 0
+    assert r.recall <= 1.0
+    assert r.f1 <= 1.0
+
+
+def test_tier4_metrics_are_bounded_for_representative_cases():
+    cases = [
+        ([], []),
+        (
+            [_rec("large_letter", "Deut.6.4", 1)],
+            [_rec("large_letter", "Deut.6.4", 1)],
+        ),
+        (
+            [_rec("inverted_nun", "Num.10.35", 1)],
+            [_rec("inverted_nun", "Num.10.35", 2)],
+        ),
+        (
+            [_rec("samekh", "Deut.1.1", 1)],
+            [_rec("samekh", "Deut.1.1", 1), _rec("samekh", "Deut.1.1", 2)],
+        ),
+        (
+            [_rec("puncta", "Num.3.39", 1), _rec("puncta", "Num.3.39", 2)],
+            [_rec("puncta", "Num.3.39", 1)],
+        ),
+        ([], [_rec("small_letter", "Deut.32.4", 1)]),
+    ]
+    t = Tier4MetaMarks()
+    for gt, pred in cases:
+        r = t.score(gt, pred)
+        assert 0.0 <= r.precision <= 1.0
+        assert 0.0 <= r.recall <= 1.0
+        assert 0.0 <= r.f1 <= 1.0
+
+
 def test_empty_gt_and_empty_pred_is_perfect():
     t = Tier4MetaMarks()
     r = t.score([], [])
