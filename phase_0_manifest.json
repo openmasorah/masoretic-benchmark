@@ -9,7 +9,7 @@
   "expected_reports_per_baseline": {
     "biblia_char_menaked": 1,
     "biblia_kraken": 1,
-    "biblia_nakdimon": 0,
+    "biblia_nakdimon": 1,
     "llm_vision": 1
   },
   "expected_total_reports": 0,
@@ -55,7 +55,7 @@
       "manuscript": "leningrad"
     }
   ],
-  "frozen_at": "2026-05-01T03:18:50Z",
+  "frozen_at": "2026-05-01T06:36:29Z",
   "fuses_fired": [],
   "iaa_subset": [
     "leningrad_devarim_F118B_fixture",
@@ -104,6 +104,11 @@
       "new_frozen_at": "2026-05-01T03:18:50Z",
       "prev_frozen_at": "2026-05-01T02:19:06Z",
       "reason": "phase 3.1: biblia_char_menaked leningrad_devarim_F118B_fixture promoted"
+    },
+    {
+      "new_frozen_at": "2026-05-01T06:36:29Z",
+      "prev_frozen_at": "2026-05-01T03:18:50Z",
+      "reason": "phase 3.1: biblia_nakdimon leningrad_devarim_F118B_fixture promoted"
     }
   ],
   "nakdimon_model_hash": "8fd7722b8002a690",
