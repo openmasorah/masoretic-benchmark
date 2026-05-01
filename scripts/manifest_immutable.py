@@ -90,6 +90,20 @@ def _appended_changelog_rows(
     return staged_changelog[len(head_changelog) :]
 
 
+def _validate_append_only_rows(
+    field: str, head: dict[str, object], staged: dict[str, object], errors: list[str]
+) -> None:
+    head_rows = head.get(field, [])
+    staged_rows = staged.get(field, [])
+    if not isinstance(head_rows, list) or not isinstance(staged_rows, list):
+        return
+    if len(staged_rows) < len(head_rows):
+        errors.append(f"REJECT: removed row from {field}; {field} is append-only")
+        return
+    if staged_rows[: len(head_rows)] != head_rows:
+        errors.append(f"REJECT: edited prefix row; {field} is append-only")
+
+
 def _has_phase_reason(row: object) -> bool:
     if not isinstance(row, dict):
         return False
@@ -131,6 +145,7 @@ def validate_manifest_successor(head: dict[str, object], staged: dict[str, objec
 
     errors: list[str] = []
     new_rows = _appended_changelog_rows(head, staged, errors)
+    _validate_append_only_rows("fuses_fired", head, staged, errors)
     _validate_changelog_chain(head, staged, new_rows, errors)
 
     changed_tracked_fields = [

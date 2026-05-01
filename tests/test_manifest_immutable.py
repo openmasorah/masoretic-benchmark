@@ -118,6 +118,39 @@ def test_new_changelog_reason_must_match_phase_prefix_for_tracked_change():
     assert any("tracked top-level field" in error and "reason" in error for error in errors)
 
 
+def test_removed_fuses_fired_row_is_rejected():
+    head = _manifest()
+    head["fuses_fired"] = [{"phase": "03.3", "reason": "test fuse"}]
+    staged = copy.deepcopy(head)
+    staged["fuses_fired"] = []
+
+    errors = validate_manifest_successor(head, staged)
+
+    assert any("fuses_fired" in error and "append-only" in error for error in errors)
+
+
+def test_edited_fuses_fired_prefix_row_is_rejected():
+    head = _manifest()
+    head["fuses_fired"] = [{"phase": "03.3", "reason": "test fuse"}]
+    staged = copy.deepcopy(head)
+    staged["fuses_fired"][0]["reason"] = "rewritten fuse"
+
+    errors = validate_manifest_successor(head, staged)
+
+    assert any("fuses_fired" in error and "append-only" in error for error in errors)
+
+
+def test_fuses_fired_append_is_accepted():
+    head = _manifest()
+    head["fuses_fired"] = [{"phase": "03.3", "reason": "test fuse"}]
+    staged = copy.deepcopy(head)
+    staged["fuses_fired"].append({"phase": "03.3", "reason": "second fuse"})
+
+    errors = validate_manifest_successor(head, staged)
+
+    assert errors == []
+
+
 def test_main_can_compare_against_explicit_base_ref(tmp_path, monkeypatch):
     head = _manifest()
     staged = copy.deepcopy(head)
