@@ -7,6 +7,7 @@ Mirrors `oracles/NAKDIMON_PIN.md` format.
 
 | Date       | Schema                          | From | To     | Reason                                                                                              |
 |------------|---------------------------------|------|--------|-----------------------------------------------------------------------------------------------------|
+| 2026-05-01 | baseline_prediction.schema.json, run_meta.schema.json | v0.1.0 | v0.1.0 | Phase 03.3 C-6 manifest provenance binding: `manifest_hash` is a required non-empty string, never `null`. |
 | 2026-05-01 | baseline_prediction.schema.json | v0.1.0 | v0.1.0 | Phase 03.3 C-2 metamark vocabulary unification: `pe`, `samekh`, `reversednun`, `puncta`, `large_letter`, `small_letter`, `suspended_letter`, `inverted_nun`. |
 | 2026-04-25 | baseline_prediction.schema.json | —    | v0.1.0 | Phase 3 BASELINES launch (D-16, D-17). Per-line shape: tier1..4, optional provenance fields per BL. |
 | 2026-04-25 | run_meta.schema.json            | —    | v0.1.0 | Phase 3 BASELINES launch (D-18, D-19). Per-baseline pins + budget + combine + per-folio nested.     |

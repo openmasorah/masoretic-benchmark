@@ -32,9 +32,7 @@
       "type": "string",
       "minLength": 1
     },
-    "manifest_hash": {
-      "type": ["string", "null"]
-    },
+    "manifest_hash": { "type": "string", "minLength": 1 },
     "run_meta_ref": {
       "type": "string",
       "const": "run_meta.json"

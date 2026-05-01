@@ -35,9 +35,7 @@
         "biblia_char_menaked"
       ]
     },
-    "manifest_hash": {
-      "type": ["string", "null"]
-    },
+    "manifest_hash": { "type": "string", "minLength": 1 },
     "scorer_version": {
       "type": ["string", "null"]
     },

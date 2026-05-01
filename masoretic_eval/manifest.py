@@ -25,6 +25,7 @@ doc missing ``iaa_subset`` outright -- not a v0.1 doc) raise
 
 from __future__ import annotations
 
+import hashlib
 import json
 from collections.abc import Iterator
 from dataclasses import dataclass, field
@@ -68,6 +69,16 @@ def _coerce_v01_to_v02_in_memory(doc: dict[str, Any]) -> dict[str, Any]:
     return out
 
 
+def _canonical_manifest_hash(raw_doc: dict[str, Any]) -> str:
+    canonical = json.dumps(
+        raw_doc,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
+
+
 @dataclass
 class Manifest:
     """Loaded phase_0_manifest.json (v0.2 schema, v0.1 read-compat)."""
@@ -81,6 +92,7 @@ class Manifest:
     expected_total_reports: int | dict[str, int]
     scorer_version: str
     nakdimon_model_hash: str
+    manifest_hash: str
     fuses_fired: list[Any] = field(default_factory=list)
     notes: str = ""
     # The verbatim coerced document, used by expected_reports_for() to
@@ -90,6 +102,7 @@ class Manifest:
     @classmethod
     def load(cls, path: Path | str) -> Manifest:
         raw_doc = json.loads(Path(path).read_text(encoding="utf-8"))
+        manifest_hash = _canonical_manifest_hash(raw_doc)
         # Coerce v0.1 missing fields BEFORE validation so v0.1 docs pass.
         doc = _coerce_v01_to_v02_in_memory(raw_doc)
         # Validate against the v0.2 schema. Truly malformed docs (e.g. a
@@ -125,6 +138,7 @@ class Manifest:
             expected_total_reports=doc["expected_total_reports"],
             scorer_version=doc["scorer_version"],
             nakdimon_model_hash=doc["nakdimon_model_hash"],
+            manifest_hash=manifest_hash,
             fuses_fired=list(doc.get("fuses_fired", [])),
             notes=doc.get("notes", ""),
             _raw=doc,

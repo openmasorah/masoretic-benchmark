@@ -4,7 +4,7 @@ Mirrors the post-03-01 Manifest API surface that BaselineBase calls:
   - .frozen_leningrad_folios() -> list[Folio-like]
   - .expected_reports_for(baseline_id) -> int (raises KeyError on absence)
   - .scorer_version: str
-  - .manifest_hash: str | None  (optional; getattr defaults to None)
+  - .manifest_hash: str
 
 The fake never touches disk; tests construct a FakeManifest with whatever
 folios + expected mapping they need and pass it directly to BaselineBase.
@@ -35,7 +35,7 @@ class FakeManifest:
     expected_reports_per_baseline: dict[str, int] = field(default_factory=dict)
     expected_total_reports: int | None = None
     scorer_version: str = "v0.1.0-scorer"
-    manifest_hash: str | None = "fake-manifest-hash"
+    manifest_hash: str = "fake-manifest-hash"
     # Phase 03.1 A-02: cost_caps_usd is authoritative at runtime. FakeManifest
     # carries it as a direct attribute; real Manifest exposes via _raw doc.
     # Default = the A-02 locked values so tests have realistic caps to enforce.
