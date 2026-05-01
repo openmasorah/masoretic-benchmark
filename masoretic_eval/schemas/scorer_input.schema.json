@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:masoretic:scorer_input.schema:v0.1.0",
+  "title": "scorer_input.json",
+  "description": "Input contract for masoretic-eval score --gt/--pred JSON files.",
+  "type": "object",
+  "required": ["text", "metamarks"],
+  "additionalProperties": false,
+  "properties": {
+    "text": {
+      "type": "string"
+    },
+    "metamarks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "verse_ref", "ordinal"],
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "pe",
+              "samekh",
+              "reversednun",
+              "puncta",
+              "large_letter",
+              "small_letter",
+              "suspended_letter",
+              "inverted_nun"
+            ]
+          },
+          "verse_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "ordinal": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "codepoints": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

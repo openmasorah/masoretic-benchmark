@@ -6,12 +6,8 @@ from pathlib import Path
 FIXTURES = Path(__file__).parent / "fixtures"
 
 
-def test_cli_score_writes_output(tmp_path):
-    # Fixtures are created in Step 2 below.
-    gt = FIXTURES / "cli_gt.json"
-    pred = FIXTURES / "cli_pred.json"
-    out = tmp_path / "result.json"
-    rc = subprocess.run(
+def _run_score(gt: Path, pred: Path, out: Path) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
         [
             sys.executable,
             "-m",
@@ -29,11 +25,59 @@ def test_cli_score_writes_output(tmp_path):
         capture_output=True,
         text=True,
     )
+
+
+def test_cli_score_writes_output(tmp_path):
+    # Fixtures are created in Step 2 below.
+    gt = FIXTURES / "cli_gt.json"
+    pred = FIXTURES / "cli_pred.json"
+    out = tmp_path / "result.json"
+    rc = _run_score(gt, pred, out)
     assert rc.returncode == 0, rc.stderr
     data = json.loads(out.read_text())
     assert data["prediction_id"] == "leningrad_devarim_f237b"
     assert data["scorer_version"] == "0.2.0"
     assert "tier1" in data["tiers"]
+
+
+def test_cli_rejects_gt_missing_text_without_writing_output(tmp_path):
+    gt = tmp_path / "missing_text_gt.json"
+    pred = FIXTURES / "cli_pred.json"
+    out = tmp_path / "result.json"
+    gt.write_text(json.dumps({"metamarks": []}), encoding="utf-8")
+
+    rc = _run_score(gt, pred, out)
+
+    assert rc.returncode != 0
+    assert "schema validation" in rc.stderr
+    assert "--gt" in rc.stderr
+    assert not out.exists()
+
+
+def test_cli_rejects_pred_unknown_metamark_without_writing_output(tmp_path):
+    gt = FIXTURES / "cli_gt.json"
+    pred = tmp_path / "unknown_metamark_pred.json"
+    out = tmp_path / "result.json"
+    pred.write_text(
+        json.dumps(
+            {
+                "text": "שמע ישראל",
+                "metamarks": [
+                    {"type": "unknown", "verse_ref": "Deut.6.4", "ordinal": 1}
+                ],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    rc = _run_score(gt, pred, out)
+
+    assert rc.returncode != 0
+    assert "schema validation" in rc.stderr
+    assert "--pred" in rc.stderr
+    assert "unknown" in rc.stderr
+    assert not out.exists()
 
 
 def test_cli_help():
