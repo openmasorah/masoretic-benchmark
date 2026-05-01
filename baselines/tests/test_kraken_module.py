@@ -150,6 +150,56 @@ def test_recognize_lines_raises_on_zero_records(monkeypatch):
         assert "leningrad_devarim_FXXX" in str(exc.value)
 
 
+def _make_record_boundary(text: str, confs: list, boundary: list):
+    """Make a fake kraken record that has NO line_bbox / bbox attrs — only
+    a ``boundary`` polygon (the BaselineOCRRecord shape blla yields under
+    actual segmentation). This exercises the Phase 03.1-04.6 hot-fix path
+    where we derive a tight bbox from the boundary polygon."""
+
+    # MagicMock unconditionally returns a MagicMock for any attribute, which
+    # would make the `getattr(rec, "line_bbox", None)` fallback never trigger.
+    # Use a plain class so missing attrs really return None via getattr.
+    class _Rec:
+        def __init__(self, t, cs, b):
+            self._text = t
+            self.confidences = cs
+            self.boundary = b
+
+        def __str__(self):
+            return self._text
+
+    return _Rec(text, confs, boundary)
+
+
+def test_recognize_lines_bbox_from_boundary_polygon(monkeypatch):
+    """Phase 03.1-04.6 hot-fix: BaselineOCRRecord (the type rpred yields
+    under blla segmentation) has no ``line_bbox`` attribute — it carries
+    ``boundary`` (the line polygon). recognize_lines must derive a tight
+    bbox from the boundary's min/max corners."""
+    from baselines._base import LineRecord
+
+    # A boundary polygon for a horizontal line: (x: 10..50, y: 20..40).
+    # Tight bbox = (10, 20, 50, 40).
+    boundary = [(10, 20), (50, 20), (50, 40), (10, 40)]
+    fake_records = [_make_record_boundary("שלום", [0.9, 0.85, 0.95, 0.9], boundary)]
+    _install_fake_kraken_modules(monkeypatch, records=fake_records)
+
+    with patch("baselines._kraken._load_model", return_value=MagicMock()):
+        from baselines._kraken import recognize_lines
+
+        out = recognize_lines(
+            Path("/tmp/fake.jpg"),
+            Path("/tmp/fake.mlmodel"),
+            folio_id="leningrad_devarim_F118B",
+        )
+    assert len(out) == 1
+    assert isinstance(out[0], LineRecord)
+    assert out[0].bbox == (10, 20, 50, 40), (
+        f"bbox must be derived from boundary polygon min/max; got {out[0].bbox}"
+    )
+    assert out[0].tier1 == "שלום"
+
+
 def test_recognize_lines_raises_on_all_empty_text(monkeypatch):
     """If every record has empty text, raise — there is no transcription
     extractable from the page (per D-04 full-page-failure semantics)."""

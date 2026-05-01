@@ -426,6 +426,144 @@ def test_llm_vision_does_not_override_run():
     assert LLMVisionBaseline.run is BaselineBase.run
 
 
+# ----------------------------------------------------------------------
+# Phase 03.1-04.6 hot-fix tests
+# ----------------------------------------------------------------------
+
+
+def test_llm_vision_skips_degenerate_bbox_lines(tmp_path, monkeypatch):
+    """Phase 03.1-04.6 hot-fix: kraken's polygonizer occasionally yields a
+    degenerate bbox (0,0,0,0) on poorly-segmented lines. The infer_folio
+    loop must skip these — emitting them would crash PIL ('cannot write
+    empty image') and distort per-line cost accounting."""
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "k")
+    monkeypatch.setenv("GOOGLE_API_KEY", "k")
+
+    fid = "leningrad_devarim_F118B_fixture"
+    manifest = FakeManifest(
+        folios=[FakeFolio(id=fid)],
+        expected_reports_per_baseline={"llm_vision": 1},
+    )
+
+    # Two kraken lines: first good, second degenerate (0,0,0,0).
+    good = LineRecord(
+        line_id=f"{fid}_L001",
+        bbox=(10, 10, 500, 60),
+        tier1="kraken-text",
+        tier2="kraken-text",
+        tier3="kraken-text",
+        tier4_records=tuple(),
+        kraken_confidence=0.9,
+    )
+    degenerate = LineRecord(
+        line_id=f"{fid}_L002",
+        bbox=(0, 0, 0, 0),  # degenerate — Kraken polygonizer failure
+        tier1="kraken-text",
+        tier2="kraken-text",
+        tier3="kraken-text",
+        tier4_records=tuple(),
+        kraken_confidence=0.0,
+    )
+
+    p = _patches(claude_text="שמע", gemini_text="שמע", kraken_n=0)
+    p["fake_kraken"] = [good, degenerate]
+
+    with (
+        patch("baselines.llm_vision.fetch_image", return_value=p["fake_image_path"]),
+        patch("baselines.llm_vision.image_sha256", return_value="img-sha"),
+        patch("baselines.llm_vision.recognize_lines", return_value=p["fake_kraken"]),
+        patch("baselines.llm_vision.claude_client", return_value=p["fake_claude"]),
+        patch("baselines.llm_vision.gemini_client", return_value=p["fake_gemini"]),
+    ):
+        bl = _ctor(tmp_path, manifest)
+        rc = bl.run()
+    assert rc == 0
+
+    # Each LLM is called exactly ONCE (not twice) — degenerate line skipped.
+    assert p["fake_claude"].messages.create.call_count == 1, (
+        "degenerate bbox line must NOT trigger claude call"
+    )
+    assert p["fake_gemini"].models.generate_content.call_count == 1, (
+        "degenerate bbox line must NOT trigger gemini call"
+    )
+
+    # Prediction has only the good line.
+    pred = json.loads((tmp_path / "llm_vision" / f"{fid}.json").read_text(encoding="utf-8"))
+    assert len(pred["lines"]) == 1
+    assert pred["lines"][0]["line_id"] == f"{fid}_L001"
+
+
+def test_llm_vision_estimate_usd_tolerates_none_token_counts():
+    """Phase 03.1-04.6 hot-fix: gemini-2.5-pro occasionally returns
+    usage_metadata with candidates_token_count=None on blocked / partially
+    finished responses. ``_estimate_usd`` must coerce None → 0 rather than
+    blow up with TypeError on float(None)."""
+    from baselines.llm_vision import LLMVisionBaseline
+
+    # None on both keys
+    meta = {"token_counts": {"input": None, "output": None}}
+    val = LLMVisionBaseline._estimate_usd(meta, "gemini")
+    assert val == 0.0
+
+    # Mixed None / number
+    meta2 = {"token_counts": {"input": 1500, "output": None}}
+    val2 = LLMVisionBaseline._estimate_usd(meta2, "claude")
+    # 1500 input tokens at $5/Mtok = $0.0075; output None → 0 → adds 0.
+    assert abs(val2 - (1500 * 5.00) / 1_000_000) < 1e-9
+
+    # Missing token_counts entirely (defensive)
+    meta3 = {}
+    val3 = LLMVisionBaseline._estimate_usd(meta3, "gemini")
+    assert val3 == 0.0
+
+
+def test_llm_vision_anthropic_request_omits_temperature(tmp_path, monkeypatch):
+    """Phase 03.1-04.6 hot-fix: claude-opus-4-7 deprecated the temperature
+    parameter (API returns 400 invalid_request_error
+    "`temperature` is deprecated for this model."). The Anthropic request
+    dict — which is canonicalized into prompt_hash via _llm_replay —
+    must NOT carry a ``temperature`` key. This locks the D-10 prompt_hash
+    shape so future runs replay byte-equal against the canonical fixture.
+    """
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "k")
+    monkeypatch.setenv("GOOGLE_API_KEY", "k")
+
+    fid = "leningrad_devarim_F118B_fixture"
+    manifest = FakeManifest(
+        folios=[FakeFolio(id=fid)],
+        expected_reports_per_baseline={"llm_vision": 1},
+    )
+    p = _patches(claude_text="שמע", gemini_text="שמע", kraken_n=1)
+
+    with (
+        patch("baselines.llm_vision.fetch_image", return_value=p["fake_image_path"]),
+        patch("baselines.llm_vision.image_sha256", return_value="img-sha"),
+        patch("baselines.llm_vision.recognize_lines", return_value=p["fake_kraken"]),
+        patch("baselines.llm_vision.claude_client", return_value=p["fake_claude"]),
+        patch("baselines.llm_vision.gemini_client", return_value=p["fake_gemini"]),
+    ):
+        bl = _ctor(tmp_path, manifest)
+        bl.run()
+
+    # Inspect the persisted replay log: the Anthropic record's request
+    # MUST NOT have a "temperature" key (Gemini's record may).
+    replay_log = tmp_path / "llm_vision" / fid / "llm_calls.jsonl"
+    records = [
+        json.loads(r) for r in replay_log.read_text(encoding="utf-8").splitlines() if r.strip()
+    ]
+    claude_records = [r for r in records if r["request"]["model"] == "claude-opus-4-7"]
+    assert len(claude_records) >= 1, "no claude record in replay log"
+    for rec in claude_records:
+        assert "temperature" not in rec["request"], (
+            "claude-opus-4-7 rejects temperature; request dict must omit it"
+        )
+    # Positive: Gemini side DOES carry temperature (locked at 0).
+    gemini_records = [r for r in records if r["request"]["model"] == "gemini-2.5-pro"]
+    assert len(gemini_records) >= 1
+    for rec in gemini_records:
+        assert rec["request"]["temperature"] == 0
+
+
 def test_llm_vision_prompt_text_d05_clean():
     """D-05 contamination boundary: PROMPT_TEXT must contain no UXLC text,
     no verse content, no GT-derived signal. Defense-in-depth grep — the

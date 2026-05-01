@@ -13,8 +13,10 @@ Newest first.
 - **Pin formula**: no derived hash here — the replay log (D-10) IS the reproducibility
   contract. `run_meta.pins.llm_pin_md_hash` carries the sha256 of THIS file's bytes,
   so any uncommitted edit to LLM_PIN.md changes the hash and surfaces in the next run.
-- **Determinism**: `temperature=0`, `seed=0` set for both models. Anthropic doesn't
-  support seed; Gemini's seed is best-effort and known non-deterministic on gemini-2.5-pro.
+- **Determinism**: `temperature=0` set for Gemini only; claude-opus-4-7 rejects
+  `temperature` parameter (deprecated for this model — verified via Anthropic API
+  400 error 2026-04-30). `seed=0` set for Gemini only; Anthropic doesn't support
+  seed; Gemini's seed is best-effort and known non-deterministic on gemini-2.5-pro.
   The replay log is the contract; provider-side non-determinism is documented in the
   BL-01 docstring + paper methodology delta (`paper/methodology_delta_BL-01_AbbyyFR_drop.md`
   in baalshem).

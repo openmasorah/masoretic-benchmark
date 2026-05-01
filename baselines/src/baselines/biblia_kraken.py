@@ -28,6 +28,7 @@ atomic-run policy (sandbox left for inspection).
 
 from __future__ import annotations
 
+import json
 import socket
 import subprocess
 from datetime import UTC, datetime
@@ -35,7 +36,7 @@ from pathlib import Path
 
 from baselines._base import BaselineBase, LineRecord
 from baselines._images import fetch_image, image_sha256
-from baselines._kraken import KRAKEN_MODEL_HASH, recognize_lines
+from baselines._kraken import KRAKEN_MODEL_HASH, recognize_lines, serialize_pagexml
 
 # Path resolution: this file is at
 #   <repo>/baselines/src/baselines/biblia_kraken.py
@@ -89,6 +90,54 @@ class BibliaKrakenBaseline(BaselineBase):
             "line_count": len(lines),
             "scope_check_passed_at_iso": datetime.now(UTC).isoformat(timespec="seconds"),
         }
+
+        # D-04 + D-21 (Phase 03.1): dual-format cache for BL-03/BL-04 chain
+        # consumption. Cache key includes folio_id + KRAKEN_MODEL_HASH so a
+        # Kraken pin bump invalidates BOTH files. Cache lives next to
+        # ``image_cache`` (which tests redirect to tmp_path) so test runs
+        # never touch the real-repo .cache/kraken/<folio>/ subtrees. In
+        # production, image_cache=<repo>/baselines/.cache/images so the
+        # cache parent is <repo>/baselines/.cache and the kraken cache
+        # lands at <repo>/baselines/.cache/kraken/<folio_id>/ as expected.
+        cache_dir = self.image_cache.parent / "kraken" / folio.id
+        cache_dir.mkdir(parents=True, exist_ok=True)
+
+        # JSON cache (D-04) — diagnostic + per-line confidence inspection.
+        json_cache_path = cache_dir / f"{KRAKEN_MODEL_HASH}.json"
+        json_cache_payload = {
+            "folio_id": folio.id,
+            "kraken_model_hash": KRAKEN_MODEL_HASH,
+            "lines": [
+                {
+                    "line_id": lr.line_id,
+                    "bbox": list(lr.bbox),
+                    "tier1": lr.tier1,
+                    "tier2": lr.tier2,
+                    "tier3": lr.tier3,
+                    "kraken_confidence": lr.kraken_confidence,
+                }
+                for lr in lines
+            ],
+        }
+        json_cache_path.write_text(
+            json.dumps(json_cache_payload, ensure_ascii=False, sort_keys=True, indent=2),
+            encoding="utf-8",
+        )
+
+        # PAGE-XML cache (D-21) — chain consumption path; symmetric with the
+        # GT-fed diagnostic branch's input format. Determinism: pinned Kraken
+        # model + image bytes -> deterministic byte-string (serialize_pagexml
+        # omits Created/LastChange timestamps to preserve byte-equality).
+        page_xml_cache_path = cache_dir / f"{KRAKEN_MODEL_HASH}.page.xml"
+        page_xml_cache_path.write_text(
+            serialize_pagexml(
+                lines,
+                folio_id=folio.id,
+                image_filename=image_path.name,
+            ),
+            encoding="utf-8",
+        )
+
         return lines
 
     # -- run_meta extension --------------------------------------------------

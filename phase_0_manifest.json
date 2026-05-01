@@ -1,90 +1,107 @@
 {
-  "version": "v0.2.0",
-  "frozen_at": "2026-04-30T17:00:00Z",
-  "scorer_version": "0.1.0",
-  "nakdimon_model_hash": "",
+  "baselines": {},
+  "baselines_seeded": [],
+  "cost_caps_usd": {
+    "per_folio": 5.00,
+    "per_run": 30.00
+  },
+  "dictabert_model_revision": "d311fbf7c403e50b040440e4859ac78064d025d0",
+  "expected_reports_per_baseline": {
+    "biblia_char_menaked": 0,
+    "biblia_kraken": 1,
+    "biblia_nakdimon": 0,
+    "llm_vision": 1
+  },
   "expected_total_reports": 0,
+  "folios": [
+    {
+      "book": "devarim",
+      "folio": "F118B",
+      "gt_hash": null,
+      "iaa_folio": true,
+      "id": "leningrad_devarim_F118B_fixture",
+      "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F118B.jpg",
+      "in_frozen_scope": true,
+      "manuscript": "leningrad"
+    },
+    {
+      "book": "devarim",
+      "folio": "F119A",
+      "gt_hash": null,
+      "iaa_folio": true,
+      "id": "leningrad_devarim_F119A_fixture",
+      "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F119A.jpg",
+      "in_frozen_scope": true,
+      "manuscript": "leningrad"
+    },
+    {
+      "book": "devarim",
+      "folio": "F119B",
+      "gt_hash": null,
+      "iaa_folio": true,
+      "id": "leningrad_devarim_F119B_fixture",
+      "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F119B.jpg",
+      "in_frozen_scope": true,
+      "manuscript": "leningrad"
+    },
+    {
+      "book": "devarim",
+      "folio": "F120A",
+      "gt_hash": null,
+      "iaa_folio": true,
+      "id": "leningrad_devarim_F120A_fixture",
+      "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F120A.jpg",
+      "in_frozen_scope": true,
+      "manuscript": "leningrad"
+    }
+  ],
+  "frozen_at": "2026-05-01T02:19:06Z",
+  "fuses_fired": [],
   "iaa_subset": [
     "leningrad_devarim_F118B_fixture",
     "leningrad_devarim_F119A_fixture",
     "leningrad_devarim_F119B_fixture",
     "leningrad_devarim_F120A_fixture"
   ],
-  "baselines_seeded": [],
-  "expected_reports_per_baseline": {
-    "biblia_kraken": 0,
-    "biblia_nakdimon": 0,
-    "biblia_char_menaked": 0,
-    "llm_vision": 0
-  },
-  "cost_caps_usd": {
-    "per_folio": 5.00,
-    "per_run": 30.00
-  },
-  "folios": [
-    {
-      "id": "leningrad_devarim_F118B_fixture",
-      "manuscript": "leningrad",
-      "book": "devarim",
-      "folio": "F118B",
-      "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F118B.jpg",
-      "iaa_folio": true,
-      "gt_hash": null,
-      "in_frozen_scope": true
-    },
-    {
-      "id": "leningrad_devarim_F119A_fixture",
-      "manuscript": "leningrad",
-      "book": "devarim",
-      "folio": "F119A",
-      "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F119A.jpg",
-      "iaa_folio": true,
-      "gt_hash": null,
-      "in_frozen_scope": true
-    },
-    {
-      "id": "leningrad_devarim_F119B_fixture",
-      "manuscript": "leningrad",
-      "book": "devarim",
-      "folio": "F119B",
-      "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F119B.jpg",
-      "iaa_folio": true,
-      "gt_hash": null,
-      "in_frozen_scope": true
-    },
-    {
-      "id": "leningrad_devarim_F120A_fixture",
-      "manuscript": "leningrad",
-      "book": "devarim",
-      "folio": "F120A",
-      "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F120A.jpg",
-      "iaa_folio": true,
-      "gt_hash": null,
-      "in_frozen_scope": true
-    }
-  ],
-  "baselines": {},
-  "fuses_fired": [],
+  "kraken_model_hash": "8514a0c7cc2b5b45",
   "manifest_changelog": [
     {
-      "prev_frozen_at": "2026-04-25T16:30:44Z",
       "new_frozen_at": "2026-04-29T02:41:41Z",
+      "prev_frozen_at": "2026-04-25T16:30:44Z",
       "reason": "phase 03.1 W3.5: import from baalshem@bc7255ecaa3eb872885467d3a59e9e6352d5668a; values preserved verbatim"
     },
     {
-      "prev_frozen_at": "2026-04-29T02:41:41Z",
       "new_frozen_at": "2026-04-29T02:42:08Z",
+      "prev_frozen_at": "2026-04-29T02:41:41Z",
       "reason": "phase 03.1 W3.5: regime change — reset expected_reports_per_baseline.* to 0 + seed cost_caps_usd ahead of W4 promotions (A-01-amended D-14 + A-02 lock)"
     },
     {
-      "prev_frozen_at": "2026-04-29T02:42:08Z",
       "new_frozen_at": "2026-04-30T13:21:24Z",
+      "prev_frozen_at": "2026-04-29T02:42:08Z",
       "reason": "phase 03.2: IAA set finalized to last 4 sides of L Devarim per Yosef 2026-04-30"
     },
     {
-      "prev_frozen_at": "2026-04-30T13:21:24Z",
       "new_frozen_at": "2026-04-30T17:00:00Z",
+      "prev_frozen_at": "2026-04-30T13:21:24Z",
       "reason": "phase 03.2: populate iaa_subset with the 4 IAA folio IDs (follow-up — original fuse missed the explicit array; per-folio iaa_folio=true was set but iaa_subset stayed []; masoretic_eval/manifest.py reads the explicit array)"
+    },
+    {
+      "new_frozen_at": "2026-04-30T19:58:28Z",
+      "prev_frozen_at": "2026-04-30T17:00:00Z",
+      "reason": "phase 3.1: biblia_kraken leningrad_devarim_F118B_fixture promoted"
+    },
+    {
+      "new_frozen_at": "2026-04-30T22:56:48Z",
+      "prev_frozen_at": "2026-04-30T19:58:28Z",
+      "reason": "phase 3.1: llm_vision leningrad_devarim_F118B_fixture promoted"
+    },
+    {
+      "prev_frozen_at": "2026-04-30T22:56:48Z",
+      "new_frozen_at": "2026-05-01T02:19:06Z",
+      "reason": "phase 03.1: evaluation protocol pre-registered per BL-07 (whole-folio macro-averaged CER tiers 1-3 / F1 tier 4 as headline; per-line CER, zone-restricted CER, segmentation-merge variants deferred to v0.2 pending IAA). Scoring methodology frozen in baselines/EVALUATION_PROTOCOL.md."
     }
-  ]
+  ],
+  "nakdimon_model_hash": "8fd7722b8002a690",
+  "scorer_version": "0.1.0",
+  "version": "v0.2.0"
 }

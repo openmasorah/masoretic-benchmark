@@ -1,0 +1,1644 @@
+{
+  "baseline_id": "llm_vision",
+  "folio_id": "leningrad_devarim_F118B_fixture",
+  "lines": [
+    {
+      "bbox": [
+        1371,
+        2,
+        1392,
+        113
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L001",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "אֵ֖ל",
+      "tier2": "אֵ֖ל",
+      "tier3": "אֵ֖ל",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1547,
+        2,
+        1655,
+        77
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L002",
+      "llm_tie_breaks": 0,
+      "llm_winner": "claude",
+      "tier1": "The text in the image is not Hebrew — it appears to be Latin script (the word \"primat\" or similar) shown upside down. There are no Hebrew characters to transcribe.",
+      "tier2": "The text in the image is not Hebrew — it appears to be Latin script (the word \"primat\" or similar) shown upside down. There are no Hebrew characters to transcribe.",
+      "tier3": "The text in the image is not Hebrew — it appears to be Latin script (the word \"primat\" or similar) shown upside down. There are no Hebrew characters to transcribe.",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1700,
+        2,
+        1774,
+        80
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L003",
+      "llm_tie_breaks": 0,
+      "llm_winner": "claude",
+      "tier1": "The text in the image appears to be in Latin script (reading \"genit\" or similar, upside down), not Hebrew. There is no Hebrew text visible to transcribe.",
+      "tier2": "The text in the image appears to be in Latin script (reading \"genit\" or similar, upside down), not Hebrew. There is no Hebrew text visible to transcribe.",
+      "tier3": "The text in the image appears to be in Latin script (reading \"genit\" or similar, upside down), not Hebrew. There is no Hebrew text visible to transcribe.",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1977,
+        5,
+        2007,
+        86
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L004",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "פִּ֣י",
+      "tier2": "פִּ֣י",
+      "tier3": "פִּ֣י",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2384,
+        29,
+        2435,
+        134
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L005",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "יְמֵ֣י",
+      "tier2": "יְמֵ֣י",
+      "tier3": "יְמֵ֣י",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        600,
+        1979,
+        669,
+        2096
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L008",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "וַיְכַ֖ס",
+      "tier2": "וַיְכַ֖ס",
+      "tier3": "וַיְכַ֖ס",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        675,
+        1439,
+        761,
+        1588
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L009",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "קְטֹ֖ל",
+      "tier2": "קְטֹ֖ל",
+      "tier3": "קְטֹ֖ל",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        618,
+        2194,
+        702,
+        2281
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L011",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "וְחַ֖י",
+      "tier2": "וְחַ֖י",
+      "tier3": "וְחַ֖י",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        645,
+        2373,
+        726,
+        2466
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L013",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "לְמַ֖י",
+      "tier2": "לְמַ֖י",
+      "tier3": "לְמַ֖י",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        558,
+        2633,
+        872,
+        2765
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L015",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "אֲשֶׁ֣ר",
+      "tier2": "אֲשֶׁ֣ר",
+      "tier3": "אֲשֶׁ֣ר",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        546,
+        2729,
+        734,
+        2842
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L016",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "כֹּ֖ל",
+      "tier2": "כֹּ֖ל",
+      "tier3": "כֹּ֖ל",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        576,
+        2815,
+        923,
+        2941
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L019",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "וְחַד֩\nבִּצְבִיתְהֵ֨ן\nוְח",
+      "tier2": "וְחַד֩\nבִּצְבִיתְהֵ֨ן\nוְח",
+      "tier3": "וְחַד֩\nבִּצְבִיתְהֵ֨ן\nוְח",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        466,
+        2914,
+        890,
+        3036
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L021",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "מוּטְבָּעֽוֹת",
+      "tier2": "מוּטְבָּעֽוֹת",
+      "tier3": "מוּטְבָּעֽוֹת",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        561,
+        3195,
+        645,
+        3287
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L022",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "רֹב\nעַל\nפִּי",
+      "tier2": "רֹב\nעַל\nפִּי",
+      "tier3": "רֹב\nעַל\nפִּי",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        624,
+        3015,
+        729,
+        3087
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L023",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "בְּנֵ֣י",
+      "tier2": "בְּנֵ֣י",
+      "tier3": "בְּנֵ֣י",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        624,
+        3063,
+        696,
+        3210
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L024",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "הֵם",
+      "tier2": "הֵם",
+      "tier3": "הֵם",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        537,
+        3257,
+        660,
+        3365
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L025",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "פֶּ֕ה\nוְאֶחָֽד׃",
+      "tier2": "פֶּ֕ה\nוְאֶחָֽד׃",
+      "tier3": "פֶּ֕ה\nוְאֶחָֽד׃",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        561,
+        3260,
+        717,
+        3365
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L026",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "מִמֶּ֖נּוּ ׃ לֹ֥א",
+      "tier2": "מִמֶּ֖נּוּ ׃ לֹ֥א",
+      "tier3": "מִמֶּ֖נּוּ ׃ לֹ֥א",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        591,
+        3344,
+        639,
+        3422
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L027",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "אִ֥ם",
+      "tier2": "אִ֥ם",
+      "tier3": "אִ֥ם",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        564,
+        3395,
+        657,
+        3481
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L028",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "בְּמֵישָׁר",
+      "tier2": "בְּמֵישָׁר",
+      "tier3": "בְּמֵישָׁר",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        612,
+        3451,
+        657,
+        3553
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L029",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "יִ֖י",
+      "tier2": "יִ֖י",
+      "tier3": "יִ֖י",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1003,
+        1164,
+        3137,
+        1295
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L031",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "וְאָעִ֣ידָה בָּ֔ם אֶת־הַשָּׁמַ֖יִם וְאֶת־הָאָ֑רֶץ כִּֽי־יָדַ֗עְתִּי",
+      "tier2": "וְאָעִ֣ידָה בָּ֔ם אֶת־הַשָּׁמַ֖יִם וְאֶת־הָאָ֑רֶץ כִּֽי־יָדַ֗עְתִּי",
+      "tier3": "וְאָעִ֣ידָה בָּ֔ם אֶת־הַשָּׁמַ֖יִם וְאֶת־הָאָ֑רֶץ כִּֽי־יָדַ֗עְתִּי",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        997,
+        1260,
+        1840,
+        1385
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L032",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "וְשָׂרַפְתָּ֥ם בָּאֵ֖שׁ לֹא־תַחְמֹד֩",
+      "tier2": "וְשָׂרַפְתָּ֥ם בָּאֵ֖שׁ לֹא־תַחְמֹד֩",
+      "tier3": "וְשָׂרַפְתָּ֥ם בָּאֵ֖שׁ לֹא־תַחְמֹד֩",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1003,
+        1355,
+        1389,
+        1475
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L033",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "וְרָעֵ֖הוּ לֹֽא־יִ֝‎",
+      "tier2": "וְרָעֵ֖הוּ לֹֽא־יִ֝‎",
+      "tier3": "וְרָעֵ֖הוּ לֹֽא־יִ֝‎",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1000,
+        1454,
+        1410,
+        1570
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L034",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "יְהוָֹ֖ה ב",
+      "tier2": "יְהוָֹ֖ה ב",
+      "tier3": "יְהוָֹ֖ה ב",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1428,
+        1361,
+        1852,
+        1469
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L035",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "אֶתְכֶ֗ם",
+      "tier2": "אֶתְכֶ֗ם",
+      "tier3": "אֶתְכֶ֗ם",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1452,
+        1454,
+        1834,
+        1564
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L036",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "בְּעֵינֵ֘י",
+      "tier2": "בְּעֵינֵ֘י",
+      "tier3": "בְּעֵינֵ֘י",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1006,
+        1549,
+        1837,
+        1672
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L037",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "מָשַׁח בְּאׇזְנֵי ׃ בְּלֹ֣ג ע",
+      "tier2": "מָשַׁח בְּאׇזְנֵי ׃ בְּלֹ֣ג ע",
+      "tier3": "מָשַׁח בְּאׇזְנֵי ׃ בְּלֹ֣ג ע",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1000,
+        1648,
+        1434,
+        1758
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L038",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "תָּמָ֑ס ע ר ע",
+      "tier2": "תָּמָ֑ס ע ר ע",
+      "tier3": "תָּמָ֑ס ע ר ע",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        648,
+        3562,
+        902,
+        3684
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L039",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "בְּ\nבְּאֹור",
+      "tier2": "בְּ\nבְּאֹור",
+      "tier3": "בְּ\nבְּאֹור",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1852,
+        1254,
+        3134,
+        1376
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L040",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "אַחֲרֵי מוֹתִ֞י כִּ֤י הַשְׁחֵת֙ תַּשְׁחִת֔וּן",
+      "tier2": "אַחֲרֵי מוֹתִ֞י כִּ֤י הַשְׁחֵת֙ תַּשְׁחִת֔וּן",
+      "tier3": "אַחֲרֵי מוֹתִ֞י כִּ֤י הַשְׁחֵת֙ תַּשְׁחִת֔וּן",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1873,
+        1340,
+        3116,
+        1475
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L041",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "הַדֶּ֕רֶךְ אֲשֶׁר־צִוִּ֖יתִי אֶתְכֶ֑ם וְקָרָ֤את",
+      "tier2": "הַדֶּ֕רֶךְ אֲשֶׁר־צִוִּ֖יתִי אֶתְכֶ֑ם וְקָרָ֤את",
+      "tier3": "הַדֶּ֕רֶךְ אֲשֶׁר־צִוִּ֖יתִי אֶתְכֶ֑ם וְקָרָ֤את",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1897,
+        1451,
+        2796,
+        1570
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L042",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "הַיָּמִ֔ים כִּ֤י תַעֲשׂוּ֙ אֶת־הָרַ֔ע",
+      "tier2": "הַיָּמִ֔ים כִּ֤י תַעֲשׂוּ֙ אֶת־הָרַ֔ע",
+      "tier3": "הַיָּמִ֔ים כִּ֤י תַעֲשׂוּ֙ אֶת־הָרַ֔ע",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1912,
+        1546,
+        2766,
+        1678
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L043",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "בְּמַעֲשֵׂ֣ה ׃ יְ֭דֶיךָ ׃ וַיְדַבֵּ֥",
+      "tier2": "בְּמַעֲשֵׂ֣ה ׃ יְ֭דֶיךָ ׃ וַיְדַבֵּ֥",
+      "tier3": "בְּמַעֲשֵׂ֣ה ׃ יְ֭דֶיךָ ׃ וַיְדַבֵּ֥",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        941,
+        2000,
+        1936,
+        2117
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L044",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "וּבִרְבִיבִ֖ים עַל־עֵ֥שֶׂב כִּ֛י שֵׁ֥ם יְהוָ֖ה אֶקְרָ֑א",
+      "tier2": "וּבִרְבִיבִ֖ים עַל־עֵ֥שֶׂב כִּ֛י שֵׁ֥ם יְהוָ֖ה אֶקְרָ֑א",
+      "tier3": "וּבִרְבִיבִ֖ים עַל־עֵ֥שֶׂב כִּ֛י שֵׁ֥ם יְהוָ֖ה אֶקְרָ֑א",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1105,
+        2093,
+        1903,
+        2206
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L045",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "כִּ֤י כָל־דְּרָכָיו֙ מִשְׁפָּ֔ט אֵ֤ל אֱמוּנָה֙",
+      "tier2": "כִּ֤י כָל־דְּרָכָיו֙ מִשְׁפָּ֔ט אֵ֤ל אֱמוּנָה֙",
+      "tier3": "כִּ֤י כָל־דְּרָכָיו֙ מִשְׁפָּ֔ט אֵ֤ל אֱמוּנָה֙",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1036,
+        2176,
+        1855,
+        2302
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L046",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "בָּנָ֑יו מוּגָ֣שׁ דּ֔וֹר עָ֥קֶשׁ וּפְתַלְתֹּ֑ל",
+      "tier2": "בָּנָ֑יו מוּגָ֣שׁ דּ֔וֹר עָ֥קֶשׁ וּפְתַלְתֹּ֑ל",
+      "tier3": "בָּנָ֑יו מוּגָ֣שׁ דּ֔וֹר עָ֥קֶשׁ וּפְתַלְתֹּ֑ל",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2853,
+        1549,
+        3113,
+        1666
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L047",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "הֶבְעִיסֻ֖ו",
+      "tier2": "הֶבְעִיסֻ֖ו",
+      "tier3": "הֶבְעִיסֻ֖ו",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2145,
+        1896,
+        3166,
+        2036
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L048",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "הַאֲזִ֥ינוּ הַשָּׁמַ֖יִם וַאֲדַבֵּ֑רָה וְתִשְׁמַ֥ע הָאָ֖רֶץ",
+      "tier2": "הַאֲזִ֥ינוּ הַשָּׁמַ֖יִם וַאֲדַבֵּ֑רָה וְתִשְׁמַ֥ע הָאָ֖רֶץ",
+      "tier3": "הַאֲזִ֥ינוּ הַשָּׁמַ֖יִם וַאֲדַבֵּ֑רָה וְתִשְׁמַ֥ע הָאָ֖רֶץ",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        953,
+        2260,
+        2145,
+        2397
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L049",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "וְלֹ֣א חָכָ֔ם הֲל֥וֹא הוּ֛א אָבִ֥יךָ קָּנֶ֖ךָ ה֣וּא עָֽשְׂךָ֑",
+      "tier2": "וְלֹ֣א חָכָ֔ם הֲל֥וֹא הוּ֛א אָבִ֥יךָ קָּנֶ֖ךָ ה֣וּא עָֽשְׂךָ֑",
+      "tier3": "וְלֹ֣א חָכָ֔ם הֲל֥וֹא הוּ֛א אָבִ֥יךָ קָּנֶ֖ךָ ה֣וּא עָֽשְׂךָ֑",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1018,
+        2356,
+        2279,
+        2490
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L050",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "שְׁנ֣וֹת דּוֹר־וָד֑וֹר שְׁאַ֤ל אָבִ֙יךָ֙ וְיַגֵּ֔דְךָ זְקֵנֶ֖יךָ",
+      "tier2": "שְׁנ֣וֹת דּוֹר־וָד֑וֹר שְׁאַ֤ל אָבִ֙יךָ֙ וְיַגֵּ֔דְךָ זְקֵנֶ֖יךָ",
+      "tier3": "שְׁנ֣וֹת דּוֹר־וָד֑וֹר שְׁאַ֤ל אָבִ֙יךָ֙ וְיַגֵּ֔דְךָ זְקֵנֶ֖יךָ",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        997,
+        2457,
+        2210,
+        2580
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L051",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "בְּהַנְחֵ֤ל עֶלְיוֹן֙ גּוֹיִ֔ם בְּהַפְרִיד֖וֹ בְּנֵ֣י אָדָ֑ם יַצֵּב֙ גְּבֻלֹ֣ת עַמִּ֔ים לְמִסְפַּ֖ר\n\nWait, let me look again at what is actually visible.\n\nבְּהַפְרִידֽוֹ בְּנֵ֣י אָדָ֑ם יַצֵּב֙ גְּבֻלֹ֣ת עַמִּ֔ים לְמִסְפַּ֖ר",
+      "tier2": "בְּהַנְחֵ֤ל עֶלְיוֹן֙ גּוֹיִ֔ם בְּהַפְרִיד֖וֹ בְּנֵ֣י אָדָ֑ם יַצֵּב֙ גְּבֻלֹ֣ת עַמִּ֔ים לְמִסְפַּ֖ר\n\nWait, let me look again at what is actually visible.\n\nבְּהַפְרִידֽוֹ בְּנֵ֣י אָדָ֑ם יַצֵּב֙ גְּבֻלֹ֣ת עַמִּ֔ים לְמִסְפַּ֖ר",
+      "tier3": "בְּהַנְחֵ֤ל עֶלְיוֹן֙ גּוֹיִ֔ם בְּהַפְרִיד֖וֹ בְּנֵ֣י אָדָ֑ם יַצֵּב֙ גְּבֻלֹ֣ת עַמִּ֔ים לְמִסְפַּ֖ר\n\nWait, let me look again at what is actually visible.\n\nבְּהַפְרִידֽוֹ בְּנֵ֣י אָדָ֑ם יַצֵּב֙ גְּבֻלֹ֣ת עַמִּ֔ים לְמִסְפַּ֖ר",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1021,
+        2559,
+        2145,
+        2666
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L052",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "וְיַעֲקֹ֖ב חֶ֣בֶל נַחֲלָת֑וֹ יִמְצָאֵ֙הוּ֙ בְּאֶ֣רֶץ מִדְבָּ֔ר",
+      "tier2": "וְיַעֲקֹ֖ב חֶ֣בֶל נַחֲלָת֑וֹ יִמְצָאֵ֙הוּ֙ בְּאֶ֣רֶץ מִדְבָּ֔ר",
+      "tier3": "וְיַעֲקֹ֖ב חֶ֣בֶל נַחֲלָת֑וֹ יִמְצָאֵ֙הוּ֙ בְּאֶ֣רֶץ מִדְבָּ֔ר",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        991,
+        2732,
+        2151,
+        2845
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L053",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "יִשָּׂאֻ֖הוּ עַל־כָּתֵ֑ף יִ֠סְבְּלֻהוּ וְיַנִּיחֻ֨הוּ וְאֵ֤ין עִמּ֖",
+      "tier2": "יִשָּׂאֻ֖הוּ עַל־כָּתֵ֑ף יִ֠סְבְּלֻהוּ וְיַנִּיחֻ֨הוּ וְאֵ֤ין עִמּ֖",
+      "tier3": "יִשָּׂאֻ֖הוּ עַל־כָּתֵ֑ף יִ֠סְבְּלֻהוּ וְיַנִּיחֻ֨הוּ וְאֵ֤ין עִמּ֖",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        956,
+        3007,
+        2178,
+        3111
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L054",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "ודם־ענב תשתה־חמר׃ וישמן ישרון ויבעט׃",
+      "tier2": "ודם־ענב תשתה־חמר׃ וישמן ישרון ויבעט׃",
+      "tier3": "ודם־ענב תשתה־חמר׃ וישמן ישרון ויבעט׃",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        935,
+        3177,
+        2192,
+        3308
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L055",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "יִזְבְּחוּ֙ לַשֵּׁדִ֣ים לֹ֣א אֱלֹ֔הַ אֱלֹהִ֖ים לֹ֣א יְדָע֑וּם חֲדָשִׁים֙",
+      "tier2": "יִזְבְּחוּ֙ לַשֵּׁדִ֣ים לֹ֣א אֱלֹ֔הַ אֱלֹהִ֖ים לֹ֣א יְדָע֑וּם חֲדָשִׁים֙",
+      "tier3": "יִזְבְּחוּ֙ לַשֵּׁדִ֣ים לֹ֣א אֱלֹ֔הַ אֱלֹהִ֖ים לֹ֣א יְדָע֑וּם חֲדָשִׁים֙",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        920,
+        3275,
+        2067,
+        3416
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L056",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "צ֔וּר יְלָדְךָ֖ תֶּ֑שִׁי וַתִּשְׁכַּ֖ח אֵ֥ל מְחֹלְלֶֽךָ׃ וַיַּ֥רְא",
+      "tier2": "צ֔וּר יְלָדְךָ֖ תֶּ֑שִׁי וַתִּשְׁכַּ֖ח אֵ֥ל מְחֹלְלֶֽךָ׃ וַיַּ֥רְא",
+      "tier3": "צ֔וּר יְלָדְךָ֖ תֶּ֑שִׁי וַתִּשְׁכַּ֖ח אֵ֥ל מְחֹלְלֶֽךָ׃ וַיַּ֥רְא",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        935,
+        3377,
+        2136,
+        3493
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L057",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "וַיֹּ֙אמֶר֙ אַסְתִּ֣ירָה פָנַ֣י מֵהֶ֔ם אֶרְאֶ֖ה מָ֣ה אַחֲרִיתָ֑ם",
+      "tier2": "וַיֹּ֙אמֶר֙ אַסְתִּ֣ירָה פָנַ֣י מֵהֶ֔ם אֶרְאֶ֖ה מָ֣ה אַחֲרִיתָ֑ם",
+      "tier3": "וַיֹּ֙אמֶר֙ אַסְתִּ֣ירָה פָנַ֣י מֵהֶ֔ם אֶרְאֶ֖ה מָ֣ה אַחֲרִיתָ֑ם",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        976,
+        3472,
+        2070,
+        3592
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L058",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "הֵ֛ם קִנְא֥וּנִי בְלֹא־אֵ֖ל כִּעֲס֣וּנִי בְּהַבְלֵיהֶ֑ם",
+      "tier2": "הֵ֛ם קִנְא֥וּנִי בְלֹא־אֵ֖ל כִּעֲס֣וּנִי בְּהַבְלֵיהֶ֑ם",
+      "tier3": "הֵ֛ם קִנְא֥וּנִי בְלֹא־אֵ֖ל כִּעֲס֣וּנִי בְּהַבְלֵיהֶ֑ם",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2276,
+        2003,
+        3128,
+        2117
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L059",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "יַעֲרֹ֤ף כַּמָּטָר֙ לִקְחִ֔י תִּזַּ֥ל כַּטַּ֖ל אִמְרָתִ֑י כִּשְׂעִירִ֣ם עֲלֵי־דֶ֔שֶׁא\n\nI should only transcribe what is visible. Let me look again:\n\nכַּטַּ֖ל אִמְרָתִ֑י כִּשְׂעִירִ֣ם עֲלֵי־דֶ֔שֶׁא",
+      "tier2": "יַעֲרֹ֤ף כַּמָּטָר֙ לִקְחִ֔י תִּזַּ֥ל כַּטַּ֖ל אִמְרָתִ֑י כִּשְׂעִירִ֣ם עֲלֵי־דֶ֔שֶׁא\n\nI should only transcribe what is visible. Let me look again:\n\nכַּטַּ֖ל אִמְרָתִ֑י כִּשְׂעִירִ֣ם עֲלֵי־דֶ֔שֶׁא",
+      "tier3": "יַעֲרֹ֤ף כַּמָּטָר֙ לִקְחִ֔י תִּזַּ֥ל כַּטַּ֖ל אִמְרָתִ֑י כִּשְׂעִירִ֣ם עֲלֵי־דֶ֔שֶׁא\n\nI should only transcribe what is visible. Let me look again:\n\nכַּטַּ֖ל אִמְרָתִ֑י כִּשְׂעִירִ֣ם עֲלֵי־דֶ֔שֶׁא",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2336,
+        2093,
+        3122,
+        2197
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L060",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "הָבוּ֙ גֹ֣דֶל לֵֽאלֹהֵ֔ינוּ׃ הַצּוּר֙ תָּמִ֣ים",
+      "tier2": "הָבוּ֙ גֹ֣דֶל לֵֽאלֹהֵ֔ינוּ׃ הַצּוּר֙ תָּמִ֣ים",
+      "tier3": "הָבוּ֙ גֹ֣דֶל לֵֽאלֹהֵ֔ינוּ׃ הַצּוּר֙ תָּמִ֣ים",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2076,
+        2185,
+        3119,
+        2287
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L061",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "עַ֤וֶל צַדִּיק֙ וְשִׁח֣וּא שָׁ֔חֵת ל֖וֹ לֹ֑א",
+      "tier2": "עַ֤וֶל צַדִּיק֙ וְשִׁח֣וּא שָׁ֔חֵת ל֖וֹ לֹ֑א",
+      "tier3": "עַ֤וֶל צַדִּיק֙ וְשִׁח֣וּא שָׁ֔חֵת ל֖וֹ לֹ֑א",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1030,
+        2633,
+        2118,
+        2765
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L062",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "יְעִ֣ירְנָה֔וּ כְּאִ֖ישׁ אֲשֶׁר־יֵע֥וֹר קְנ֑וֹ",
+      "tier2": "יְעִ֣ירְנָה֔וּ כְּאִ֖ישׁ אֲשֶׁר־יֵע֥וֹר קְנ֑וֹ",
+      "tier3": "יְעִ֣ירְנָה֔וּ כְּאִ֖ישׁ אֲשֶׁר־יֵע֥וֹר קְנ֑וֹ",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1000,
+        2809,
+        2061,
+        2929
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L063",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "וַיֹּאכַ֤ל תְּנוּבֹ֣ת שָׂדָ֑י וַיֵּנִקֵ֤הֽוּ דְבַשׁ֙ מִסֶּ֔לַע",
+      "tier2": "וַיֹּאכַ֤ל תְּנוּבֹ֣ת שָׂדָ֑י וַיֵּנִקֵ֤הֽוּ דְבַשׁ֙ מִסֶּ֔לַע",
+      "tier3": "וַיֹּאכַ֤ל תְּנוּבֹ֣ת שָׂדָ֑י וַיֵּנִקֵ֤הֽוּ דְבַשׁ֙ מִסֶּ֔לַע",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1018,
+        2899,
+        2055,
+        3027
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L064",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "וְחֵ֤לֶב כִּלָיוֹת֙ עִם־חֵ֣לֶב כָּרִ֔ים וְאֵילִ֖ים מִבָּשָׁ֑ן",
+      "tier2": "וְחֵ֤לֶב כִּלָיוֹת֙ עִם־חֵ֣לֶב כָּרִ֔ים וְאֵילִ֖ים מִבָּשָׁ֑ן",
+      "tier3": "וְחֵ֤לֶב כִּלָיוֹת֙ עִם־חֵ֣לֶב כָּרִ֔ים וְאֵילִ֖ים מִבָּשָׁ֑ן",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1018,
+        3559,
+        2127,
+        3681
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L065",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "אַבְעוּ֩סֵ֩ם֩ בִּיאַשְׁקַדְחָ֖ה בְּאַפֵּ֣י נְתִיקָ֑ךְ ׃ עֻ֖",
+      "tier2": "אַבְעוּ֩סֵ֩ם֩ בִּיאַשְׁקַדְחָ֖ה בְּאַפֵּ֣י נְתִיקָ֑ךְ ׃ עֻ֖",
+      "tier3": "אַבְעוּ֩סֵ֩ם֩ בִּיאַשְׁקַדְחָ֖ה בְּאַפֵּ֣י נְתִיקָ֑ךְ ׃ עֻ֖",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1024,
+        3637,
+        1108,
+        3741
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L066",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "כִּ֤י",
+      "tier2": "כִּ֤י",
+      "tier3": "כִּ֤י",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2853,
+        1451,
+        3107,
+        1576
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L067",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "בְּאַחֲרִ֖ית",
+      "tier2": "בְּאַחֲרִ֖ית",
+      "tier3": "בְּאַחֲרִ֖ית",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1601,
+        1639,
+        3128,
+        1764
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L068",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "קְהַ֣ל יִשְׂרָאֵ֑ל אֶת־דִּבְרֵ֥י הַשִּׁירָ֖ה הַזֹּ֑את",
+      "tier2": "קְהַ֣ל יִשְׂרָאֵ֑ל אֶת־דִּבְרֵ֥י הַשִּׁירָ֖ה הַזֹּ֑את",
+      "tier3": "קְהַ֣ל יִשְׂרָאֵ֑ל אֶת־דִּבְרֵ֥י הַשִּׁירָ֖ה הַזֹּ֑את",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1048,
+        1848,
+        1852,
+        2036
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L069",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "יַעֲרֹ֤ף כַּמָּטָר֙ לִקְחִ֔י",
+      "tier2": "יַעֲרֹ֤ף כַּמָּטָר֙ לִקְחִ֔י",
+      "tier3": "יַעֲרֹ֤ף כַּמָּטָר֙ לִקְחִ֔י",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1030,
+        2806,
+        1141,
+        2875
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L070",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "אֶל",
+      "tier2": "אֶל",
+      "tier3": "אֶל",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        767,
+        3090,
+        2160,
+        3216
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L071",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "אֱל֗וֹהַּ עָשָׂ֔הוּ וַיְנַבֵּ֖ל צ֥וּר יְשֻׁעָתֽוֹ׃ יַקְנִאֻ֖הֻ",
+      "tier2": "אֱל֗וֹהַּ עָשָׂ֔הוּ וַיְנַבֵּ֖ל צ֥וּר יְשֻׁעָתֽוֹ׃ יַקְנִאֻ֖הֻ",
+      "tier3": "אֱל֗וֹהַּ עָשָׂ֔הוּ וַיְנַבֵּ֖ל צ֥וּר יְשֻׁעָתֽוֹ׃ יַקְנִאֻ֖הֻ",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2363,
+        2263,
+        3125,
+        2394
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L074",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "לְיִצְחָ֔ק תַּגִּ֥יד לְזֹ֖את עִם־נַבְ",
+      "tier2": "לְיִצְחָ֔ק תַּגִּ֥יד לְזֹ֖את עִם־נַבְ",
+      "tier3": "לְיִצְחָ֔ק תַּגִּ֥יד לְזֹ֖את עִם־נַבְ",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2446,
+        2347,
+        3137,
+        2484
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L075",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "וּבְנֶ֔ךָ זֵ֖כֶר יְמ֥וֹת עוֹלָ֑ם בִּ֚ינוּ",
+      "tier2": "וּבְנֶ֔ךָ זֵ֖כֶר יְמ֥וֹת עוֹלָ֑ם בִּ֚ינוּ",
+      "tier3": "וּבְנֶ֔ךָ זֵ֖כֶר יְמ֥וֹת עוֹלָ֑ם בִּ֚ינוּ",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2345,
+        2451,
+        3143,
+        2577
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L076",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "וַיֹּ֣אמְרוּ לָ֔ךְ בְּהִנָּחֵ֥ל עֲלֻיֹ֖ות מָ֑יִם",
+      "tier2": "וַיֹּ֣אמְרוּ לָ֔ךְ בְּהִנָּחֵ֥ל עֲלֻיֹ֖ות מָ֑יִם",
+      "tier3": "וַיֹּ֣אמְרוּ לָ֔ךְ בְּהִנָּחֵ֥ל עֲלֻיֹ֖ות מָ֑יִם",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2327,
+        2553,
+        3128,
+        2660
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L077",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "בְּמֵי יִשְׂרָאֵל כִּי חֵלֶק יְהֹוָה עַמּוֹ",
+      "tier2": "בְּמֵי יִשְׂרָאֵל כִּי חֵלֶק יְהֹוָה עַמּוֹ",
+      "tier3": "בְּמֵי יִשְׂרָאֵל כִּי חֵלֶק יְהֹוָה עַמּוֹ",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2252,
+        2627,
+        3166,
+        2765
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L078",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "וּבְתָחֻו֙ וִלֲל֔וּ יִשְׁמָע֖וּס בְּנֵ֣י נָחֽוֹר",
+      "tier2": "וּבְתָחֻו֙ וִלֲל֔וּ יִשְׁמָע֖וּס בְּנֵ֣י נָחֽוֹר",
+      "tier3": "וּבְתָחֻו֙ וִלֲל֔וּ יִשְׁמָע֖וּס בְּנֵ֣י נָחֽוֹר",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3155,
+        2114,
+        3271,
+        2179
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L080",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "מֹשֶׁ֖ה",
+      "tier2": "מֹשֶׁ֖ה",
+      "tier3": "מֹשֶׁ֖ה",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3289,
+        1158,
+        3414,
+        1290
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L081",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "יִ֔י",
+      "tier2": "יִ֔י",
+      "tier3": "יִ֔י",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3340,
+        2200,
+        3459,
+        2311
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L082",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "רבי\nבעל",
+      "tier2": "רבי\nבעל",
+      "tier3": "רבי\nבעל",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3346,
+        2254,
+        3414,
+        2347
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L083",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "מֵעֵינַ֖י",
+      "tier2": "מֵעֵינַ֖י",
+      "tier3": "מֵעֵינַ֖י",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3337,
+        2290,
+        3450,
+        2439
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L084",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "בִּ֔י",
+      "tier2": "בִּ֔י",
+      "tier3": "בִּ֔י",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3346,
+        2400,
+        3411,
+        2472
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L085",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "וּכְבֹ֖ד",
+      "tier2": "וּכְבֹ֖ד",
+      "tier3": "וּכְבֹ֖ד",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3289,
+        2448,
+        3417,
+        2553
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L086",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "ורף בִּ",
+      "tier2": "ורף בִּ",
+      "tier3": "ורף בִּ",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3232,
+        2565,
+        3391,
+        2762
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L088",
+      "llm_tie_breaks": 0,
+      "llm_winner": "claude",
+      "tier1": "׃׃׃׃",
+      "tier2": "׃׃׃׃",
+      "tier3": "׃׃׃׃",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2303,
+        2723,
+        3391,
+        2854
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L089",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "נֶ֑שֶׁר יָעִ֖יר קִנּ֑וֹ עַל־גּוֹזָלָ֖יו יְרַחֵ֑ף יִפְרֹ֤שׂ כְּנָפָיו֙ יִקָּחֵ֔הוּ",
+      "tier2": "נֶ֑שֶׁר יָעִ֖יר קִנּ֑וֹ עַל־גּוֹזָלָ֖יו יְרַחֵ֑ף יִפְרֹ֤שׂ כְּנָפָיו֙ יִקָּחֵ֔הוּ",
+      "tier3": "נֶ֑שֶׁר יָעִ֖יר קִנּ֑וֹ עַל־גּוֹזָלָ֖יו יְרַחֵ֑ף יִפְרֹ֤שׂ כְּנָפָיו֙ יִקָּחֵ֔הוּ",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2312,
+        2824,
+        3116,
+        2932
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L090",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "אֶל־נֵכָ֑ר יְזַבֵּ֖חוּ עַל־בָּמוֹתַ֣י אֲ֝",
+      "tier2": "אֶל־נֵכָ֑ר יְזַבֵּ֖חוּ עַל־בָּמוֹתַ֣י אֲ֝",
+      "tier3": "אֶל־נֵכָ֑ר יְזַבֵּ֖חוּ עַל־בָּמוֹתַ֣י אֲ֝",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2282,
+        2908,
+        3119,
+        3030
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L091",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "יִ֭שְׁמָן מֵֽחַלְמִ֥ישׁ צ֗וּר חֲמָאת בָּ֝",
+      "tier2": "יִ֭שְׁמָן מֵֽחַלְמִ֥ישׁ צ֗וּר חֲמָאת בָּ֝",
+      "tier3": "יִ֭שְׁמָן מֵֽחַלְמִ֥ישׁ צ֗וּר חֲמָאת בָּ֝",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2324,
+        3001,
+        3119,
+        3120
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L092",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "וְעַתּוּדִ֖ים עֲשָׂרָ֑ה בִּלְבַד֙ מֵחַטַּ֣ה",
+      "tier2": "וְעַתּוּדִ֖ים עֲשָׂרָ֑ה בִּלְבַד֙ מֵחַטַּ֣ה",
+      "tier3": "וְעַתּוּדִ֖ים עֲשָׂרָ֑ה בִּלְבַד֙ מֵחַטַּ֣ה",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2216,
+        3084,
+        3113,
+        3216
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L093",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "שָׁמַ֗נְתָּ עָבִ֙יתָ֙ כָּשִׂ֔יתָ וַיִּטֹּשׁ֙",
+      "tier2": "שָׁמַ֗נְתָּ עָבִ֙יתָ֙ כָּשִׂ֔יתָ וַיִּטֹּשׁ֙",
+      "tier3": "שָׁמַ֗נְתָּ עָבִ֙יתָ֙ כָּשִׂ֔יתָ וַיִּטֹּשׁ֙",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2435,
+        3195,
+        3122,
+        3317
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L094",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "בְּזָר֖וֹעַ סְנוּ֥עֲבֹתֵ֗יכֶם יַעַסְח֖וּ",
+      "tier2": "בְּזָר֖וֹעַ סְנוּ֥עֲבֹתֵ֗יכֶם יַעַסְח֖וּ",
+      "tier3": "בְּזָר֖וֹעַ סְנוּ֥עֲבֹתֵ֗יכֶם יַעַסְח֖וּ",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2300,
+        3287,
+        3134,
+        3413
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L095",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "מִקִּרְבְּכֶ֔ם וְלֹא־שָׁעֲר֖וּם אֲבֹתֵיכֶֽם׃",
+      "tier2": "מִקִּרְבְּכֶ֔ם וְלֹא־שָׁעֲר֖וּם אֲבֹתֵיכֶֽם׃",
+      "tier3": "מִקִּרְבְּכֶ֔ם וְלֹא־שָׁעֲר֖וּם אֲבֹתֵיכֶֽם׃",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3143,
+        2738,
+        3477,
+        3024
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L096",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "בְּמ֥וֹ בָ֝֗\n\nגַּ֝חֲל֗\n\nחֻ֣ם דְּמ֣וּ דָֽקַ֖",
+      "tier2": "בְּמ֥וֹ בָ֝֗\n\nגַּ֝חֲל֗\n\nחֻ֣ם דְּמ֣וּ דָֽקַ֖",
+      "tier3": "בְּמ֥וֹ בָ֝֗\n\nגַּ֝חֲל֗\n\nחֻ֣ם דְּמ֣וּ דָֽקַ֖",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2300,
+        3386,
+        3253,
+        3490
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L097",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "יְתֻ֕וחַ וַיָּבָ֖א מִבְּעָ֑ס בָּנ֖וּ וּבְנֹתָֽיו׃",
+      "tier2": "יְתֻ֕וחַ וַיָּבָ֖א מִבְּעָ֑ס בָּנ֖וּ וּבְנֹתָֽיו׃",
+      "tier3": "יְתֻ֕וחַ וַיָּבָ֖א מִבְּעָ֑ס בָּנ֖וּ וּבְנֹתָֽיו׃",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3065,
+        3538,
+        3155,
+        3631
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L098",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "אֹ֖ת",
+      "tier2": "אֹ֖ת",
+      "tier3": "אֹ֖ת",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2163,
+        3445,
+        3086,
+        3592
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L099",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "דֹּ֑ור וַתִּפֹּ֧שֶׂת חוֹמָ֛ה בַּמַּ֖ס לֹאֱ֑מִינַ֑ב",
+      "tier2": "דֹּ֑ור וַתִּפֹּ֧שֶׂת חוֹמָ֛ה בַּמַּ֖ס לֹאֱ֑מִינַ֑ב",
+      "tier3": "דֹּ֑ור וַתִּפֹּ֧שֶׂת חוֹמָ֛ה בַּמַּ֖ס לֹאֱ֑מִינַ֑ב",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2378,
+        3538,
+        3149,
+        3666
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L100",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "וַאֲנִ֥י אַקְנִיאֵ֖ם בְּלֹא־עָ֑ם בְּג֥וֹי",
+      "tier2": "וַאֲנִ֥י אַקְנִיאֵ֖ם בְּלֹא־עָ֑ם בְּג֥וֹי",
+      "tier3": "וַאֲנִ֥י אַקְנִיאֵ֖ם בְּלֹא־עָ֑ם בְּג֥וֹי",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2449,
+        3652,
+        3134,
+        3771
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L101",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "שְׁאוֹל֙ תַּחְתִּ֔ית וַתֹּ֥אכַל אֶ֖רֶץ",
+      "tier2": "שְׁאוֹל֙ תַּחְתִּ֔ית וַתֹּ֥אכַל אֶ֖רֶץ",
+      "tier3": "שְׁאוֹל֙ תַּחְתִּ֔ית וַתֹּ֥אכַל אֶ֖רֶץ",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3340,
+        1307,
+        3456,
+        1675
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L102",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "בֲּ\nחֲכַ\nבָּ\nלִ\nבִתְךָ\nוּבְכׇל\nקְוִיו",
+      "tier2": "בֲּ\nחֲכַ\nבָּ\nלִ\nבִתְךָ\nוּבְכׇל\nקְוִיו",
+      "tier3": "בֲּ\nחֲכַ\nבָּ\nלִ\nבִתְךָ\nוּבְכׇל\nקְוִיו",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3328,
+        1630,
+        3426,
+        1702
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L103",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "זְכוּת",
+      "tier2": "זְכוּת",
+      "tier3": "זְכוּת",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3316,
+        2000,
+        3420,
+        2093
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L104",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "פֶּ֖סֶק",
+      "tier2": "פֶּ֖סֶק",
+      "tier3": "פֶּ֖סֶק",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3175,
+        2158,
+        3322,
+        2287
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L105",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "כִּי\nבֵּ֣ית",
+      "tier2": "כִּי\nבֵּ֣ית",
+      "tier3": "כִּי\nבֵּ֣ית",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3158,
+        2299,
+        3271,
+        2403
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L106",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "מִ֖י",
+      "tier2": "מִ֖י",
+      "tier3": "מִ֖י",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3340,
+        1678,
+        3429,
+        1752
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L107",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "בְּמָ֥א",
+      "tier2": "בְּמָ֥א",
+      "tier3": "בְּמָ֥א",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3340,
+        1923,
+        3441,
+        2006
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L108",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "אֶל\nכִּי",
+      "tier2": "אֶל\nכִּי",
+      "tier3": "אֶל\nכִּי",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3373,
+        1952,
+        3414,
+        2018
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L109",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "אֶת־כָּל־",
+      "tier2": "אֶת־כָּל־",
+      "tier3": "אֶת־כָּל־",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3346,
+        3084,
+        3411,
+        3195
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L111",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "בְּעֵ֥ז",
+      "tier2": "בְּעֵ֥ז",
+      "tier3": "בְּעֵ֥ז",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3280,
+        3260,
+        3364,
+        3410
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L112",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "כֹ֔ל\nוּמִן֙",
+      "tier2": "כֹ֔ל\nוּמִן֙",
+      "tier3": "כֹ֔ל\nוּמִן֙",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3313,
+        2738,
+        3435,
+        3084
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L113",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "לִ֖י\nבְּגַ֥ב\nלִ֖י\nסִחֹ֑ן\nלִ֖י\nבָּ֠",
+      "tier2": "לִ֖י\nבְּגַ֥ב\nלִ֖י\nסִחֹ֑ן\nלִ֖י\nבָּ֠",
+      "tier3": "לִ֖י\nבְּגַ֥ב\nלִ֖י\nסִחֹ֑ן\nלִ֖י\nבָּ֠",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3349,
+        3072,
+        3435,
+        3189
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L114",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "מַדּ֖וּעַ",
+      "tier2": "מַדּ֖וּעַ",
+      "tier3": "מַדּ֖וּעַ",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3334,
+        3338,
+        3435,
+        3717
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L115",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "אֵ֔ת\nחֹ֖ק\nוְ\nלֽוֹ\nשָׁ֥ם\nוְ\nלֽוֹ",
+      "tier2": "אֵ֔ת\nחֹ֖ק\nוְ\nלֽוֹ\nשָׁ֥ם\nוְ\nלֽוֹ",
+      "tier3": "אֵ֔ת\nחֹ֖ק\nוְ\nלֽוֹ\nשָׁ֥ם\nוְ\nלֽוֹ",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3337,
+        3663,
+        3414,
+        3750
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L116",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "וַיֵּ֣רֶד׃",
+      "tier2": "וַיֵּ֣רֶד׃",
+      "tier3": "וַיֵּ֣רֶד׃",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        3280,
+        3723,
+        3417,
+        3825
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L117",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "אֹתָ֑ךְ\nמְצָ֣רְחֵ֔ךְ",
+      "tier2": "אֹתָ֑ךְ\nמְצָ֣רְחֵ֔ךְ",
+      "tier3": "אֹתָ֑ךְ\nמְצָ֣רְחֵ֔ךְ",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        705,
+        3849,
+        3417,
+        3962
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L118",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "ארץ׃ יד קוממיון ותמצאחן ותכבחת שאול הכוהן אבל רבנו ואשתכי דברה חשך סס ותחרבת סס עשרך כי קול בני ויקבצוטרני מרובם יסעיר תמעדי ומבוסי גוי שאי סביב",
+      "tier2": "ארץ׃ יד קוממיון ותמצאחן ותכבחת שאול הכוהן אבל רבנו ואשתכי דברה חשך סס ותחרבת סס עשרך כי קול בני ויקבצוטרני מרובם יסעיר תמעדי ומבוסי גוי שאי סביב",
+      "tier3": "ארץ׃ יד קוממיון ותמצאחן ותכבחת שאול הכוהן אבל רבנו ואשתכי דברה חשך סס ותחרבת סס עשרך כי קול בני ויקבצוטרני מרובם יסעיר תמעדי ומבוסי גוי שאי סביב",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        917,
+        3935,
+        3420,
+        4022
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L119",
+      "llm_tie_breaks": 1,
+      "llm_winner": "claude",
+      "tier1": "בּוֹ לֹא בִּ֯הְ֯ת֯הַ֯ב֯ט֯ ובגלל אַדְּרַבָּה רָטוֹם פְּטָרֶק בְּעַד דְּ֯ן֯ וַתָּגַב קְרָדּוּ עֲבִיטָם רְגָזַה ׃6 וַיֹּאמְר֯וּ ט רב וְקָיְמַטוּן דְקַלְךָ בְּהוּ֯ל חוּרָשֶׁר כֻּלְבֵּי אֲמָת תַּכְמִיד תַּמְלִיד בְּ֯ב֯טִם חַבְבוּ ׃ 0 ׃ וְעַ֯ל",
+      "tier2": "בּוֹ לֹא בִּ֯הְ֯ת֯הַ֯ב֯ט֯ ובגלל אַדְּרַבָּה רָטוֹם פְּטָרֶק בְּעַד דְּ֯ן֯ וַתָּגַב קְרָדּוּ עֲבִיטָם רְגָזַה ׃6 וַיֹּאמְר֯וּ ט רב וְקָיְמַטוּן דְקַלְךָ בְּהוּ֯ל חוּרָשֶׁר כֻּלְבֵּי אֲמָת תַּכְמִיד תַּמְלִיד בְּ֯ב֯טִם חַבְבוּ ׃ 0 ׃ וְעַ֯ל",
+      "tier3": "בּוֹ לֹא בִּ֯הְ֯ת֯הַ֯ב֯ט֯ ובגלל אַדְּרַבָּה רָטוֹם פְּטָרֶק בְּעַד דְּ֯ן֯ וַתָּגַב קְרָדּוּ עֲבִיטָם רְגָזַה ׃6 וַיֹּאמְר֯וּ ט רב וְקָיְמַטוּן דְקַלְךָ בְּהוּ֯ל חוּרָשֶׁר כֻּלְבֵּי אֲמָת תַּכְמִיד תַּמְלִיד בְּ֯ב֯טִם חַבְבוּ ׃ 0 ׃ וְעַ֯ל",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        994,
+        4735,
+        1568,
+        4852
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L120",
+      "llm_tie_breaks": 0,
+      "llm_winner": "claude",
+      "tier1": "",
+      "tier2": "",
+      "tier3": "",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1703,
+        4730,
+        2004,
+        4852
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L121",
+      "llm_tie_breaks": 0,
+      "llm_winner": "claude",
+      "tier1": "There is no Hebrew text in this image. The image shows the word \"Bruce\" displayed upside down in Latin characters.",
+      "tier2": "There is no Hebrew text in this image. The image shows the word \"Bruce\" displayed upside down in Latin characters.",
+      "tier3": "There is no Hebrew text in this image. The image shows the word \"Bruce\" displayed upside down in Latin characters.",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        2823,
+        4721,
+        3373,
+        4852
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L123",
+      "llm_tie_breaks": 0,
+      "llm_winner": "claude",
+      "tier1": "",
+      "tier2": "",
+      "tier3": "",
+      "tier4_records": []
+    },
+    {
+      "bbox": [
+        1449,
+        5082,
+        2963,
+        5225
+      ],
+      "line_id": "leningrad_devarim_F118B_fixture_L124",
+      "llm_tie_breaks": 0,
+      "llm_winner": "claude",
+      "tier1": "",
+      "tier2": "",
+      "tier3": "",
+      "tier4_records": []
+    }
+  ],
+  "manifest_hash": null,
+  "run_meta_ref": "run_meta.json",
+  "schema_version": "0.1.0"
+}

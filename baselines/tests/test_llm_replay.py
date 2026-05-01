@@ -234,3 +234,97 @@ def test_canonical_prompt_hash_changes_on_request_change():
     a = _fake_request(text="prompt-A")
     b = _fake_request(text="prompt-B")
     assert canonical_prompt_hash(a) != canonical_prompt_hash(b)
+
+
+# ----------------------------------------------------------------------
+# T7 (Phase 03.1-04.6 hot-fix): retry-on-retryable-error in replay writer
+# ----------------------------------------------------------------------
+
+
+class _FakeRetryable(Exception):
+    """Stand-in retryable error injected into baselines._llm_clients._retryable_errors
+    so the retry path exercises without requiring anthropic / google-genai
+    SDKs to be installed in the unit-test environment."""
+
+
+def test_llm_call_with_replay_retries_on_retryable_error(tmp_path, monkeypatch):
+    """Phase 03.1-04.6 hot-fix: a single transient retryable error must
+    be retried; on success, exactly ONE record lands in the replay log.
+
+    Without this fix, a single 503 on Gemini fails the whole folio
+    (reproduced 2026-04-30 with 67 null-token rows in partial F118B run).
+    """
+    # Patch _retryable_errors() to return our injected exception class so
+    # the retry path triggers without needing real SDK exception types.
+    import baselines._llm_clients as cl
+
+    monkeypatch.setattr(cl, "_retryable_errors", lambda: (_FakeRetryable,))
+    # Stub time.sleep so the backoff doesn't actually wait. _llm_replay does
+    # `import time as _time` lazily inside the function body; patching the
+    # global time.sleep covers that import.
+    import time as _t
+
+    monkeypatch.setattr(_t, "sleep", lambda *_a, **_k: None)
+
+    log = tmp_path / "llm_calls.jsonl"
+    request = _fake_request()
+
+    call_count = {"n": 0}
+
+    def flaky_client(**req):
+        call_count["n"] += 1
+        if call_count["n"] == 1:
+            raise _FakeRetryable("first attempt: simulated 503")
+        return _fake_response("recovered-after-retry")
+
+    meta = llm_call_with_replay(
+        client_fn=flaky_client,
+        request=request,
+        replay_log=log,
+        replay=False,
+        extract_response_meta=_extract_meta,
+    )
+    # client called exactly twice: one failure + one success
+    assert call_count["n"] == 2, f"expected 2 client invocations, got {call_count['n']}"
+    assert meta["response"] == "recovered-after-retry"
+    # Exactly ONE record persisted: the one for the successful attempt.
+    records = [json.loads(ln) for ln in log.read_text(encoding="utf-8").splitlines() if ln.strip()]
+    assert len(records) == 1, "retry path must persist exactly one record on eventual success"
+    assert records[0]["response"] == "recovered-after-retry"
+
+
+def test_llm_call_with_replay_raises_after_max_attempts(tmp_path, monkeypatch):
+    """Phase 03.1-04.6 hot-fix: after ``_max_attempts`` (3) consecutive
+    retryable errors, the exception propagates and NO record is written.
+
+    Without this guarantee, a permanently-broken provider would either
+    block forever or persist a half-formed record.
+    """
+    import baselines._llm_clients as cl
+
+    monkeypatch.setattr(cl, "_retryable_errors", lambda: (_FakeRetryable,))
+    import time as _t
+
+    monkeypatch.setattr(_t, "sleep", lambda *_a, **_k: None)
+
+    log = tmp_path / "llm_calls.jsonl"
+    request = _fake_request()
+
+    call_count = {"n": 0}
+
+    def always_fails(**req):
+        call_count["n"] += 1
+        raise _FakeRetryable(f"attempt {call_count['n']}")
+
+    with pytest.raises(_FakeRetryable):
+        llm_call_with_replay(
+            client_fn=always_fails,
+            request=request,
+            replay_log=log,
+            replay=False,
+            extract_response_meta=_extract_meta,
+        )
+    # 3 attempts total per llm_call_with_replay's _max_attempts.
+    assert call_count["n"] == 3, f"expected 3 attempts before raise, got {call_count['n']}"
+    # NO record written: the loop only persists on success.
+    assert not log.exists() or log.read_text(encoding="utf-8").strip() == ""

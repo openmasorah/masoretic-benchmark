@@ -30,17 +30,30 @@ def _ctor(tmp_path, manifest, cls):
     return bl
 
 
-def _seed_manifest_for_run(tmp_path, monkeypatch, baseline_id: str = "biblia_kraken"):
+def _seed_manifest_for_run(
+    tmp_path,
+    monkeypatch,
+    baseline_id: str = "biblia_kraken",
+    *,
+    expected_count: int = 0,
+):
     """A-01: BaselineBase.run reads PHASE_0_MANIFEST_PATH per folio.
     Seed an empty-but-valid manifest in tmp_path and point the env there.
-    Returns the path to the seeded manifest."""
+
+    Phase 03.1-05 Rule 1 fix in BaselineBase.run reads the on-disk counter
+    as the authoritative validate target; tests that exercise the D-15
+    off-by-one path now seed the disk counter at the desired pre-run value
+    (which the per-folio bumps will then advance).
+
+    Returns the path to the seeded manifest.
+    """
     p = tmp_path / "phase_0_manifest.json"
     p.write_text(
         json.dumps(
             {
                 "version": "v0.2.0",
                 "frozen_at": "2026-04-25T16:30:44Z",
-                "expected_reports_per_baseline": {baseline_id: 0},
+                "expected_reports_per_baseline": {baseline_id: expected_count},
                 "manifest_changelog": [],
             },
             ensure_ascii=False,
@@ -155,12 +168,20 @@ class _UnderCounterBaseline(BaselineBase):
 
 
 def test_d15_off_by_one_raises_after_per_folio_promote(tmp_path, monkeypatch):
-    """A-01 amendment: per-folio promote means D-15 check happens at the
-    end-of-run, AFTER all folios already promoted. The folio that did
-    promote is in results/<bl>/; the validate raises BaselineError because
-    1 != 2. Off-by-one D-15 is now detected post-promote rather than
-    pre-promote (the per-folio invariant subsumed the pre-promote check).
-    The CI-side `test_results_dir_count_equals_manifest_expected_reports`
+    """A-01 amendment + Phase 03.1-05 Rule 1 fix: per-folio promote means
+    D-15 check happens at end-of-run, AFTER all folios already promoted.
+    The on-disk manifest counter is the authoritative validate target.
+
+    Off-by-one scenario: seed disk with biblia_kraken=1 (one prediction
+    already promoted from a prior run); 1 new folio in scope; per-folio
+    promote bumps disk to 2. But ``_count_results`` only sees the 1 file
+    actually written this run (clean tmp_path means
+    ``results/biblia_kraken/`` had no files at run start; the
+    pre-existing-promoted prediction is purely a manifest fiction here).
+    wrote=1 vs disk-declares=2 → BaselineError.
+
+    The folio that did promote this run is in ``results/<bl>/``. The
+    CI-side ``test_results_dir_count_equals_manifest_expected_reports``
     is the cross-run gate that flags the persistent inconsistency.
     """
     from baselines._errors import BaselineError
@@ -168,9 +189,11 @@ def test_d15_off_by_one_raises_after_per_folio_promote(tmp_path, monkeypatch):
     fid = "leningrad_devarim_F118B_fixture"
     manifest = FakeManifest(
         folios=[FakeFolio(id=fid)],
-        expected_reports_per_baseline={"biblia_kraken": 2},  # declares 2, only 1 folio in scope
+        expected_reports_per_baseline={"biblia_kraken": 1},
     )
-    _seed_manifest_for_run(tmp_path, monkeypatch, "biblia_kraken")
+    # Disk pre-run: 1 already promoted; this run adds 1 → disk becomes 2.
+    # But results/biblia_kraken/ in tmp_path is empty pre-run, so written=1.
+    _seed_manifest_for_run(tmp_path, monkeypatch, "biblia_kraken", expected_count=1)
     bl = _ctor(tmp_path, manifest, _UnderCounterBaseline)
 
     with pytest.raises(BaselineError, match=r"D-15.*mismatch"):
@@ -184,20 +207,32 @@ def test_d15_off_by_one_raises_after_per_folio_promote(tmp_path, monkeypatch):
 
 
 def test_d15_unknown_baseline_raises_baselineerror(tmp_path, monkeypatch):
-    """Manifest declares mapping for some baselines but not this one ->
-    KeyError -> wrapped as BaselineError with D-15 context."""
-    from baselines._errors import BaselineError
+    """Phase 03.1-05 Rule 1 fix: under A-01 amendment, per-folio promote
+    auto-creates the baseline_id key on disk via ``build_bump`` (which
+    uses ``setdefault`` on ``expected_reports_per_baseline`` then
+    increments). A pre-A-01 "manifest doesn't declare this baseline"
+    scenario can therefore no longer occur once promote_folio runs.
 
-    fid = "leningrad_devarim_F118B_fixture"
+    The remaining production-realistic path: ``validate_expected_total_reports``
+    receives a manifest object whose ``expected_reports_for(...)`` raises
+    KeyError. This test exercises that helper directly with a FakeManifest
+    that declares only ``other_baseline`` — the helper wraps the KeyError
+    as a BaselineError carrying the D-15 context.
+    """
+    from baselines._errors import BaselineError
+    from baselines._run_meta import validate_expected_total_reports
+
     manifest = FakeManifest(
-        folios=[FakeFolio(id=fid)],
+        folios=[FakeFolio(id="leningrad_devarim_F118B_fixture")],
         expected_reports_per_baseline={"other_baseline": 1},
     )
-    _seed_manifest_for_run(tmp_path, monkeypatch, "biblia_kraken")
-    bl = _ctor(tmp_path, manifest, _GoodBaseline)
 
     with pytest.raises(BaselineError, match=r"D-15.*does not declare expected reports"):
-        bl.run()
+        validate_expected_total_reports(
+            manifest=manifest,
+            baseline_id="biblia_kraken",
+            written_count=1,
+        )
 
 
 # -- SandboxRun unit tests ---------------------------------------------------

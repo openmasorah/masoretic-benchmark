@@ -85,14 +85,20 @@ def gemini_client():
     Phase 1 B-4). KeyError on missing. Env-var check comes BEFORE the SDK
     import (see claude_client docstring).
 
-    Phase 03.1 A-02 (Pitfall 4): SDK-side retries disabled. The google-genai
-    1.x http_options retry knob (``retry_count``) is set to 0 so any
-    backoff/retry happens explicitly inside ``call_with_retry_and_billing``.
+    Phase 03.1 A-02 (Pitfall 4): SDK-side retries disabled. Phase 03.1-05
+    Rule 1 fix: google-genai 1.73 renamed the retry knob — ``retry_count``
+    on ``HttpOptions`` was removed in favor of ``retry_options``
+    (``HttpRetryOptions(attempts=1)`` means a single attempt with no
+    retries). Any backoff/retry happens explicitly inside
+    ``call_with_retry_and_billing``.
     """
     key = os.environ["GOOGLE_API_KEY"]  # B-4: KeyError on missing
     from google import genai  # lazy: keeps mocked unit tests SDK-free
 
-    return genai.Client(api_key=key, http_options={"retry_count": 0})
+    return genai.Client(
+        api_key=key,
+        http_options={"retry_options": {"attempts": 1}},
+    )
 
 
 def call_with_retry_and_billing(

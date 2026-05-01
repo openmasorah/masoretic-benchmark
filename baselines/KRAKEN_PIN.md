@@ -46,3 +46,9 @@ below implies a new derived hash.
   when the cache file exists AND its sha256 matches the pin row. Drift
   (cache present but sha256 mismatch) exits non-zero with a stderr
   explanation; never silently re-downloads.
+
+## Notes (Phase 03.1)
+
+| Date | Note |
+|---|---|
+| 2026-04-30 | BiblIA segmentation model `BiblIAlong02_se3_2_tl.mlmodel` lives at github.com/dstoekl/sofer_mahir without Zenodo DOI. Phase 03.1 v0.1 ships with kraken's default built-in segmenter (`kraken.blla.segment`) — NOT the BiblIA medieval-tuned segmenter; medieval-tuned segmenter pinning deferred to v0.2 cleanup. RESEARCH.md Pitfall 2 / Open Question 1 resolved as option (b) "off-the-shelf ceiling". KRAKEN_MODEL_HASH `8514a0c7cc2b5b45` covers ONLY the recognition model. |

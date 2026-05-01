@@ -160,6 +160,28 @@ class LLMVisionBaseline(BaselineBase):
         folio_used_usd = 0.0
         folio_image = Image.open(image_path).convert("RGB")
         for ln in kraken_lines:
+            # Skip degenerate-bbox lines (Phase 03.1-05 Rule 1 fix).
+            # Kraken's polygonizer occasionally yields (0, 0, 0, 0) on
+            # poorly-segmented lines (TopologyException paths in blla.segment
+            # warnings); cropping a 0x0 region and saving as JPEG raises
+            # PIL.UnidentifiedImageError "cannot write empty image". Such
+            # lines carry no usable text; emitting them as empty
+            # transcriptions would also distort the LLM-vision per-line cost
+            # accounting. Surface a debug-friendly warning and skip.
+            x0, y0, x1, y1 = ln.bbox
+            if x1 <= x0 or y1 <= y0:
+                # Defense-in-depth: log via the standard logger (the
+                # existing module already imports logging via lazy means).
+                import logging as _logging
+
+                _logging.getLogger(__name__).warning(
+                    "BL-01: skipping line %s with degenerate bbox %s "
+                    "(Kraken polygonizer failure on this line)",
+                    ln.line_id,
+                    ln.bbox,
+                )
+                continue
+
             # Crop the line region; LLMs see ONLY this cropped image.
             crop_path = replay_log.parent / f"{ln.line_id}.jpg"
             crop_path.parent.mkdir(parents=True, exist_ok=True)
@@ -223,10 +245,16 @@ class LLMVisionBaseline(BaselineBase):
         evaluated AFTER the pair completes, so retry budget naturally
         counts. A purely pre-call estimate would gate on ``max_output_tokens``;
         either is allowed by D-08.).
+
+        Phase 03.1-05 Rule 1 fix: tolerate ``None`` token counts. Gemini SDK
+        1.73 occasionally returns ``usage_metadata`` with
+        ``candidates_token_count=None`` (blocked responses, partial
+        finishes); coerce None to 0 so the estimate stays a finite number
+        rather than blowing up with TypeError.
         """
         tc = meta.get("token_counts") or {}
-        in_t = float(tc.get("input", 0))
-        out_t = float(tc.get("output", 0))
+        in_t = float(tc.get("input") or 0)
+        out_t = float(tc.get("output") or 0)
         rates = RATE_TABLE[source]
         return (
             in_t * rates["input_per_mtok_usd"] + out_t * rates["output_per_mtok_usd"]
@@ -237,10 +265,15 @@ class LLMVisionBaseline(BaselineBase):
         """Wrap Anthropic vision call through the D-10 replay log."""
         with open(crop_path, "rb") as f:
             b64 = base64.b64encode(f.read()).decode("ascii")
+        # Phase 03.1-05 Rule 1 fix: Anthropic deprecated `temperature` for
+        # claude-opus-4-7 (API returns 400 invalid_request_error
+        # "`temperature` is deprecated for this model."). Omit it from the
+        # request dict for Anthropic so replay determinism (prompt_hash)
+        # tracks the actually-issued request shape. Gemini still supports
+        # temperature; that path is unchanged.
         request = {
             "model": ANTHROPIC_MODEL_ID,
             "max_tokens": INFERENCE_CFG["max_output_tokens"],
-            "temperature": INFERENCE_CFG["temperature"],
             "image_bytes_ref": f"sha256:{crop_sha}",  # D-10: NEVER inline raw bytes
             "prompt": PROMPT_TEXT,
         }
@@ -249,7 +282,6 @@ class LLMVisionBaseline(BaselineBase):
             return claude_client().messages.create(
                 model=req["model"],
                 max_tokens=req["max_tokens"],
-                temperature=req["temperature"],
                 messages=[
                     {
                         "role": "user",
@@ -269,15 +301,27 @@ class LLMVisionBaseline(BaselineBase):
             )
 
         def _extract(raw):
+            in_t = raw.usage.input_tokens
+            out_t = raw.usage.output_tokens
+            # Phase 03.1-04.6 hot-fix: emit actual_spend_usd alongside
+            # token_counts so the D-10 replay record carries it (extension
+            # locked by test_replay_spend_record.py). Math mirrors
+            # _estimate_usd semantics: (tokens / 1M) * rate.
+            rates = RATE_TABLE["claude"]
+            actual_spend_usd = (
+                float(in_t or 0) * rates["input_per_mtok_usd"]
+                + float(out_t or 0) * rates["output_per_mtok_usd"]
+            ) / 1_000_000
             return {
                 "response": raw.content[0].text if raw.content else "",
                 "response_id": getattr(raw, "id", None),
                 "model_version_returned": getattr(raw, "model", ANTHROPIC_MODEL_ID),
                 "token_counts": {
-                    "input": raw.usage.input_tokens,
-                    "output": raw.usage.output_tokens,
+                    "input": in_t,
+                    "output": out_t,
                 },
                 "finish_reason": getattr(raw, "stop_reason", None),
+                "actual_spend_usd": actual_spend_usd,
             }
 
         return llm_call_with_replay(
@@ -319,15 +363,28 @@ class LLMVisionBaseline(BaselineBase):
 
         def _extract(raw):
             u = getattr(raw, "usage_metadata", None)
+            in_t = getattr(u, "prompt_token_count", 0) if u else 0
+            out_t = getattr(u, "candidates_token_count", 0) if u else 0
+            # Phase 03.1-04.6 hot-fix: emit actual_spend_usd alongside
+            # token_counts. Math mirrors _estimate_usd semantics; tolerate
+            # None token counts (gemini-2.5-pro returns None on blocked
+            # responses) by coercing to 0 — the same defense
+            # _estimate_usd has.
+            rates = RATE_TABLE["gemini"]
+            actual_spend_usd = (
+                float(in_t or 0) * rates["input_per_mtok_usd"]
+                + float(out_t or 0) * rates["output_per_mtok_usd"]
+            ) / 1_000_000
             return {
                 "response": raw.text or "",
                 "response_id": getattr(raw, "response_id", None),
                 "model_version_returned": getattr(raw, "model_version", GEMINI_MODEL_ID),
                 "token_counts": {
-                    "input": getattr(u, "prompt_token_count", 0) if u else 0,
-                    "output": getattr(u, "candidates_token_count", 0) if u else 0,
+                    "input": in_t,
+                    "output": out_t,
                 },
                 "finish_reason": str(getattr(raw, "finish_reason", None)),
+                "actual_spend_usd": actual_spend_usd,
             }
 
         return llm_call_with_replay(
