@@ -86,12 +86,6 @@ top-level golden-fixture and manifest gates. Key files:
 - `test_reject_private_paths.py`, `test_check_version_cascade.py`,
   `test_release_smoke.py` — repo-level gates (private-path leaks, version
   cascade, package-tree-only smoke).
-- `tests/release/` — release-gate tests (license table, leaderboard schema,
-  IAA report schema, manifest release invariants, README brand compliance,
-  HF roundtrip, audit release red-team, release workflow smoke).
-  <!-- VERIFY: at the time this doc was written, only compiled `__pycache__`
-  artifacts were present in `tests/release/`; the source files are
-  excluded from the public sibling repo via the private-path policy. -->
 - `tests/fixtures/` — shared scorer fixtures: `golden/` (gt.json,
   prediction.json, expected_result.json), `cli_gt.json`,
   `cli_pred.json`, `synthetic_devarim_shema.page.xml`,
@@ -162,7 +156,7 @@ the dry-run synthetic Shema folio, the UXLC fragment cache, and the
 
 | Marker             | Defined in                                  | Default       | Opt-in env var           |
 |--------------------|---------------------------------------------|---------------|--------------------------|
-| `live_oracles`     | `oracles/tests/conftest.py` + `oracles/pyproject.toml`<!-- VERIFY: oracles/pyproject.toml does not currently declare `[tool.pytest.ini_options].markers`; the marker is registered via `pytest_configure` in `oracles/tests/conftest.py` only. --> | skipped       | `RUN_LIVE_ORACLES=1`     |
+| `live_oracles`     | `oracles/tests/conftest.py` (registered via `pytest_configure`) | skipped       | `RUN_LIVE_ORACLES=1`     |
 | `live_baselines`   | `baselines/tests/conftest.py` + `baselines/pyproject.toml` | skipped       | `RUN_LIVE_BASELINES=1`   |
 | `live_kraken`      | `baselines/pyproject.toml` (sub-marker of `live_baselines`) | skipped       | `RUN_LIVE_BASELINES=1` (and a cached `BiblIA_01.mlmodel`) |
 

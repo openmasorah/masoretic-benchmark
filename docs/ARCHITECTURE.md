@@ -214,8 +214,8 @@ scorer's key primitives against independent implementations:
   the `grapheme`-package output must match PyICU's `BreakIterator.createCharacterInstance(Locale("he"))`
   on a Hebrew fixture. PyICU is an optional dev dependency
   (`PyICU>=2.11; platform_system != 'Windows'`) so the test skips when PyICU
-  is unavailable. <!-- VERIFY: PyICU cross-validation is wired into the
-  CI workflow, not only available as an optional local dev dependency -->
+  is unavailable; CI installs `libicu-dev` + `pkg-config` in every test job
+  in `.github/workflows/ci.yml`, so the cross-validation runs on every PR.
 - **Edit distance** (`tests/test_external_crossval.py`): the scorer's
   `cluster_aligned_cer` must agree with a hand-rolled O(n·m) naive
   Levenshtein implementation on identical-cluster-count fixtures, and must
