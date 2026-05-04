@@ -136,13 +136,17 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. A static `leaderboard.jso
 
 ## Citation
 
-A BibTeX entry will be added at paper submission. For now:
+If you use this benchmark or scoring suite, please cite. GitHub renders a "Cite this repository" widget from `CITATION.cff`; the BibTeX form for paper bibliographies is:
 
 ```bibtex
-@misc{lamm2026masoretic,
-  title  = {masoretic-eval: 4-tier CER scorer for medieval Hebrew},
-  author = {Lamm, Ben and Ginsburg, Yosef},
-  year   = {2026},
-  note   = {v0.2.0, https://github.com/openmesorah/masoretic-benchmark}
+@dataset{lamm2026masoretic,
+  title        = {Open Mesorah Masoretic Benchmark: a 4-tier CER evaluation suite for medieval Tiberian Hebrew},
+  author       = {Lamm, Ben and Ginsburg, Yosef and Finkelstein, Ari},
+  year         = {2026},
+  version      = {0.2.0},
+  howpublished = {Hugging Face dataset, \url{https://huggingface.co/datasets/openmesorah/masoretic-benchmark-v0.1}},
+  note         = {Code: \url{https://github.com/openmesorah/masoretic-benchmark}}
 }
 ```
+
+A peer-reviewed paper citation will be added when the JCDL 2027 submission lands.

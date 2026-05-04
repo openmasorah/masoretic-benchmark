@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this benchmark or scoring suite, please cite as follows."
+type: dataset
+title: "Open Mesorah Masoretic Benchmark: a 4-tier CER evaluation suite for medieval Tiberian Hebrew"
+version: "0.2.0"
+date-released: "2026-05-04"
+license: CC-BY-4.0
+authors:
+  - family-names: Lamm
+    given-names: Ben
+  - family-names: Ginsburg
+    given-names: Yosef
+  - family-names: Finkelstein
+    given-names: Ari
+repository-code: "https://github.com/openmesorah/masoretic-benchmark"
+identifiers:
+  - type: url
+    value: "https://huggingface.co/datasets/openmesorah/masoretic-benchmark-v0.1"
+    description: "Hugging Face dataset distribution"
+keywords:
+  - hebrew
+  - tiberian
+  - manuscript
+  - masoretic
+  - leningrad-codex
+  - ocr
+  - htr
+  - benchmark
+  - evaluation
+  - character-error-rate
+  - nikkud
+  - trop
+  - digital-humanities
