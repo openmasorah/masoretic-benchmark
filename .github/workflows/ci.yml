@@ -35,6 +35,9 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install gate dependencies
+        run: pip install "jsonschema>=4.0"
+
       - name: Validate root phase_0_manifest.json
         run: |
           python - <<'PY'
