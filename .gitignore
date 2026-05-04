@@ -28,3 +28,18 @@ baselines/.cache/
 # at any time. Keeps the repo lean while preserving deterministic provenance
 # (each gt_adapter golden's _provenance block records the source).
 baselines/tests/fixtures/_uxlc_cache/
+
+# Local agent / editor / OS metadata — never commit
+.claude/
+.mcp.json
+codebase-review/
+.DS_Store
+.idea/
+.vscode/
+*.local
+
+# Secrets — never commit (no real ones today; this keeps it that way)
+.env
+.env.*
+*.pem
+*.key
