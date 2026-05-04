@@ -36,7 +36,7 @@ Optional extras instead of `[all]`:
   `tenacity`); listed for symmetry.
 - `[dev]` — `pytest`, `pytest-mock`.
 
-`masoretic-eval >= 0.1.0,<0.2` is a hard dependency. The scorer must be
+`masoretic-eval >= 0.2.0,<0.3` is a hard dependency. The scorer must be
 installed (editable or wheel) before installing this package.
 
 ## Modules
@@ -53,8 +53,7 @@ installed (editable or wheel) before installing this package.
 DICTA calls are recorded to a daily-rotated JSONL audit log at
 `oracles/audit/dicta_<YYYY-MM-DD>.jsonl`. The directory is gitignored — audit
 data is provenance only and is referenced from leaderboard rows by back-pointer
-(`audit/dicta_<date>.jsonl#L<N>`), never redistributed publicly. See D-15
-through D-18 in `.planning/phases/02-oracles/02-CONTEXT.md`.
+(`audit/dicta_<date>.jsonl#L<N>`), never redistributed publicly.
 
 ## CI
 
@@ -74,8 +73,8 @@ When `oracle-live` fails, a human investigates. Drift means one of:
    golden fixture cache. Fix: re-pin properly per D-09 (update `NAKDIMON_PIN.md`,
    then regenerate the cache).
 2. **DICTA endpoint rotated** (Pitfall 2) and the response payload shifted. Fix:
-   re-verify endpoint URL, regenerate cache, update
-   `tactical_dicta_nakdan_access.md`.
+   re-verify endpoint URL and regenerate the cache; document the new endpoint
+   in the PR description.
 
 CI **never** auto-updates the cache. Cache regeneration is always a deliberate
 human commit.

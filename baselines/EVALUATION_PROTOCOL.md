@@ -9,7 +9,7 @@ Pipeline benchmark. Every change writes a new row with date + reason. Newest fir
 |---|---|---|---|---|
 | 2026-04-30 | **Macro-averaged whole-folio CER (tiers 1–3) / F1 (tier 4)** | 1, 2, 3, 4 | Per frozen folio, then macro-averaged across folios | ICDAR-HTR (Sánchez et al., READ project, HIMANIS) |
 
-This row implements REQUIREMENTS.md **BL-07** verbatim:
+This row implements the pre-registered **BL-07** rule verbatim:
 
 > **BL-07**: Macro-averaged CER (tiers 1–3) / F1 (tier 4) is reported per frozen
 > folio for every baseline; totals match `expected_total_reports` in the manifest.
@@ -75,7 +75,7 @@ agreement (IAA) is established and Yosef has bandwidth for tier 2/3/4 review.
 - **Segmentation-merge variants** — y-clustering merge with τ ∈ {0.7×, 1.0×, 1.5×}
   median(bbox_height) as a sensitivity analysis. Plan 03.1-04.7 carries the
   prepared spec; deferred until per-line CER is itself promoted to headline.
-- **Tier 4 (mesora marks) F1** — REQUIREMENTS.md BL-07 declares F1 for tier 4
+- **Tier 4 (mesora marks) F1** — Rule BL-07 declares F1 for tier 4
   as the headline metric; deferred until GT files include `tier4_records` for
   any folio. Operator's hand transcription is tier-1-only; tier 4 awaits Yosef's
   deeper review via the eScriptorium pipeline (Phase 1 GT-INFRA).
@@ -95,8 +95,9 @@ sophistication. Defenses against ad-hoc-methodology critiques:
   Methodology attacks land on ad-hoc choices, not pre-registered convention.
 - **ICDAR-HTR convention.** Whole-folio CER is the standard for historical-
   document HTR evaluation (Sánchez/READ/HIMANIS). Cite directly in paper.
-- **Spec compliance.** REQUIREMENTS.md BL-07 declares "per folio" not
-  "per line." We implement the spec, not invent methodology.
+- **Spec compliance.** Rule BL-07 (above) declares "per folio" not
+  "per line." We implement the pre-registered convention, not invent
+  methodology.
 - **Sensitivity reporting.** When per-line CER is added in v0.2, the
   pre-registered τ-derivation rule + sensitivity sweep at τ × {0.7, 1.0, 1.5}
   closes the "tunable-parameter" attack surface.
