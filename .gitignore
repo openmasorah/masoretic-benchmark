@@ -37,6 +37,9 @@ codebase-review/
 .idea/
 .vscode/
 *.local
+# Agent orientation file — kept local; not part of the public artifact.
+CLAUDE.md
+.planning/
 
 # Secrets — never commit (no real ones today; this keeps it that way)
 .env
