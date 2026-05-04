@@ -1,37 +1,44 @@
-# masoretic-benchmark
+<!-- generated-by: gsd-doc-writer -->
+# masoretic-eval
 
 ![CI](https://github.com/openmesorah/masoretic-benchmark/actions/workflows/ci.yml/badge.svg)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](.python-version)
 
-4-tier CER scorer + public benchmark dataset for medieval Hebrew manuscripts.
+A 4-tier Character Error Rate (CER) scorer and public benchmark dataset for medieval Hebrew manuscript transcription.
 
-## Components
+`masoretic-eval` evaluates Hebrew OCR/HTR predictions against ground truth at four tiers — consonants, nikkud, full text, and metamark records — producing reproducible, pre-registered scores for the IAA Leningrad Codex Devarim folio set.
 
-- **`masoretic_eval/`** — Scorer Python package. Apache 2.0.
-- **`baselines/`** — Four independent baseline scripts (BL-01 LLM-vision, BL-02 BiblIA Kraken, BL-03 Kraken→Nakdimon, BL-04 Kraken→DictaBERT char-menaked).
-- **`oracles/`** — Hebrew diacritization oracle modules consumed by the scorer's pass-through tier-2 fields.
-- **`schemas/`** — JSON Schemas + changelogs for the prediction format and the frozen `phase_0_manifest.json` contract.
-- **`results/`** — Frozen per-baseline predictions and `results/scores/` headline CER scores for the 4 IAA folios.
-- **`baselines/tests/fixtures/iaa_folio_*.gt_adapter_golden.json`** — Hand-transcribed tier-1 GT for the IAA folios; CC-BY-4.0 text; IIIF/archive.org image references only.
+## Installation
 
-A static `leaderboard.json` + PR-based submission flow lands in a follow-up release.
+```bash
+pip install -e ".[dev]"
+```
 
-## Install
+Requires Python 3.11. The repo pins `3.11` via `.python-version`; Python >= 3.12 cannot install the `nakdimon` baseline because its transitive `tensorflow==2.15.0` dependency has no wheel for 3.12 on macOS arm64. Use `pyenv` (or equivalent) to honor the pinned version. CI runs Python 3.11.
 
-    pip install -e ".[dev]"
+## Quick start
 
-### Python version
+1. Install with dev extras (above).
+2. Score a prediction against ground truth using the `masoretic-eval` CLI:
 
-This project pins to Python 3.11 (`.python-version`). Local dev on Python >= 3.12 will fail to import `nakdimon` because its transitive `tensorflow==2.15.0` dependency has no wheel for 3.12 on macOS arm64. CI runs 3.11. Use pyenv or your equivalent to honor the `.python-version` file.
+   ```bash
+   masoretic-eval score \
+     --gt path/to/gt.json \
+     --pred path/to/prediction.json \
+     --folio-id leningrad_devarim_F118B \
+     --out result.json
+   ```
+
+3. Inspect `result.json` for tier 1–4 CER scores and the composite headline score.
+
+A `phase_0_manifest.json` must be present in the working directory or supplied with `--manifest`.
 
 ## Usage
 
-    masoretic-eval score \
-      --gt path/to/gt.json \
-      --pred path/to/prediction.json \
-      --folio-id leningrad_devarim_f237b \
-      --out result.json
+### CLI input shape
 
-Input JSON shape (both `gt` and `pred`):
+Both `--gt` and `--pred` JSON files conform to `masoretic_eval/schemas/scorer_input.schema.json`:
 
 ```json
 {
@@ -40,64 +47,102 @@ Input JSON shape (both `gt` and `pred`):
 }
 ```
 
+### Optional oracle pass-through fields
+
+`nakdimon_disagreement_rate` and `dicta_disagreement_rate` are pass-through inputs computed externally by the caller; the scorer emits them unchanged in its output:
+
+```bash
+masoretic-eval score \
+  --gt gt.json --pred pred.json --folio-id leningrad_devarim_F118B \
+  --nakdimon-disagreement-rate 0.041 \
+  --dicta-disagreement-rate 0.038 \
+  --out result.json
+```
+
+### Repository layout
+
+| Path | Purpose |
+|---|---|
+| `masoretic_eval/` | Scorer Python package (Apache-2.0). |
+| `baselines/` | Four independent baselines: BL-01 LLM-vision, BL-02 BiblIA Kraken, BL-03 Kraken→Nakdimon, BL-04 Kraken→DictaBERT char-menaked. |
+| `oracles/` | Hebrew diacritization oracle modules consumed externally to populate the scorer's pass-through tier-2 fields. |
+| `schemas/` | JSON Schemas + changelogs for `baseline_prediction.schema.json`, `phase_0_manifest.schema.json`, and `run_meta.schema.json`. |
+| `results/` | Frozen per-baseline predictions plus `results/scores/` headline CER reports for the IAA folios. |
+| `scripts/` | Release and gate scripts (manifest immutability, version-cascade, private-path rejection). |
+| `tests/` | Scorer test suite. |
+| `docs/` | Architecture, getting-started, development, testing, and configuration guides. |
+| `phase_0_manifest.json` | Frozen, append-only fixture manifest hashed into every score report. |
+
+### IAA benchmark fixtures
+
+Hand-transcribed tier-1 ground truth for the 4-folio IAA set (Leningrad Devarim F118B, F119A, F119B, F120A) lives at `baselines/tests/fixtures/iaa_folio_leningrad_devarim_*_fixture.gt_adapter_golden.json`. Text is CC-BY-4.0; only IIIF/archive.org references are stored — no manuscript images are redistributed. Per-baseline headline scores for F118B are in `results/scores/leningrad_devarim_F118B_fixture.json`.
+
 ## Methodology
 
 ### Normalization
-- All inputs NFD-normalized at scoring time. GT ships raw UXLC LC-order byte-for-byte.
-- CGJ (U+034F) stripped during scoring.
+
+- Inputs are NFD-normalized at scoring time. Ground truth ships as raw UXLC LC-order, byte-for-byte.
+- CGJ (U+034F) is stripped during scoring.
 
 ### Alignment and edit counting
+
 - **Alignment unit:** UAX #29 grapheme clusters.
 - **Edit unit:** codepoints within aligned cluster pairs.
-- Unaligned (inserted / deleted) clusters contribute edits equal to their codepoint count.
-- Cross-validated against PyICU in CI and against a hand-rolled naive Levenshtein on shared fixtures (anti-self-grading).
+- Unaligned (inserted/deleted) clusters contribute edits equal to their codepoint count.
+- Cross-validated in CI against PyICU and against a hand-rolled naive Levenshtein on shared fixtures (anti-self-grading guard).
 
 ### Tiered denominator policy
+
 - **Tier 1:** consonant codepoints only (te'amim + nikkud stripped).
 - **Tier 2:** consonant + nikkud codepoints (te'amim stripped).
 - **Tier 3:** full codepoint count.
-- **Tier 4:** F1 over `(type, verse_ref, ordinal)` records, not CER. Partial credit (⅓) for `(type, verse_ref)` match with wrong ordinal.
+- **Tier 4:** F1 over `(type, verse_ref, ordinal)` metamark records — not CER. Partial credit (⅓) when `(type, verse_ref)` matches but ordinal is wrong.
 
 ### Composite headline score
-`CER₃ = 0.5·cer_consonantal + 0.3·cer_nikkud + 0.2·cer_full`. Tier 4 reported separately.
+
+`CER₃ = 0.5·cer_consonantal + 0.3·cer_nikkud + 0.2·cer_full`. Tier 4 is reported separately.
 
 ### Qere/ketiv
+
 Scored against qere by default (UXLC `<q>` element when present). Ketiv-only words use `<k>`.
 
-### Oracle fields (v0.1 scorer)
-`nakdimon_disagreement_rate` and `dicta_disagreement_rate` are **pass-through inputs**: callers compute them externally and supply them via CLI flags or `Scorer.score()` kwargs. The scorer emits them unchanged in the output JSON. Oracle integration (Nakdimon OSS pip install, DICTA API client, dictabert) is covered by a follow-up plan.
+## Known limitations (v0.2 scorer)
 
-## Known limitations (v0.1 scorer)
+- Oracle disagreement rates are pass-through only; the scorer does not compute them.
+- The UXLC loader is exercised on Deuteronomy fixtures; coverage for other books is pending.
+- The tier 4 metamark type taxonomy is the week-1 schema-decision inventory; additions require a scorer version bump.
 
-- Oracle disagreement rates are pass-through only; no built-in computation.
-- UXLC loader is tested on Deuteronomy fixtures; coverage for other books pending follow-up plan expansion.
-- Tier 4 type taxonomy is the week-1 schema-decision inventory; additions require a scorer version bump.
-
-## Submission instructions
-
-The PR-based submission flow lands in a follow-up release. The current v0.1 scorer is a standalone library + CLI; new baselines can be scored locally by emitting a prediction JSON that matches `schemas/baseline_prediction.schema.json` and running `masoretic-eval score`.
-
-## IAA results
-
-The 4-folio IAA set (Leningrad Devarim F118B, F119A, F119B, F120A) is hand-transcribed by the operator (tier 1) and pre-registered against the methodology in `baselines/EVALUATION_PROTOCOL.md`. Per-baseline headline CER scores for F118B are in `results/scores/leningrad_devarim_F118B_fixture.json`; F119A/F119B/F120A apply the same pre-registered methodology cold (no per-folio tuning) and ship as the IAA set is scored.
-
-## License table
+## License
 
 | Artifact | License |
 |---|---|
 | Scorer code (`masoretic_eval/`) | Apache 2.0 |
-| Benchmark text GT | CC-BY-4.0 |
+| Benchmark text ground truth | CC-BY-4.0 |
 | Manuscript images | Fetched via IIIF from archive.org (PDM 1.0); never redistributed |
+
+See [LICENSE](LICENSE) for the full Apache 2.0 text.
+
+## Documentation
+
+- [Architecture](docs/ARCHITECTURE.md) — Components, data flow, and key abstractions.
+- [Getting Started](docs/GETTING-STARTED.md) — Prerequisites and first-run walkthrough.
+- [Development](docs/DEVELOPMENT.md) — Local setup, build commands, and code style.
+- [Testing](docs/TESTING.md) — Test framework, coverage policy, and CI integration.
+- [Configuration](docs/CONFIGURATION.md) — Environment variables, manifest, and runtime settings.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. A static `leaderboard.json` and PR-based submission flow will land in a follow-up release; in the meantime, new baselines can be scored locally by emitting a prediction JSON that matches `schemas/baseline_prediction.schema.json` and running `masoretic-eval score`.
 
 ## Citation
 
-BibTeX entry will be added at paper submission. For now:
+A BibTeX entry will be added at paper submission. For now:
 
 ```bibtex
 @misc{lamm2026masoretic,
   title  = {masoretic-eval: 4-tier CER scorer for medieval Hebrew},
   author = {Lamm, Ben and Ginsberg, Yosef},
   year   = {2026},
-  note   = {v0.1.0, https://github.com/openmesorah/masoretic-benchmark}
+  note   = {v0.2.0, https://github.com/openmesorah/masoretic-benchmark}
 }
 ```
