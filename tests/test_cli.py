@@ -81,6 +81,40 @@ def test_cli_rejects_gt_missing_text_without_writing_output(tmp_path):
     assert not out.exists()
 
 
+def test_cli_accepts_optional_input_metadata(tmp_path):
+    gt = tmp_path / "gt_with_metadata.json"
+    pred = tmp_path / "pred_with_metadata.json"
+    out = tmp_path / "result.json"
+    gt.write_text(
+        json.dumps(
+            {
+                "folio_id": "leningrad_devarim_f237b",
+                "gt_version": "v0.1.0-test",
+                "text": "שמע ישראל",
+                "metamarks": [],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    pred.write_text(
+        json.dumps(
+            {
+                "folio_id": "leningrad_devarim_f237b",
+                "text": "שמע ישראל",
+                "metamarks": [],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    rc = _run_score(gt, pred, out)
+
+    assert rc.returncode == 0, rc.stderr
+    assert out.exists()
+
+
 def test_cli_rejects_pred_unknown_metamark_without_writing_output(tmp_path):
     gt = FIXTURES / "cli_gt.json"
     pred = tmp_path / "unknown_metamark_pred.json"
@@ -89,9 +123,7 @@ def test_cli_rejects_pred_unknown_metamark_without_writing_output(tmp_path):
         json.dumps(
             {
                 "text": "שמע ישראל",
-                "metamarks": [
-                    {"type": "unknown", "verse_ref": "Deut.6.4", "ordinal": 1}
-                ],
+                "metamarks": [{"type": "unknown", "verse_ref": "Deut.6.4", "ordinal": 1}],
             },
             ensure_ascii=False,
         ),

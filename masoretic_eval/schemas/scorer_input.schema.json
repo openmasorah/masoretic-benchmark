@@ -7,6 +7,14 @@
   "required": ["text", "metamarks"],
   "additionalProperties": false,
   "properties": {
+    "folio_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "gt_version": {
+      "type": "string",
+      "minLength": 1
+    },
     "text": {
       "type": "string"
     },
