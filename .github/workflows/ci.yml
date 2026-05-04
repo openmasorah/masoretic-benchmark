@@ -2,8 +2,8 @@
 #
 # Copy to sibling repo's `.github/workflows/ci.yml` per ./README.md.
 #
-# PITFALL 8: this workflow does NOT invoke baalshem in any form (no vendoring,
-# no cloning, no submodules). The F8 gate lives in baalshem and is NOT run
+# PITFALL 8: this workflow does NOT invoke openmesorah in any form (no vendoring,
+# no cloning, no submodules). The F8 gate lives in openmesorah and is NOT run
 # here — this CI checks the sibling repo in isolation.
 
 name: CI

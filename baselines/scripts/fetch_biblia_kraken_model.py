@@ -18,10 +18,10 @@ Pin formula mirrors ``oracles._hashing.compute_nakdimon_model_hash``:
     kraken_model_hash = sha256(f"kraken=={version}:{mlmodel_sha256}").hexdigest()[:16]
 
 NOTE on DOIs: ``10.5281/zenodo.5468286`` is the MODEL DOI. The Phase 1
-stub at ``gt-infra/gt_infra/dry_run/biblia_kraken_stub.py`` (in baalshem)
+stub at ``gt-infra/gt_infra/dry_run/biblia_kraken_stub.py`` (in openmesorah)
 uses ``10.5281/zenodo.5167263`` which is the DATASET DOI (the BiblIA
 paper's training corpus, NOT the model file). Production code uses the
-model DOI; the stub stays in baalshem as a Phase 1 dry-run artifact.
+model DOI; the stub stays in openmesorah as a Phase 1 dry-run artifact.
 """
 
 from __future__ import annotations

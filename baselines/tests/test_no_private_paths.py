@@ -15,7 +15,7 @@ PUBLIC_BOUND_PATHS = [
 ]
 
 FORBIDDEN_PATTERNS = (
-    "Workspace/" + "baalshem",
+    "Workspace/" + "openmesorah",
     "/Users/" + "benlamm",
 )
 

@@ -83,17 +83,16 @@ agreement (IAA) is established and Yosef has bandwidth for tier 2/3/4 review.
 The phase 03.1-05 whole-folio CER methodology spike
 (`method1_whole_folio`) already computed sensitivity analysis across
 whole-folio, zone-restricted, and bucketed-per-line CER under three threshold
-settings. Per Hamming's recommendation, that data is the "Reviewer-2
-sensitivity number" referenced in the paper's methodology section; full
-diagnostic table is supplementary material in v0.2.
+settings. That sensitivity table is referenced in the paper's methodology
+section; the full diagnostic table is supplementary material in v0.2.
 
-## Reviewer-2 mitigations
+## Methodology defenses
 
 The benchmark's load-bearing claim is **reproducibility**, not metric
-sophistication. Defenses:
+sophistication. Defenses against ad-hoc-methodology critiques:
 
 - **Pre-registration.** This file is committed before any folio is scored.
-  Reviewers attack ad-hoc methodology, not pre-registered convention.
+  Methodology attacks land on ad-hoc choices, not pre-registered convention.
 - **ICDAR-HTR convention.** Whole-folio CER is the standard for historical-
   document HTR evaluation (Sánchez/READ/HIMANIS). Cite directly in paper.
 - **Spec compliance.** REQUIREMENTS.md BL-07 declares "per folio" not

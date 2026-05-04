@@ -13,7 +13,7 @@ chain depends on a Phase 1 line-level GT export (`{lines:[{line_id,bbox,
 tier1}]}` per folio). As of Phase 3 landing, Phase 1 produced ONLY a
 single-text-blob golden fixture at `tests/fixtures/golden/gt.json` (no
 per-line bboxes). The whole live test therefore SKIPS until that export
-is supplied with BAALSHEM_GT_EXPORT_JSON. The realistic-chain mocked test
+is supplied with OPENMESORAH_GT_EXPORT_JSON. The realistic-chain mocked test
 in `test_baseline_unit_char_menaked_chain.py` exercises the realistic-chain
 code path under unit tests; this live test only adds value once a real
 per-line GT is available.
@@ -26,7 +26,7 @@ from pathlib import Path
 
 import pytest
 
-GT_EXPORT_PATH_ENV = "BAALSHEM_GT_EXPORT_JSON"
+GT_EXPORT_PATH_ENV = "OPENMESORAH_GT_EXPORT_JSON"
 
 
 @pytest.mark.live_baselines

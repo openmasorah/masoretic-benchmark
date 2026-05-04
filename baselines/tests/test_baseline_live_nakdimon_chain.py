@@ -15,12 +15,12 @@ export `{lines:[{line_id,bbox,tier1}]}` for the Shema fixture (Phase 1's
 golden fixture is a single-text-blob shape — see 01-13b SUMMARY,
 gt-infra/exports does not exist with the line-level shape this loader
 needs). The diagnostic-chain assertion is wrapped with a pytest.skip
-when BAALSHEM_GT_EXPORT_JSON is unset; the realistic-chain prediction
+when OPENMESORAH_GT_EXPORT_JSON is unset; the realistic-chain prediction
 still runs end-to-end against Kraken + Nakdimon when both gates pass.
 
 # TODO(phase-1-gt-export): unblock the diagnostic-chain section below
 # when Phase 1 emits per-line GT for `leningrad_devarim_F118B_fixture`
-# via BAALSHEM_GT_EXPORT_JSON. Until then, the diagnostic chain code path
+# via OPENMESORAH_GT_EXPORT_JSON. Until then, the diagnostic chain code path
 # is exercised only by the mocked-unit tier (test_baseline_unit_nakdimon_chain.py).
 """
 
@@ -36,7 +36,7 @@ _THIS = Path(__file__).resolve()
 SIBLING_ROOT = _THIS.parents[2]
 
 DEFAULT_KRAKEN_MODEL = SIBLING_ROOT / "baselines" / ".cache" / "kraken" / "BiblIA_01.mlmodel"
-GT_EXPORT_PATH_ENV = "BAALSHEM_GT_EXPORT_JSON"
+GT_EXPORT_PATH_ENV = "OPENMESORAH_GT_EXPORT_JSON"
 
 
 @pytest.mark.live_baselines

@@ -7,8 +7,10 @@ scorer itself:
 - `oracles.nakdimon_oss` — primary, MIT, reproducibly pinned (Nakdimon code
   version + bundled Keras H5 weights → short MODEL_HASH).
 - `oracles.nakdan_hybrid` — secondary, DICTA 2020 hybrid Nakdan API
-  (`genre=rabbinic`), 1 QPS throttle, labeled "not reproducible (rotating
-  endpoint, no version header)".
+  (`genre=rabbinic`), 1 QPS throttle. Marked as a non-reproducible source
+  in the pin log because, at the time of evaluation, the public endpoint
+  did not expose a version header sufficient to pin a specific model
+  release; a daily-rotated audit log preserves the exact responses we used.
 - `oracles.dictabert` — off-label `dictabert-large-char-menaked` for the
   publishable negative-result baseline (Baseline 4) only.
 
@@ -103,8 +105,8 @@ commit the recovered baseline.
 ### Pitfall 8 carry-forward
 
 Phase 1's GT-12 IAA gate is NOT run by sibling CI — the sibling repo must be
-independently verifiable by anyone (no baalshem dependency). IAA gates live in
-baalshem only.
+independently verifiable by anyone (no openmesorah dependency). IAA gates live in
+openmesorah only.
 
 ## License
 

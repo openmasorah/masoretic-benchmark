@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 DENYLIST: tuple[str, ...] = (
-    "Workspace/" + "baalshem",
+    "Workspace/" + "openmesorah",
     "/Users/" + "benlamm",
 )
 
@@ -20,8 +20,7 @@ def _git_ls_files() -> list[str]:
     result = subprocess.run(
         ["git", "ls-files"],
         check=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        capture_output=True,
         text=True,
     )
     return [line for line in result.stdout.splitlines() if line]
@@ -37,11 +36,7 @@ def _scan_path(path: str) -> list[str]:
         text = p.read_text(encoding="utf-8", errors="ignore")
     except OSError:
         return []
-    return [
-        f"REJECT (private path {pattern!r}): {path}"
-        for pattern in DENYLIST
-        if pattern in text
-    ]
+    return [f"REJECT (private path {pattern!r}): {path}" for pattern in DENYLIST if pattern in text]
 
 
 def main(argv: list[str]) -> int:
@@ -55,7 +50,7 @@ def main(argv: list[str]) -> int:
             print(error, file=sys.stderr)
         print(
             "\nGT-10/BL-08/REL-09: public-bound masoretic-benchmark files must "
-            "not contain private baalshem workspace or local user path leaks.",
+            "not contain private openmesorah workspace or local user path leaks.",
             file=sys.stderr,
         )
         return 1

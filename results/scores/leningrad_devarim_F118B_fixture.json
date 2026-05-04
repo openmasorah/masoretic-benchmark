@@ -72,7 +72,7 @@
         "result_commit": "8d9bce4",
         "diagnostic_file": "results/biblia_nakdimon/diagnostic/leningrad_devarim_F118B_fixture.gt_fed.json",
         "tier1_matches_bl04_note": "Tier-1 CER identical to BL-04 (59.65%) by construction — both chain baselines share the same upstream Kraken text-recognition pass; only the diacritizer (Nakdimon vs DictaBERT char-menaked) differs, which affects tier 2/3 not tier 1.",
-        "execution_environment": "eScriptorium EC2 (i-01f2d8c603f694929, Ubuntu 22.04 x86_64, Python 3.11.15) — Nakdimon TF 2.15 SIGABRTs on macOS arm64+Rosetta (Pitfall 1) so BL-03 runs on Linux infra per Pitfall 1 mitigation."
+        "execution_environment": "Linux x86_64, Python 3.11.15 — Nakdimon TF 2.15 SIGABRTs on macOS arm64+Rosetta (Pitfall 1) so BL-03 runs on Linux infra per Pitfall 1 mitigation."
       }
     },
     "biblia_char_menaked": {

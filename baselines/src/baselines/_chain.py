@@ -63,7 +63,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_KRAKEN_MODEL = REPO_ROOT / "baselines" / ".cache" / "kraken" / "BiblIA_01.mlmodel"
 DEFAULT_IMAGE_CACHE = REPO_ROOT / "baselines" / ".cache" / "images"
 
-GT_EXPORT_PATH_ENV = "BAALSHEM_GT_EXPORT_JSON"
+GT_EXPORT_PATH_ENV = "OPENMESORAH_GT_EXPORT_JSON"
 
 
 class ChainBaseline(BaselineBase):

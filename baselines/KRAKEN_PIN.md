@@ -29,10 +29,10 @@ below implies a new derived hash.
   `KRAKEN_MODEL_HASH` constant stays canonical-from-the-pin.
 - **DOI distinction**: `10.5281/zenodo.5468286` is the MODEL DOI (the
   `BiblIA_01.mlmodel` artifact). The Phase 1 dry-run stub at
-  `gt-infra/gt_infra/dry_run/biblia_kraken_stub.py` (in baalshem) uses
+  `gt-infra/gt_infra/dry_run/biblia_kraken_stub.py` (in openmesorah) uses
   `10.5281/zenodo.5167263` which is the DATASET DOI (the BiblIA paper's
   training corpus, NOT the model file). Production code uses the model
-  DOI; the Phase 1 stub stays unchanged in baalshem as a dry-run artifact.
+  DOI; the Phase 1 stub stays unchanged in openmesorah as a dry-run artifact.
 - **Direct download URL** (`https://zenodo.org/records/5468286/files/BiblIA_01.mlmodel`)
   is recorded in `baselines/scripts/fetch_biblia_kraken_model.py::DOWNLOAD_URL`.
   If Zenodo changes URL structure, fix the script in the SAME commit that

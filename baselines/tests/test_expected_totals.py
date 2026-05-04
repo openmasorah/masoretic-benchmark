@@ -1,6 +1,6 @@
 """D-15 declarations test: manifest declares expected_reports_per_baseline.
 
-Asserts that for EVERY known Phase 3 baseline_id, the live baalshem manifest
+Asserts that for EVERY known Phase 3 baseline_id, the live openmesorah manifest
 has the key present in `expected_reports_per_baseline`.
 
 Per Plan 03-01 Task 3, the v0.2 manifest emission populates
@@ -22,7 +22,7 @@ from pathlib import Path
 
 import pytest
 
-BAALSHEM_MANIFEST = Path(__file__).resolve().parents[2] / "phase_0_manifest.json"
+OPENMESORAH_MANIFEST = Path(__file__).resolve().parents[2] / "phase_0_manifest.json"
 KNOWN_BASELINE_IDS = (
     "llm_vision",
     "biblia_kraken",
@@ -32,11 +32,11 @@ KNOWN_BASELINE_IDS = (
 
 
 @pytest.mark.skipif(
-    not BAALSHEM_MANIFEST.exists(),
-    reason="baalshem manifest not present in this CI sandbox",
+    not OPENMESORAH_MANIFEST.exists(),
+    reason="openmesorah manifest not present in this CI sandbox",
 )
 def test_manifest_declares_expected_reports_per_baseline_for_every_baseline_id():
-    m = json.loads(BAALSHEM_MANIFEST.read_text(encoding="utf-8"))
+    m = json.loads(OPENMESORAH_MANIFEST.read_text(encoding="utf-8"))
     per_baseline = m.get("expected_reports_per_baseline")
     assert per_baseline is not None, (
         "D-15: manifest is missing the `expected_reports_per_baseline` field entirely. "
@@ -83,10 +83,10 @@ def test_results_dir_count_equals_manifest_expected_reports():
     if not SIBLING_RESULTS.exists():
         pytest.skip("results/ tree not yet seeded (Phase 03.1 W4/W5 in progress)")
 
-    if not BAALSHEM_MANIFEST.exists():
-        pytest.skip("baalshem manifest not present (running outside expected layout)")
+    if not OPENMESORAH_MANIFEST.exists():
+        pytest.skip("openmesorah manifest not present (running outside expected layout)")
 
-    m = json.loads(BAALSHEM_MANIFEST.read_text(encoding="utf-8"))
+    m = json.loads(OPENMESORAH_MANIFEST.read_text(encoding="utf-8"))
     per_baseline = m["expected_reports_per_baseline"]
     for bid, expected in per_baseline.items():
         bl_dir = SIBLING_RESULTS / bid
@@ -101,15 +101,15 @@ def test_results_dir_count_equals_manifest_expected_reports():
 
 
 @pytest.mark.skipif(
-    not BAALSHEM_MANIFEST.exists(),
-    reason="baalshem manifest not present in this CI sandbox",
+    not OPENMESORAH_MANIFEST.exists(),
+    reason="openmesorah manifest not present in this CI sandbox",
 )
 def test_manifest_version_is_v02():
     """Companion check: the manifest's schema version is v0.2.0 — only the
     v0.2 schema declares `expected_reports_per_baseline` as the canonical
     counter. A v0.1 manifest would still be load-coerced by Manifest.load()
     but would lack the per-baseline mapping in canonical form."""
-    m = json.loads(BAALSHEM_MANIFEST.read_text(encoding="utf-8"))
+    m = json.loads(OPENMESORAH_MANIFEST.read_text(encoding="utf-8"))
     version = m.get("version", "")
     assert version.startswith("v0.2"), (
         f"D-15 expects v0.2 manifest with per-baseline mapping; manifest version is {version!r}"

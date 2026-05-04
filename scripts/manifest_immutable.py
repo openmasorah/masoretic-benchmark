@@ -1,7 +1,7 @@
 """Pre-commit hook: ``phase_0_manifest.json`` is append-only-immutable (Pattern 4).
 
 **Target repo:** ``~/Workspace/masoretic-benchmark/`` (the public sibling repo).
-This file is COPY-READY; baalshem does not edit the sibling repo directly
+This file is COPY-READY; openmesorah does not edit the sibling repo directly
 (see CLAUDE.md + Pitfall 8 of .planning/phases/01-gt-infra/01-RESEARCH.md).
 
 Allowed mutations:

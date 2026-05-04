@@ -10,9 +10,9 @@ constant re-derived on import.
 
 NOTE on DOIs: ``10.5281/zenodo.5468286`` is the MODEL DOI. The Phase 1
 dry-run stub at ``gt-infra/gt_infra/dry_run/biblia_kraken_stub.py`` (in
-baalshem) uses ``10.5281/zenodo.5167263`` which is the DATASET DOI (the
+openmesorah) uses ``10.5281/zenodo.5167263`` which is the DATASET DOI (the
 BiblIA paper's training corpus, NOT the model file). Production code
-uses the model DOI; the Phase 1 stub stays unchanged in baalshem.
+uses the model DOI; the Phase 1 stub stays unchanged in openmesorah.
 
 D-12 contract: this subclass overrides ONLY ``infer_folio``. The
 template-method ABC's ``run()`` is locked structurally by

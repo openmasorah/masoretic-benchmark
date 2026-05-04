@@ -1,15 +1,19 @@
 # masoretic-benchmark
 
-![CI](https://github.com/thebenlamm/masoretic-benchmark/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/openmesorah/masoretic-benchmark/actions/workflows/ci.yml/badge.svg)
 
 4-tier CER scorer + public benchmark dataset for medieval Hebrew manuscripts.
 
 ## Components
 
-- **`masoretic_eval/`** — Scorer Python package (this plan). Apache 2.0.
-- **`data/`** — Frozen benchmark data (CC-BY-4.0 text; IIIF image refs only). Populated by follow-up GT-infra plan.
-- **`baselines/`** — Four independent baseline scripts. Populated by follow-up baseline plan.
-- **`leaderboard/`** — Static `leaderboard.json` + PR-based submission (optional-polish Gradio deferred). Populated by follow-up release plan.
+- **`masoretic_eval/`** — Scorer Python package. Apache 2.0.
+- **`baselines/`** — Four independent baseline scripts (BL-01 LLM-vision, BL-02 BiblIA Kraken, BL-03 Kraken→Nakdimon, BL-04 Kraken→DictaBERT char-menaked).
+- **`oracles/`** — Hebrew diacritization oracle modules consumed by the scorer's pass-through tier-2 fields.
+- **`schemas/`** — JSON Schemas + changelogs for the prediction format and the frozen `phase_0_manifest.json` contract.
+- **`results/`** — Frozen per-baseline predictions and `results/scores/` headline CER scores for the 4 IAA folios.
+- **`baselines/tests/fixtures/iaa_folio_*.gt_adapter_golden.json`** — Hand-transcribed tier-1 GT for the IAA folios; CC-BY-4.0 text; IIIF/archive.org image references only.
+
+A static `leaderboard.json` + PR-based submission flow lands in a follow-up release.
 
 ## Install
 
@@ -71,18 +75,18 @@ Scored against qere by default (UXLC `<q>` element when present). Ketiv-only wor
 
 ## Submission instructions
 
-Deferred to the release follow-up plan. Current v0.1 scorer is a standalone library + CLI.
+The PR-based submission flow lands in a follow-up release. The current v0.1 scorer is a standalone library + CLI; new baselines can be scored locally by emitting a prediction JSON that matches `schemas/baseline_prediction.schema.json` and running `masoretic-eval score`.
 
 ## IAA results
 
-Populated by the GT-infra follow-up plan at v0.1 ship.
+The 4-folio IAA set (Leningrad Devarim F118B, F119A, F119B, F120A) is hand-transcribed by the operator (tier 1) and pre-registered against the methodology in `baselines/EVALUATION_PROTOCOL.md`. Per-baseline headline CER scores for F118B are in `results/scores/leningrad_devarim_F118B_fixture.json`; F119A/F119B/F120A apply the same pre-registered methodology cold (no per-folio tuning) and ship as the IAA set is scored.
 
 ## License table
 
 | Artifact | License |
 |---|---|
 | Scorer code (`masoretic_eval/`) | Apache 2.0 |
-| Benchmark text GT | CC-BY-4.0 (released by follow-up plan) |
+| Benchmark text GT | CC-BY-4.0 |
 | Manuscript images | Fetched via IIIF from archive.org (PDM 1.0); never redistributed |
 
 ## Citation
@@ -94,6 +98,6 @@ BibTeX entry will be added at paper submission. For now:
   title  = {masoretic-eval: 4-tier CER scorer for medieval Hebrew},
   author = {Lamm, Ben and Ginsberg, Yosef},
   year   = {2026},
-  note   = {v0.1.0, https://github.com/thebenlamm/masoretic-benchmark}
+  note   = {v0.1.0, https://github.com/openmesorah/masoretic-benchmark}
 }
 ```

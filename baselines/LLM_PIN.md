@@ -19,13 +19,14 @@ Newest first.
   seed; Gemini's seed is best-effort and known non-deterministic on gemini-2.5-pro.
   The replay log is the contract; provider-side non-determinism is documented in the
   BL-01 docstring + paper methodology delta (`paper/methodology_delta_BL-01_AbbyyFR_drop.md`
-  in baalshem).
+  in openmesorah).
 - **Tie-break**: alphabetical, Claude < Gemini, so Claude wins ties. WHOLE-LINE WINNER —
   NO tier-mixing across sources within a line (D-07). Disclosed explicitly in paper.
 - **AbbyyFR (dropped)**: Engine SDK contamination risk (Hebrew Bible mode trained on
-  unknown corpus) + Cloud SDK reproducibility profile (rotating endpoint, no version
-  header, same DICTA-style non-reproducible signature) — both fail the paper-defensible
-  bar. Reframed as LLM-best-of-two per Phase 3 Adjudication A-2.
+  a corpus we cannot inspect) and Cloud SDK reproducibility profile (no published
+  endpoint version header at the time of evaluation) did not meet the bar for a
+  pre-registered, paper-defensible source. Reframed as LLM-best-of-two per Phase 3
+  Adjudication A-2.
 - **Cost cap**: $5/folio + $25/run (configured in `llm_vision.config.yaml`). Provider
   price changes = re-pin event in this file + the YAML, captured into the next run's
   `run_meta.budget.rate_table_snapshot`.

@@ -5,11 +5,10 @@ from pathlib import Path
 
 import pytest
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = REPO_ROOT / "scripts" / "reject_private_paths.py"
 PRIVATE_PATTERNS = (
-    "Workspace/" + "baalshem",
+    "Workspace/" + "openmesorah",
     "/Users/" + "benlamm",
 )
 
