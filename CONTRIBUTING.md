@@ -60,7 +60,12 @@ frozen on 2026-04-30:
 
 - Changing the headline metric, tier denominators, alignment unit, or composite
   weighting (`CER₃ = 0.5·cer_consonantal + 0.3·cer_nikkud + 0.2·cer_full`).
-- Changing the metamark type taxonomy without a scorer version bump.
+- Changing the metamark type taxonomy without a scorer version bump. Note: tier 4
+  ("metamark records") covers **body-text-internal** marks only — sof pasuq,
+  paseq, maqqef, puncta extraordinaria, gershayim, and similar in-line marks. The
+  full marginal masorah apparatus (Masorah parva, Masorah magna) is a separate
+  research milestone and is **not** a tier of this benchmark; do not propose
+  expanding tier 4 to cover Mp/Mg.
 - Re-scoring an existing folio with a tweaked methodology and overwriting prior
   results.
 
