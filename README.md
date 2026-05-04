@@ -141,7 +141,7 @@ A BibTeX entry will be added at paper submission. For now:
 ```bibtex
 @misc{lamm2026masoretic,
   title  = {masoretic-eval: 4-tier CER scorer for medieval Hebrew},
-  author = {Lamm, Ben and Ginsberg, Yosef},
+  author = {Lamm, Ben and Ginsburg, Yosef},
   year   = {2026},
   note   = {v0.2.0, https://github.com/openmesorah/masoretic-benchmark}
 }
