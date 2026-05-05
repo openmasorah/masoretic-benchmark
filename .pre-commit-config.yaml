@@ -49,6 +49,16 @@ repos:
         files: ^phase_0_manifest\.json$
         pass_filenames: false
 
+      - id: validate-corpus
+        name: "Validate corpus/manuscripts.yaml against schemas/manuscript.schema.json"
+        entry: python scripts/validate_corpus.py
+        language: python
+        files: ^(corpus/.*\.ya?ml|schemas/manuscript\.schema\.json|scripts/validate_corpus\.py)$
+        pass_filenames: false
+        additional_dependencies:
+          - pyyaml>=6.0
+          - jsonschema>=4.21
+
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.20.0
     hooks:
