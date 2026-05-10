@@ -1,21 +1,100 @@
 {
-    "name": "Open Masorah Tier-4 Supplement",
+    "version": "1.0",
+    "name": "Open Masorah Hebrew",
+    "author": "Open Masorah",
+    "wrapPrefix": "",
+    "wrapSuffix": "",
     "characters": [
-        {
-            "code": "05C3",
-            "name": "HEBREW PUNCTUATION SOF PASUQ"
-        },
-        {
-            "code": "05C4",
-            "name": "HEBREW MARK UPPER DOT"
-        },
-        {
-            "code": "05C5",
-            "name": "HEBREW MARK LOWER DOT"
-        },
-        {
-            "code": "05C6",
-            "name": "HEBREW PUNCTUATION NUN HAFUKHA"
-        }
+        {"row": 0, "column": 0, "character": "א", "keyboard_code": null},
+        {"row": 0, "column": 1, "character": "ב", "keyboard_code": null},
+        {"row": 0, "column": 2, "character": "ג", "keyboard_code": null},
+        {"row": 0, "column": 3, "character": "ד", "keyboard_code": null},
+        {"row": 0, "column": 4, "character": "ה", "keyboard_code": null},
+        {"row": 0, "column": 5, "character": "ו", "keyboard_code": null},
+        {"row": 0, "column": 6, "character": "ז", "keyboard_code": null},
+        {"row": 0, "column": 7, "character": "ח", "keyboard_code": null},
+        {"row": 0, "column": 8, "character": "ט", "keyboard_code": null},
+        {"row": 0, "column": 9, "character": "י", "keyboard_code": null},
+
+        {"row": 1, "column": 0, "character": "כ", "keyboard_code": null},
+        {"row": 1, "column": 1, "character": "ל", "keyboard_code": null},
+        {"row": 1, "column": 2, "character": "מ", "keyboard_code": null},
+        {"row": 1, "column": 3, "character": "נ", "keyboard_code": null},
+        {"row": 1, "column": 4, "character": "ס", "keyboard_code": null},
+        {"row": 1, "column": 5, "character": "ע", "keyboard_code": null},
+        {"row": 1, "column": 6, "character": "פ", "keyboard_code": null},
+        {"row": 1, "column": 7, "character": "צ", "keyboard_code": null},
+        {"row": 1, "column": 8, "character": "ק", "keyboard_code": null},
+        {"row": 1, "column": 9, "character": "ר", "keyboard_code": null},
+
+        {"row": 2, "column": 0, "character": "ש", "keyboard_code": null},
+        {"row": 2, "column": 1, "character": "ת", "keyboard_code": null},
+        {"row": 2, "column": 2, "character": "ך", "keyboard_code": null},
+        {"row": 2, "column": 3, "character": "ם", "keyboard_code": null},
+        {"row": 2, "column": 4, "character": "ן", "keyboard_code": null},
+        {"row": 2, "column": 5, "character": "ף", "keyboard_code": null},
+        {"row": 2, "column": 6, "character": "ץ", "keyboard_code": null},
+
+        {"row": 3, "column": 0, "character": "׃", "keyboard_code": 190},
+        {"row": 3, "column": 1, "character": "ׄ", "keyboard_code": null},
+        {"row": 3, "column": 2, "character": "ׅ", "keyboard_code": null},
+        {"row": 3, "column": 3, "character": "׆", "keyboard_code": 78},
+
+        {"row": 4, "column": 0, "character": "ְ", "keyboard_code": 83},
+        {"row": 4, "column": 1, "character": "ֱ", "keyboard_code": null},
+        {"row": 4, "column": 2, "character": "ֲ", "keyboard_code": null},
+        {"row": 4, "column": 3, "character": "ֳ", "keyboard_code": null},
+        {"row": 4, "column": 4, "character": "ִ", "keyboard_code": 73},
+        {"row": 4, "column": 5, "character": "ֵ", "keyboard_code": 69},
+        {"row": 4, "column": 6, "character": "ֶ", "keyboard_code": 71},
+        {"row": 4, "column": 7, "character": "ַ", "keyboard_code": 65},
+        {"row": 4, "column": 8, "character": "ָ", "keyboard_code": 81},
+        {"row": 4, "column": 9, "character": "ֹ", "keyboard_code": 79},
+
+        {"row": 5, "column": 0, "character": "ֺ", "keyboard_code": null},
+        {"row": 5, "column": 1, "character": "ֻ", "keyboard_code": 85},
+        {"row": 5, "column": 2, "character": "ּ", "keyboard_code": 68},
+        {"row": 5, "column": 3, "character": "ֽ", "keyboard_code": 77},
+        {"row": 5, "column": 4, "character": "־", "keyboard_code": 189},
+        {"row": 5, "column": 5, "character": "ֿ", "keyboard_code": 82},
+        {"row": 5, "column": 6, "character": "׀", "keyboard_code": 80},
+        {"row": 5, "column": 7, "character": "ׁ", "keyboard_code": 219},
+        {"row": 5, "column": 8, "character": "ׂ", "keyboard_code": 221},
+        {"row": 5, "column": 9, "character": "ׇ", "keyboard_code": null},
+
+        {"row": 6, "column": 0, "character": "֑", "keyboard_code": 49},
+        {"row": 6, "column": 1, "character": "֒", "keyboard_code": null},
+        {"row": 6, "column": 2, "character": "֓", "keyboard_code": null},
+        {"row": 6, "column": 3, "character": "֔", "keyboard_code": 53},
+        {"row": 6, "column": 4, "character": "֕", "keyboard_code": null},
+        {"row": 6, "column": 5, "character": "֖", "keyboard_code": 50},
+        {"row": 6, "column": 6, "character": "֗", "keyboard_code": 54},
+        {"row": 6, "column": 7, "character": "֘", "keyboard_code": null},
+        {"row": 6, "column": 8, "character": "֙", "keyboard_code": 56},
+        {"row": 6, "column": 9, "character": "֚", "keyboard_code": null},
+
+        {"row": 7, "column": 0, "character": "֛", "keyboard_code": 57},
+        {"row": 7, "column": 1, "character": "֜", "keyboard_code": 55},
+        {"row": 7, "column": 2, "character": "֝", "keyboard_code": null},
+        {"row": 7, "column": 3, "character": "֞", "keyboard_code": null},
+        {"row": 7, "column": 4, "character": "֟", "keyboard_code": null},
+        {"row": 7, "column": 5, "character": "֠", "keyboard_code": null},
+        {"row": 7, "column": 6, "character": "֡", "keyboard_code": null},
+        {"row": 7, "column": 7, "character": "֢", "keyboard_code": null},
+        {"row": 7, "column": 8, "character": "֣", "keyboard_code": 51},
+        {"row": 7, "column": 9, "character": "֤", "keyboard_code": null},
+
+        {"row": 8, "column": 0, "character": "֥", "keyboard_code": 52},
+        {"row": 8, "column": 1, "character": "֦", "keyboard_code": null},
+        {"row": 8, "column": 2, "character": "֧", "keyboard_code": null},
+        {"row": 8, "column": 3, "character": "֨", "keyboard_code": null},
+        {"row": 8, "column": 4, "character": "֩", "keyboard_code": null},
+        {"row": 8, "column": 5, "character": "֪", "keyboard_code": null},
+        {"row": 8, "column": 6, "character": "֫", "keyboard_code": 48},
+        {"row": 8, "column": 7, "character": "֬", "keyboard_code": null},
+        {"row": 8, "column": 8, "character": "֭", "keyboard_code": null},
+        {"row": 8, "column": 9, "character": "֮", "keyboard_code": null},
+
+        {"row": 9, "column": 0, "character": "֯", "keyboard_code": null}
     ]
 }
