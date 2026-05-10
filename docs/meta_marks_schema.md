@@ -205,18 +205,44 @@ Per-line checklist:
 
 ---
 
-## Tracked v0.1 follow-ups
+## Tracked follow-ups
 
-These are required for tier-4 **scoring** but do not block transcription start.
-Annotators may begin tagging against this schema in parallel.
+### Shipped in v0.1 (PR #20)
 
-1. **Scorer NFC pre-comparison fix** — `masoretic_eval` to apply
-   `unicodedata.normalize("NFC", s)` to reference and prediction strings before
-   tier-1/2/3/4 CER computation.
-2. **PAGE-XML parser extraction for `@custom` tier-4 fields** — `parashah:*`,
-   `letter_size:*`, `layout:*` tokens are not currently extracted by
-   `masoretic_eval/page_xml.py` (which extracts `verse_ref` only). Patch must
-   land before scoring of these fields is possible.
+1. **Scorer NFC pre-comparison fix** — `masoretic_eval/normalize.py` applies
+   `unicodedata.normalize("NFC", s)` before NFD+CGJ-strip in
+   `normalize_for_scoring()`. All tier scorers route through this function.
+2. **PAGE-XML parser extraction for `@custom` tier-4 fields** —
+   `masoretic_eval/page_xml.py::_parse_custom` extracts `parashah:*`,
+   `letter_size:*`, `layout:stichographic_column@*` into typed `LineRecord`
+   fields. Strict-everywhere policy: unknown top-level keys and unknown
+   sub-keys both raise `ValueError`.
+
+### Deferred to v0.2 (cross-AI review on PR #20)
+
+These were raised by codex + cursor reviewers on the v0.1 follow-up PR. None
+block tier-4 scoring; track them so they don't evaporate.
+
+1. **Tier-1 / tier-3 / tier-4 NFC-equivalence tests + idempotence guard** —
+   the v0.1 NFC test covers tier-2 only. Add coverage that two NFC-equivalent
+   strings produce CER == 0 for tier-1, tier-3, and tier-4, and that
+   `normalize_for_scoring` is a no-op on already-NFC input (idempotence).
+2. **Duplicate-scalar-token detection in `_parse_custom`** — repeated tokens
+   for scalar fields (e.g. two `parashah:` or two
+   `layout:stichographic_column@`) silently overwrite (last wins). Promote to
+   `ValueError` for consistency with the strict-everywhere policy.
+3. **`letter_size` index bounds validation** — `large@9999` parses
+   successfully and propagates malformed metadata. Validate indices against
+   `len(text)` after both are known (in `parse_page_xml`, post-parse).
+4. **`letter_size` ordering / dedup policy clarification** — schema §4 does
+   not specify whether multiple `large@<idx>` entries must be sorted or
+   deduplicated. Implementation today: insertion order, no dedup. Decide
+   canonical posture and update both the schema doc and the parser
+   accordingly.
+5. **Parser strict-mode flag** (optional) — if forward-compatibility for new
+   schema versions becomes a real need, expose `_parse_custom(strict=True)` as
+   the default with `strict=False` opt-in for permissive reads. Don't add
+   unless a concrete use case appears.
 
 ---
 
@@ -233,4 +259,5 @@ Annotators may begin tagging against this schema in parallel.
 
 ## CHANGELOG
 
+- **2026-05-10** — v0.1 follow-ups shipped (PR #20): NFC pre-comparison in scorer, `@custom` tier-4 field extraction with strict-everywhere parser policy, Pitfall 2 regression guard via non-canonical combining-mark order test. Cross-AI review (codex + cursor) deferred 5 items to v0.2 — see "Deferred to v0.2" above.
 - **2026-05-09** — v0.1 PROPOSED drafted. Pre-ratification design review by FAMP architect (AMBER, 4 adjustments applied: NFC mandate, parashah `@custom` precision, char-index fragility note, U+05C6 scope note) and FAMP matt (3 changes applied: Ha'azinu encodings front-loaded, completeness contract added, quick reference folded inline). Pending ratification.
