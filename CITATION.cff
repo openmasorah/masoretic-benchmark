@@ -12,10 +12,10 @@ authors:
     given-names: Yosef
   - family-names: Finkelstein
     given-names: Ari
-repository-code: "https://github.com/openmesorah/masoretic-benchmark"
+repository-code: "https://github.com/openmasorah/masoretic-benchmark"
 identifiers:
   - type: url
-    value: "https://huggingface.co/datasets/openmesorah/masoretic-benchmark-v0.1"
+    value: "https://huggingface.co/datasets/openmasorah/masoretic-benchmark-v0.1"
     description: "Hugging Face dataset distribution"
 keywords:
   - hebrew

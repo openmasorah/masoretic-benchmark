@@ -1,0 +1,21 @@
+{
+    "name": "Open Masorah Tier-4 Supplement",
+    "characters": [
+        {
+            "code": "05C3",
+            "name": "HEBREW PUNCTUATION SOF PASUQ"
+        },
+        {
+            "code": "05C4",
+            "name": "HEBREW MARK UPPER DOT"
+        },
+        {
+            "code": "05C5",
+            "name": "HEBREW MARK LOWER DOT"
+        },
+        {
+            "code": "05C6",
+            "name": "HEBREW PUNCTUATION NUN HAFUKHA"
+        }
+    ]
+}

@@ -1,0 +1,197 @@
+# Open Mesorah / masoretic-benchmark — manuscript catalog.
+#
+# Validated against schemas/manuscript.schema.json (JSON Schema 2020-12).
+# Run scripts/validate_corpus.py before committing changes here.
+#
+# Catalog ids that also appear in phase_0_manifest.json folios MUST match the
+# manuscript enum in schemas/phase_0_manifest.schema.json. Catalog may list
+# manuscripts the manifest has not yet referenced (cross-check is one-way:
+# manifest -> catalog).
+
+schema: schemas/manuscript.schema.json
+
+entries:
+  - id: leningrad
+    schema_version: "0.1"
+    identity:
+      name: "Leningrad Codex"
+      common_names:
+        - "Codex Leningradensis"
+        - "Codex L"
+      sigla:
+        hbce: "L"
+        bhq: "ML"
+        bhs: "L"
+      shelfmark: "Saint Petersburg, Russian National Library, Firkovich B 19A"
+      date:
+        written: "1008/09 CE"
+        written_iso: "1008"
+        colophon_attested: true
+      origin:
+        place: "Cairo (likely)"
+        tradition: "Tiberian"
+        scribe: "Samuel ben Jacob"
+      current_location:
+        institution: "Russian National Library"
+        city: "Saint Petersburg"
+        country: "Russia"
+    image_sources:
+      - id: archive_org_color
+        type: image_set
+        url: "https://archive.org/details/leningrad-codex-color"
+        iiif_manifest: null
+        provider: "Internet Archive"
+        rights: "https://creativecommons.org/publicdomain/mark/1.0/"
+        rights_label: "PDM 1.0"
+        resolution: high
+        coverage: complete
+        notes: "Color scans uploaded by West Semitic Research; matches archive.org/download/leningrad-codex-color/BIB_LENCDX_<FOLIO>.jpg pattern used in phase_0_manifest.json"
+    ground_truth:
+      tier_1_consonants:
+        source: "UXLC v4.20"
+        source_url: "https://tanach.us/"
+        license: "Public domain (UXLC distributes without restriction)"
+        license_spdx: "CC0-1.0"
+        coverage: complete
+        notes: "UXLC consonantal text; aligned to Leningrad as base"
+      tier_2_nikkud:
+        source: "UXLC v4.20"
+        source_url: "https://tanach.us/"
+        license: "Public domain (UXLC distributes without restriction)"
+        license_spdx: "CC0-1.0"
+        coverage: complete
+        notes: "UXLC vocalization aligned to Leningrad"
+      tier_3_trop:
+        source: "UXLC v4.20"
+        source_url: "https://tanach.us/"
+        license: "Public domain (UXLC distributes without restriction)"
+        license_spdx: "CC0-1.0"
+        coverage: complete
+        notes: "UXLC cantillation aligned to Leningrad"
+      tier_4_metamarks:
+        source: "Open Mesorah hand-transcription"
+        source_url: "https://openmasorah.com"
+        license: "Creative Commons Attribution 4.0"
+        license_spdx: "CC-BY-4.0"
+        coverage: partial
+        verified_folios:
+          - "F118B"
+        pending_folios:
+          - "F119A"
+          - "F119B"
+          - "F120A"
+        mark_types_covered:
+          - large_letter
+          - small_letter
+          - inverted_nun
+          - puncta_extraordinaria
+          - circellus
+          - line_filler
+          - stichographic_layout
+        mark_types_excluded:
+          - suspended_letter
+          - dotted_letter
+          - rashe_tevot
+        notes: "Ha'azinu through Torah end (Devarim F118B-F120A); IAA set per phase 03.1"
+    pipeline:
+      phase: 0
+      in_frozen_scope: true
+      iaa_eligible: true
+      public_distributable: true
+      folio_id_pattern: "^F\\d{3}[AB]$"
+    related:
+      - relation: basis_of
+        target: bhs
+        type: edition
+      - relation: basis_of
+        target: bhq
+        type: edition
+      - relation: compared_with
+        target: aleppo
+        type: manuscript
+    citations:
+      - "Beit-Arie, Malachi. Hebrew Codicology. Jerusalem, 2021."
+      - "Wuerthwein, Ernst. The Text of the Old Testament. 2nd ed., Eerdmans, 1995."
+
+  - id: aleppo
+    schema_version: "0.1"
+    identity:
+      name: "Aleppo Codex"
+      common_names:
+        - "Keter Aram Tzova"
+        - "Codex A"
+      sigla:
+        hbce: "A"
+        bhq: "MA"
+      shelfmark: "Jerusalem, Ben-Zvi Institute"
+      date:
+        written: "ca. 930 CE"
+        written_iso: "0930"
+        colophon_attested: false
+      origin:
+        place: "Tiberias"
+        tradition: "Tiberian"
+        scribe:
+          consonants: "Shlomo ben Buya'a"
+          vocalization: "Aaron ben Moshe ben Asher"
+      current_location:
+        institution: "Ben-Zvi Institute"
+        city: "Jerusalem"
+        country: "Israel"
+    image_sources:
+      - id: aleppocodex_org
+        type: image_set
+        url: "https://www.aleppocodex.org/"
+        iiif_manifest: null
+        provider: "Ben-Zvi Institute"
+        rights: "All rights reserved; reference use only"
+        rights_label: "all_rights_reserved"
+        resolution: high
+        coverage: partial
+        notes: "~60% of original codex extant; Torah largely lost. Reference only - not redistributable."
+    ground_truth:
+      tier_1_consonants:
+        source: "Mechon Mamre (MAM)"
+        source_url: "https://www.mechon-mamre.org/"
+        license: "See mechon-mamre.org terms"
+        license_spdx: "NOASSERTION"
+        coverage: partial
+        notes: "MAM aligns to Aleppo where extant"
+      tier_2_nikkud:
+        source: "Mechon Mamre (MAM)"
+        source_url: "https://www.mechon-mamre.org/"
+        license: "See mechon-mamre.org terms"
+        license_spdx: "NOASSERTION"
+        coverage: partial
+        notes: "MAM vocalization aligned to Aleppo where extant"
+      tier_3_trop:
+        source: "Mechon Mamre (MAM)"
+        source_url: "https://www.mechon-mamre.org/"
+        license: "See mechon-mamre.org terms"
+        license_spdx: "NOASSERTION"
+        coverage: partial
+        notes: "MAM cantillation aligned to Aleppo where extant"
+      tier_4_metamarks:
+        source: "none"
+        license: "n/a"
+        license_spdx: "NOASSERTION"
+        coverage: none
+        mark_types_covered: []
+        mark_types_excluded: []
+        notes: "No tier-4 GT in phase 0 scope; deferred to phase 2."
+    pipeline:
+      phase: 2
+      in_frozen_scope: false
+      iaa_eligible: false
+      public_distributable: false
+      folio_id_pattern: "^F\\d{3}[AB]$"
+    related:
+      - relation: basis_of
+        target: hubp
+        type: edition
+      - relation: compared_with
+        target: leningrad
+        type: manuscript
+    citations:
+      - "Friedman, Matti. The Aleppo Codex. Algonquin, 2012."
+      - "Ben-Zvi Institute. The Aleppo Codex Online. https://www.aleppocodex.org/"

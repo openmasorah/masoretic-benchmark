@@ -1,0 +1,283 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:masoretic:manuscript.schema:v0.1",
+  "title": "manuscript catalog entry",
+  "description": "Validates each entry in corpus/manuscripts.yaml. Manuscript ids that also appear in phase_0_manifest.json folios MUST align with the manuscript enum declared in phase_0_manifest.schema.json. The catalog is the wider authority; the manifest enum is a phase-0-frozen subset, so a catalog entry may legitimately exist for manuscripts the manifest has not yet referenced (cross-checked one-way by scripts/validate_corpus.py).",
+  "type": "object",
+  "required": [
+    "id",
+    "schema_version",
+    "identity",
+    "image_sources",
+    "ground_truth",
+    "pipeline"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "coverage_enum": {
+      "type": "string",
+      "enum": ["complete", "partial", "sample", "none"]
+    },
+    "mark_type_enum": {
+      "type": "string",
+      "enum": [
+        "large_letter",
+        "small_letter",
+        "inverted_nun",
+        "puncta_extraordinaria",
+        "circellus",
+        "line_filler",
+        "stichographic_layout",
+        "suspended_letter",
+        "dotted_letter",
+        "rashe_tevot"
+      ]
+    },
+    "tier_block": {
+      "type": "object",
+      "required": ["source", "license", "license_spdx", "coverage"],
+      "additionalProperties": false,
+      "properties": {
+        "source": { "type": "string", "minLength": 1 },
+        "source_url": { "type": "string", "format": "uri" },
+        "license": { "type": "string", "minLength": 1 },
+        "license_spdx": { "type": "string", "minLength": 1 },
+        "coverage": { "$ref": "#/$defs/coverage_enum" },
+        "verified_folios": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "pending_folios": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "notes": { "type": "string" }
+      }
+    }
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "0.1"
+    },
+    "identity": {
+      "type": "object",
+      "required": [
+        "name",
+        "shelfmark",
+        "date",
+        "origin",
+        "current_location"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "common_names": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "sigla": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "hbce": { "type": "string" },
+            "bhq": { "type": "string" },
+            "bhs": { "type": "string" }
+          }
+        },
+        "shelfmark": { "type": "string", "minLength": 1 },
+        "date": {
+          "type": "object",
+          "required": ["written"],
+          "additionalProperties": false,
+          "properties": {
+            "written": { "type": "string", "minLength": 1 },
+            "written_iso": { "type": "string" },
+            "colophon_attested": { "type": "boolean" }
+          }
+        },
+        "origin": {
+          "type": "object",
+          "required": ["place", "tradition"],
+          "additionalProperties": false,
+          "properties": {
+            "place": { "type": "string", "minLength": 1 },
+            "tradition": { "type": "string", "minLength": 1 },
+            "scribe": {
+              "oneOf": [
+                { "type": "string", "minLength": 1 },
+                {
+                  "type": "object",
+                  "required": ["consonants", "vocalization"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "consonants": { "type": "string", "minLength": 1 },
+                    "vocalization": { "type": "string", "minLength": 1 }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "current_location": {
+          "type": "object",
+          "required": ["institution", "city", "country"],
+          "additionalProperties": false,
+          "properties": {
+            "institution": { "type": "string", "minLength": 1 },
+            "city": { "type": "string", "minLength": 1 },
+            "country": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "image_sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "url",
+          "provider",
+          "rights",
+          "rights_label",
+          "resolution",
+          "coverage"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["iiif_manifest", "image_set", "text_only", "single_image"]
+          },
+          "url": { "type": "string", "format": "uri" },
+          "iiif_manifest": {
+            "oneOf": [
+              { "type": "string", "format": "uri" },
+              { "type": "null" }
+            ]
+          },
+          "provider": { "type": "string", "minLength": 1 },
+          "rights": { "type": "string", "minLength": 1 },
+          "rights_label": { "type": "string", "minLength": 1 },
+          "resolution": {
+            "type": "string",
+            "enum": ["high", "medium", "low", "unknown"]
+          },
+          "coverage": {
+            "type": "string",
+            "enum": ["complete", "partial", "sample"]
+          },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "ground_truth": {
+      "type": "object",
+      "required": [
+        "tier_1_consonants",
+        "tier_2_nikkud",
+        "tier_3_trop",
+        "tier_4_metamarks"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tier_1_consonants": { "$ref": "#/$defs/tier_block" },
+        "tier_2_nikkud": { "$ref": "#/$defs/tier_block" },
+        "tier_3_trop": { "$ref": "#/$defs/tier_block" },
+        "tier_4_metamarks": {
+          "type": "object",
+          "required": ["source", "license", "license_spdx", "coverage"],
+          "additionalProperties": false,
+          "properties": {
+            "source": { "type": "string", "minLength": 1 },
+            "source_url": { "type": "string", "format": "uri" },
+            "license": { "type": "string", "minLength": 1 },
+            "license_spdx": { "type": "string", "minLength": 1 },
+            "coverage": { "$ref": "#/$defs/coverage_enum" },
+            "verified_folios": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "pending_folios": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "notes": { "type": "string" },
+            "mark_types_covered": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/mark_type_enum" }
+            },
+            "mark_types_excluded": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/mark_type_enum" }
+            }
+          }
+        }
+      }
+    },
+    "pipeline": {
+      "type": "object",
+      "required": [
+        "phase",
+        "in_frozen_scope",
+        "iaa_eligible",
+        "public_distributable",
+        "folio_id_pattern"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "phase": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "in_frozen_scope": { "type": "boolean" },
+        "iaa_eligible": { "type": "boolean" },
+        "public_distributable": { "type": "boolean" },
+        "folio_id_pattern": { "type": "string", "minLength": 1 }
+      }
+    },
+    "related": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["relation", "target", "type"],
+        "additionalProperties": false,
+        "properties": {
+          "relation": {
+            "type": "string",
+            "enum": [
+              "basis_of",
+              "compared_with",
+              "derived_from",
+              "superseded_by",
+              "references"
+            ]
+          },
+          "target": { "type": "string", "minLength": 1 },
+          "type": {
+            "type": "string",
+            "enum": ["manuscript", "edition"]
+          }
+        }
+      }
+    },
+    "citations": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}
