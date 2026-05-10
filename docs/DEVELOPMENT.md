@@ -19,7 +19,7 @@ development.
 1. **Clone the repo.**
 
    ```bash
-   git clone https://github.com/openmesorah/masoretic-benchmark.git
+   git clone https://github.com/openmasorah/masoretic-benchmark.git
    cd masoretic-benchmark
    ```
 

@@ -210,7 +210,7 @@ Every PR runs the following jobs (PR-blocking unless noted). See
 
 ## Reporting issues
 
-Open issues at <https://github.com/openmesorah/masoretic-benchmark/issues>. There
+Open issues at <https://github.com/openmasorah/masoretic-benchmark/issues>. There
 is no formal bug template; please include:
 
 - What you ran (CLI invocation, Python version, OS).

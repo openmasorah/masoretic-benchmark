@@ -39,7 +39,7 @@ pyenv local 3.11   # writes .python-version, already committed
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/openmesorah/masoretic-benchmark.git
+   git clone https://github.com/openmasorah/masoretic-benchmark.git
    cd masoretic-benchmark
    ```
 

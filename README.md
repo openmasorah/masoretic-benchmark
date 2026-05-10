@@ -1,7 +1,7 @@
 <!-- generated-by: gsd-doc-writer -->
 # masoretic-eval
 
-![CI](https://github.com/openmesorah/masoretic-benchmark/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/openmasorah/masoretic-benchmark/actions/workflows/ci.yml/badge.svg)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](.python-version)
 
@@ -144,8 +144,8 @@ If you use this benchmark or scoring suite, please cite. GitHub renders a "Cite 
   author       = {Lamm, Ben and Ginsburg, Yosef and Finkelstein, Ari},
   year         = {2026},
   version      = {0.2.0},
-  howpublished = {Hugging Face dataset, \url{https://huggingface.co/datasets/openmesorah/masoretic-benchmark-v0.1}},
-  note         = {Code: \url{https://github.com/openmesorah/masoretic-benchmark}}
+  howpublished = {Hugging Face dataset, \url{https://huggingface.co/datasets/openmasorah/masoretic-benchmark-v0.1}},
+  note         = {Code: \url{https://github.com/openmasorah/masoretic-benchmark}}
 }
 ```
 
