@@ -70,7 +70,7 @@ entries:
         notes: "UXLC cantillation aligned to Leningrad"
       tier_4_metamarks:
         source: "Open Mesorah hand-transcription"
-        source_url: "https://openmesorah.com"
+        source_url: "https://openmasorah.com"
         license: "Creative Commons Attribution 4.0"
         license_spdx: "CC-BY-4.0"
         coverage: partial

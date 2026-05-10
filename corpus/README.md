@@ -4,7 +4,7 @@
 
 `manuscripts.yaml` is the canonical, structured catalog of every Hebrew
 manuscript referenced anywhere in this benchmark — by `phase_0_manifest.json`,
-by baseline runs, by the paper, or by `openmesorah.com`. Entries are validated
+by baseline runs, by the paper, or by `openmasorah.com`. Entries are validated
 against [`../schemas/manuscript.schema.json`](../schemas/manuscript.schema.json)
 (JSON Schema 2020-12). Treat this catalog as the single source of truth for
 manuscript identity, image-source rights, and per-tier ground-truth licensing;
