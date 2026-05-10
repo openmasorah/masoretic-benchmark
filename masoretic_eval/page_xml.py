@@ -14,7 +14,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 from lxml import etree
 
@@ -40,7 +40,7 @@ class LineRecord:
     stichographic_column: int | None = None
 
 
-def _parse_custom(custom_attr: str, line_id: str) -> dict:
+def _parse_custom(custom_attr: str, line_id: str) -> dict[str, Any]:
     """Parse a ``TextLine @custom`` attribute into typed tier-4 fields.
 
     Splits on ``;``, strips whitespace, and routes each token:
@@ -68,7 +68,7 @@ def _parse_custom(custom_attr: str, line_id: str) -> dict:
     Malformed tokens raise ``ValueError`` naming the offending token and
     ``TextLine`` id.
     """
-    result: dict = {
+    result: dict[str, Any] = {
         "verse_ref": "",
         "parashah": None,
         "large_letters": [],
