@@ -223,3 +223,213 @@ def test_parse_synthetic_devarim_shema_golden() -> None:
     # Type invariant: all texts are str (never None).
     for r in records:
         assert isinstance(r.text, str), f"line_num={r.line_num} text not str"
+
+
+# ---------------------------------------------------------------------------
+# @custom field extraction (meta-marks schema v0.1, tracked follow-up §2)
+# ---------------------------------------------------------------------------
+
+
+def _page_xml_with_custom(
+    lines: list[tuple[int, str, str, float | None]],
+) -> bytes:
+    """Build minimal PAGE-XML with caller-supplied ``custom`` attributes.
+
+    Each tuple is ``(line_num, custom_attr, text, conf)``.
+    """
+    nsmap = {None: PAGE_NS}
+    pcgts = etree.Element(f"{{{PAGE_NS}}}PcGts", nsmap=nsmap)
+    page = etree.SubElement(
+        pcgts,
+        f"{{{PAGE_NS}}}Page",
+        imageFilename="test.jpg",
+        imageWidth="1200",
+        imageHeight="1800",
+    )
+    region = etree.SubElement(page, f"{{{PAGE_NS}}}TextRegion", id="r1")
+    etree.SubElement(region, f"{{{PAGE_NS}}}Coords", points="0,0 0,0")
+    for line_num, custom_attr, text, conf in lines:
+        tl = etree.SubElement(
+            region,
+            f"{{{PAGE_NS}}}TextLine",
+            id=f"line_{line_num}",
+            custom=custom_attr,
+        )
+        etree.SubElement(tl, f"{{{PAGE_NS}}}Coords", points="0,0 0,0")
+        te_attrs = {"index": "0"}
+        if conf is not None:
+            te_attrs["conf"] = f"{conf:.4f}"
+        te = etree.SubElement(tl, f"{{{PAGE_NS}}}TextEquiv", **te_attrs)
+        etree.SubElement(te, f"{{{PAGE_NS}}}Unicode").text = text
+    return etree.tostring(pcgts, xml_declaration=True, encoding="UTF-8")
+
+
+def test_custom_parashah_petuhah(tmp_path: Path) -> None:
+    xml_bytes = _page_xml_with_custom([(1, "verse_ref:Deut.32.1; parashah:petuhah", "הַאֲזִ֥ינוּ", 0.9)])
+    p = tmp_path / "petuhah.xml"
+    p.write_bytes(xml_bytes)
+    lines = parse_page_xml(p)
+    assert len(lines) == 1
+    assert lines[0].parashah == "petuhah"
+    assert lines[0].verse_ref == "Deut.32.1"
+
+
+def test_custom_parashah_setumah(tmp_path: Path) -> None:
+    xml_bytes = _page_xml_with_custom([(1, "verse_ref:Deut.6.5; parashah:setumah", "וְאָהַבְתָּ", None)])
+    p = tmp_path / "setumah.xml"
+    p.write_bytes(xml_bytes)
+    lines = parse_page_xml(p)
+    assert lines[0].parashah == "setumah"
+
+
+def test_custom_large_letter_single(tmp_path: Path) -> None:
+    xml_bytes = _page_xml_with_custom(
+        [(1, "verse_ref:Deut.32.6; letter_size:large@7", "הֲ־ לַיְהוָה", None)]
+    )
+    p = tmp_path / "large.xml"
+    p.write_bytes(xml_bytes)
+    lines = parse_page_xml(p)
+    assert lines[0].large_letters == (7,)
+    assert lines[0].small_letters == ()
+
+
+def test_custom_large_letter_multi(tmp_path: Path) -> None:
+    xml_bytes = _page_xml_with_custom(
+        [(1, "verse_ref:Deut.32.6; letter_size:large@5,large@12", "הֲ־ לַיְהוָה", None)]
+    )
+    p = tmp_path / "large_multi.xml"
+    p.write_bytes(xml_bytes)
+    lines = parse_page_xml(p)
+    assert lines[0].large_letters == (5, 12)
+
+
+def test_custom_small_letter(tmp_path: Path) -> None:
+    xml_bytes = _page_xml_with_custom(
+        [(1, "verse_ref:Deut.32.4; letter_size:small@3", "הַצּוּר֙", None)]
+    )
+    p = tmp_path / "small.xml"
+    p.write_bytes(xml_bytes)
+    lines = parse_page_xml(p)
+    assert lines[0].small_letters == (3,)
+    assert lines[0].large_letters == ()
+
+
+def test_custom_stichographic_column(tmp_path: Path) -> None:
+    xml_bytes = _page_xml_with_custom(
+        [(1, "verse_ref:Deut.32.2; layout:stichographic_column@1", "יַעֲרֹ֤ף", None)]
+    )
+    p = tmp_path / "stich.xml"
+    p.write_bytes(xml_bytes)
+    lines = parse_page_xml(p)
+    assert lines[0].stichographic_column == 1
+
+
+def test_custom_stichographic_column_two(tmp_path: Path) -> None:
+    xml_bytes = _page_xml_with_custom(
+        [(1, "verse_ref:Deut.32.2; layout:stichographic_column@2", "תִּזַּ֥ל", None)]
+    )
+    p = tmp_path / "stich2.xml"
+    p.write_bytes(xml_bytes)
+    lines = parse_page_xml(p)
+    assert lines[0].stichographic_column == 2
+
+
+def test_custom_all_fields_combined(tmp_path: Path) -> None:
+    """All three @custom field types on one TextLine parse correctly together."""
+    custom = (
+        "verse_ref:Deut.32.6; "
+        "parashah:petuhah; "
+        "letter_size:large@5,large@12; "
+        "layout:stichographic_column@1"
+    )
+    xml_bytes = _page_xml_with_custom([(1, custom, "הֲ לַיְהוָה", None)])
+    p = tmp_path / "combined.xml"
+    p.write_bytes(xml_bytes)
+    lines = parse_page_xml(p)
+    assert len(lines) == 1
+    r = lines[0]
+    assert r.verse_ref == "Deut.32.6"
+    assert r.parashah == "petuhah"
+    assert r.large_letters == (5, 12)
+    assert r.small_letters == ()
+    assert r.stichographic_column == 1
+
+
+def test_custom_no_custom_tokens_gives_defaults(tmp_path: Path) -> None:
+    """TextLine with only verse_ref → all new fields are default (None/empty)."""
+    xml_bytes = _page_xml_with_custom([(1, "verse_ref:Deut.1.1", "א", None)])
+    p = tmp_path / "no_custom.xml"
+    p.write_bytes(xml_bytes)
+    lines = parse_page_xml(p)
+    assert lines[0].parashah is None
+    assert lines[0].large_letters == ()
+    assert lines[0].small_letters == ()
+    assert lines[0].stichographic_column is None
+
+
+def test_custom_malformed_parashah_raises(tmp_path: Path) -> None:
+    import pytest
+
+    from masoretic_eval.page_xml import _parse_custom
+
+    with pytest.raises(ValueError, match="parashah"):
+        _parse_custom("parashah:open", "line_99")
+
+
+def test_custom_malformed_letter_size_raises(tmp_path: Path) -> None:
+    import pytest
+
+    from masoretic_eval.page_xml import _parse_custom
+
+    with pytest.raises(ValueError, match="letter_size"):
+        _parse_custom("letter_size:huge@5", "line_99")
+
+
+def test_custom_malformed_stichographic_column_raises(tmp_path: Path) -> None:
+    import pytest
+
+    from masoretic_eval.page_xml import _parse_custom
+
+    with pytest.raises(ValueError, match="stichographic_column"):
+        _parse_custom("layout:stichographic_column@3", "line_99")
+
+
+def test_f118b_fixture_roundtrip_no_regression() -> None:
+    """Round-trip the F118B fixture; verse_ref and text fields must be byte-identical.
+
+    Skipped if the fixture file is not accessible (operator-local sibling repo).
+    Path is constructed via Path.home() to avoid embedding operator userpath literals.
+    """
+    import pytest
+
+    # Resolve via home so the source file contains no operator-local path literal
+    # (private-path scanner denylist: /Users/<operator> is a reject pattern).
+    fixture = (
+        Path.home()
+        / "Workspace"
+        / "baalshem"
+        / "gt-infra"
+        / "exports"
+        / "leningrad_devarim_F118B_fixture.page.xml"
+    )
+    if not fixture.exists():
+        pytest.skip("F118B fixture not accessible from this environment")
+
+    records = parse_page_xml(fixture)
+    assert len(records) > 0, "F118B fixture parsed zero lines — check file path"
+
+    for r in records:
+        assert isinstance(r.verse_ref, str), f"line {r.line_num}: verse_ref is not str"
+        assert isinstance(r.text, str), f"line {r.line_num}: text is not str"
+        # New fields must default safely — none of the existing F118B GT has @custom tokens
+        # beyond verse_ref, so all tier-4 fields should be at their defaults.
+        assert r.parashah is None, f"line {r.line_num}: unexpected parashah {r.parashah!r}"
+        assert r.large_letters == (), (
+            f"line {r.line_num}: unexpected large_letters {r.large_letters!r}"
+        )
+        assert r.small_letters == (), (
+            f"line {r.line_num}: unexpected small_letters {r.small_letters!r}"
+        )
+        assert r.stichographic_column is None, (
+            f"line {r.line_num}: unexpected stichographic_column {r.stichographic_column!r}"
+        )
