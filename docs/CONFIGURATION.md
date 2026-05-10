@@ -332,7 +332,7 @@ The oracles package registers `live_oracles` in `oracles/tests/conftest.py`.
 | `no-commit-to-branch` | same | Block direct commits to `main` |
 | `ruff` (`--fix`) + `ruff-format` | `astral-sh/ruff-pre-commit v0.15.11` | Lint + format Python |
 | `reject-binary-extensions` | local (`scripts/reject_binaries.py`) | Reject `*.jpg`, `*.pdf`, `*.png`, etc., and anything under `scans/` |
-| `reject-private-paths` | local (`scripts/reject_private_paths.py`) | Reject leaks of the private `openmesorah` workspace path or local user paths |
+| `reject-private-paths` | local (`scripts/reject_private_paths.py`) | Reject leaks of the private `openmasorah` workspace path or local user paths |
 | `manifest-append-only` | local (`scripts/manifest_immutable.py`) | Enforce `phase_0_manifest.json` append-only immutability (only fires on changes to that exact file) |
 | `gitleaks` | `gitleaks/gitleaks v8.20.0` | Detect hardcoded secrets |
 
@@ -374,7 +374,7 @@ Two workflows live in `.github/workflows/`:
 
 CI installs system dependency `libicu-dev pkg-config` (for `PyICU`) before any
 pip install on Linux runners. Sibling repo CI does **not** invoke the private
-`openmesorah` repo in any form (no vendoring, cloning, or submodules) — Pitfall 8
+`openmasorah` repo in any form (no vendoring, cloning, or submodules) — Pitfall 8
 carry-forward.
 
 ## Per-environment overrides

@@ -104,8 +104,8 @@ commit the recovered baseline.
 ### Pitfall 8 carry-forward
 
 Phase 1's GT-12 IAA gate is NOT run by sibling CI — the sibling repo must be
-independently verifiable by anyone (no openmesorah dependency). IAA gates live in
-openmesorah only.
+independently verifiable by anyone (no openmasorah dependency). IAA gates live in
+openmasorah only.
 
 ## License
 

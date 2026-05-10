@@ -1,7 +1,7 @@
 # Pre-commit config snippet for the SIBLING public repo (~/Workspace/masoretic-benchmark/).
 #
 # Merge these `repos:` entries into the sibling repo's `.pre-commit-config.yaml`.
-# DO NOT install in openmesorah — openmesorah has its own (lighter) hooks; see
+# DO NOT install in openmasorah — openmasorah has its own (lighter) hooks; see
 # CLAUDE.md + Pitfall 8 (.planning/phases/01-gt-infra/01-RESEARCH.md).
 #
 # The two `local` hooks reference scripts copied to `scripts/` per the runbook
@@ -37,7 +37,7 @@ repos:
         pass_filenames: true
 
       - id: reject-private-paths
-        name: "Reject private openmesorah workspace and local user path leaks"
+        name: "Reject private openmasorah workspace and local user path leaks"
         entry: python scripts/reject_private_paths.py
         language: python
         pass_filenames: true

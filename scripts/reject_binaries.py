@@ -1,8 +1,8 @@
 """Pre-commit hook: reject binaries + anything under scans/ + files >5 MB.
 
 **Target repo:** ``~/Workspace/masoretic-benchmark/`` (the public sibling repo).
-This file is COPY-READY; it is maintained here in openmesorah's
-``gt-infra/sibling_hooks/`` but is not installed in openmesorah itself.
+This file is COPY-READY; it is maintained here in openmasorah's
+``gt-infra/sibling_hooks/`` but is not installed in openmasorah itself.
 
 Defense in depth against the private Cairo Shmuel / El Códice / personal mss
 ever leaking into the public repo. Paired with BL-08 (baseline content filter)

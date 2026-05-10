@@ -66,4 +66,4 @@ oracle pattern; full workflow at `.github/workflows/ci.yml`):
 **Deferred for Phase 3.1:** the `baseline-live` job's "real fixture generation" step is currently a no-op echo. Real predictions on the 5 IAA folios for BL-01..BL-04 (estimated ~$5–$25 LLM spend + Kraken/Nakdimon/DictaBERT inference) are deferred to a Phase 3.1 gap-closure plan. CI infrastructure (cache key, secrets, install pattern) is ready for Phase 3.1 to populate the live tier without further wiring work.
 
 **Phase 1 F8 gate is NOT in sibling CI** — Pitfall 8 carry-forward. The sibling
-repo must be independently verifiable; F8 is openmesorah's gate.
+repo must be independently verifiable; F8 is openmasorah's gate.
