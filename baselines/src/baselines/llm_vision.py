@@ -18,7 +18,7 @@ HISTORY: AbbyyFR was dropped 2026-04-25 per Phase 3 Adjudication A-2:
   - Engine SDK Hebrew Bible mode = training-contamination risk (vendor opaque).
   - Cloud SDK = rotating endpoint, no version header (DICTA-style non-reproducible).
   - 2026 frontier vision LLMs cleanly clear the bar AbbyyFR fails.
-See ``paper/methodology_delta_BL-01_AbbyyFR_drop.md`` (in openmesorah) for
+See ``paper/methodology_delta_BL-01_AbbyyFR_drop.md`` (in openmasorah) for
 the full reframing rationale; CONTEXT.md decision-log entry D-20 records
 the dependency graph implication.
 

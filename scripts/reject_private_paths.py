@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 DENYLIST: tuple[str, ...] = (
-    "Workspace/" + "openmesorah",
+    "Workspace/" + "openmasorah",
     "/Users/" + "benlamm",
 )
 
@@ -50,7 +50,7 @@ def main(argv: list[str]) -> int:
             print(error, file=sys.stderr)
         print(
             "\nGT-10/BL-08/REL-09: public-bound masoretic-benchmark files must "
-            "not contain private openmesorah workspace or local user path leaks.",
+            "not contain private openmasorah workspace or local user path leaks.",
             file=sys.stderr,
         )
         return 1

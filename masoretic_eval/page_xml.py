@@ -1,10 +1,10 @@
 """PAGE-XML 2019-07-15 parser. Authoritative implementation (Phase 03.1 A-04).
 
-Verbatim move from openmesorah/gt-infra/gt_infra/export/page_xml_parser.py
+Verbatim move from openmasorah/gt-infra/gt_infra/export/page_xml_parser.py
 in masoretic_eval v0.2.0. The gt-infra path becomes a 2-line shim.
 
 Pitfall 2: bytes survive — no Unicode normalization anywhere. lxml does
-not normalize on parse (verified in openmesorah 01-04 + Phase 1 byte-preservation tests).
+not normalize on parse (verified in openmasorah 01-04 + Phase 1 byte-preservation tests).
 """
 
 from __future__ import annotations

@@ -1,6 +1,6 @@
 """D-15 declarations test: manifest declares expected_reports_per_baseline.
 
-Asserts that for EVERY known Phase 3 baseline_id, the live openmesorah manifest
+Asserts that for EVERY known Phase 3 baseline_id, the live openmasorah manifest
 has the key present in `expected_reports_per_baseline`.
 
 Per Plan 03-01 Task 3, the v0.2 manifest emission populates
@@ -33,7 +33,7 @@ KNOWN_BASELINE_IDS = (
 
 @pytest.mark.skipif(
     not OPENMESORAH_MANIFEST.exists(),
-    reason="openmesorah manifest not present in this CI sandbox",
+    reason="openmasorah manifest not present in this CI sandbox",
 )
 def test_manifest_declares_expected_reports_per_baseline_for_every_baseline_id():
     m = json.loads(OPENMESORAH_MANIFEST.read_text(encoding="utf-8"))
@@ -84,7 +84,7 @@ def test_results_dir_count_equals_manifest_expected_reports():
         pytest.skip("results/ tree not yet seeded (Phase 03.1 W4/W5 in progress)")
 
     if not OPENMESORAH_MANIFEST.exists():
-        pytest.skip("openmesorah manifest not present (running outside expected layout)")
+        pytest.skip("openmasorah manifest not present (running outside expected layout)")
 
     m = json.loads(OPENMESORAH_MANIFEST.read_text(encoding="utf-8"))
     per_baseline = m["expected_reports_per_baseline"]
@@ -102,7 +102,7 @@ def test_results_dir_count_equals_manifest_expected_reports():
 
 @pytest.mark.skipif(
     not OPENMESORAH_MANIFEST.exists(),
-    reason="openmesorah manifest not present in this CI sandbox",
+    reason="openmasorah manifest not present in this CI sandbox",
 )
 def test_manifest_version_is_v02():
     """Companion check: the manifest's schema version is v0.2.0 — only the

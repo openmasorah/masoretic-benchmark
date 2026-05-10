@@ -19,7 +19,7 @@ Newest first.
   seed; Gemini's seed is best-effort and known non-deterministic on gemini-2.5-pro.
   The replay log is the contract; provider-side non-determinism is documented in the
   BL-01 docstring + paper methodology delta (`paper/methodology_delta_BL-01_AbbyyFR_drop.md`
-  in openmesorah).
+  in openmasorah).
 - **Tie-break**: alphabetical, Claude < Gemini, so Claude wins ties. WHOLE-LINE WINNER —
   NO tier-mixing across sources within a line (D-07). Disclosed explicitly in paper.
 - **AbbyyFR (dropped)**: Engine SDK contamination risk (Hebrew Bible mode trained on
