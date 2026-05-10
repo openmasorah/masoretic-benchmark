@@ -106,6 +106,39 @@ def test_parse_preserves_bytes(tmp_path: Path) -> None:
     assert "͏" in lines[0].text
 
 
+def test_parse_preserves_non_canonical_combining_mark_order(tmp_path: Path) -> None:
+    """Pitfall 2: non-canonical combining-mark order survives parse byte-identical.
+
+    A parser that silently NFC-normalised would canonically reorder U+05C4
+    (HEBREW MARK UPPER DOT, CCC=230) below U+05B8 (QAMATS, CCC=18) and this
+    assertion would fail. This is the regression guard the F118B fixture-roundtrip
+    test does NOT provide — that test only checks types and tier-4 defaults.
+    """
+    import unicodedata
+
+    # א + U+05C4 (HEBREW MARK UPPER DOT, CCC=230) + U+05B8 (QAMATS, CCC=18).
+    # NFC reorders by CCC ascending, so canonical form has QAMATS first.
+    # \u escapes used to keep the literals byte-explicit; visually-similar
+    # combining-mark literals are unsafe to copy/paste in source.
+    non_canonical = "\u05d0\u05c4\u05b8"
+    canonical = "\u05d0\u05b8\u05c4"
+    assert non_canonical != canonical, "test setup invalid \u2014 strings must differ in bytes"
+    assert unicodedata.normalize("NFC", non_canonical) == canonical, (
+        "test setup invalid \u2014 NFC must reorder these combining marks"
+    )
+
+    xml_bytes = _minimal_page_xml([(1, "Deut.1.1", non_canonical, None)])
+    p = tmp_path / "non_canonical.xml"
+    p.write_bytes(xml_bytes)
+    lines = parse_page_xml(p)
+    assert len(lines) == 1
+    assert lines[0].text == non_canonical, (
+        f"Pitfall 2 violation — parser reordered combining marks. "
+        f"Expected {non_canonical!r}, got {lines[0].text!r}"
+    )
+    assert lines[0].text != canonical, "Parser silently produced canonical order — Pitfall 2 broken"
+
+
 # ---------------------------------------------------------------------------
 # 3. Skip-branch: TextLine missing TextEquiv
 # ---------------------------------------------------------------------------
@@ -394,8 +427,34 @@ def test_custom_malformed_stichographic_column_raises(tmp_path: Path) -> None:
         _parse_custom("layout:stichographic_column@3", "line_99")
 
 
+def test_custom_unknown_top_level_token_raises() -> None:
+    """Strict-everywhere policy: unknown top-level keys raise ValueError.
+
+    Annotator typos like ``parasha:petuhah`` (missing 'h') must surface
+    immediately rather than being silent-skipped through to scoring.
+    """
+    import pytest
+
+    from masoretic_eval.page_xml import _parse_custom
+
+    with pytest.raises(ValueError, match="unrecognised top-level key"):
+        _parse_custom("parasha:petuhah", "line_99")
+
+    with pytest.raises(ValueError, match="unrecognised top-level key"):
+        _parse_custom("verse_ref:Deut.1.1; bogus_key:value", "line_99")
+
+
 def test_f118b_fixture_roundtrip_no_regression() -> None:
-    """Round-trip the F118B fixture; verse_ref and text fields must be byte-identical.
+    """Smoke test on the real F118B fixture: parses without error, tier-4 fields default.
+
+    NOT a byte-faithfulness proof — that lives in:
+      - test_parse_preserves_bytes (CGJ regression guard)
+      - test_parse_preserves_non_canonical_combining_mark_order (Pitfall 2 guard)
+
+    This test only confirms (a) the F118B fixture remains parseable,
+    (b) types are correct on every record, and (c) the new tier-4 fields
+    default to their empty values for a GT export that contains only
+    ``verse_ref`` tokens.
 
     Skipped if the fixture file is not accessible (operator-local sibling repo).
     Path is constructed via Path.home() to avoid embedding operator userpath literals.

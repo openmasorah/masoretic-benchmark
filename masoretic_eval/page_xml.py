@@ -50,6 +50,13 @@ def _parse_custom(custom_attr: str, line_id: str) -> dict:
       - ``letter_size:small@<idx>[,small@<idx>…]``  → ``small_letters`` (tuple[int])
       - ``layout:stichographic_column@<n>``          → ``stichographic_column`` (int)
 
+    **Strict-everywhere policy.** Unknown top-level keys *and* unknown sub-keys
+    both raise ``ValueError``. Annotator typos (``parasha:petuhah``,
+    ``letter_szie:large@5``) surface immediately rather than passing through
+    to scoring as malformed GT. Forward-compatibility for new schema versions
+    is handled by an explicit version bump + parser update, not by
+    silent-skip on unrecognised tokens.
+
     Letter-size indices are the comma-separated zero-based code-unit indices
     into the TextLine's text content after NFC normalization (per schema §4).
     Multiple entries of the same size share the same semicolon-delimited token
@@ -117,8 +124,12 @@ def _parse_custom(custom_attr: str, line_id: str) -> dict:
                 f"unrecognised layout subkey (expected 'stichographic_column@<n>')"
             )
 
-        # Unknown tokens (e.g. future extensions or tool-generated metadata)
-        # are silently skipped so the parser remains forward-compatible.
+        else:
+            raise ValueError(
+                f"Malformed @custom token {tok!r} in TextLine {line_id!r}: "
+                f"unrecognised top-level key (expected one of: "
+                f"verse_ref, parashah, letter_size, layout)"
+            )
 
     return result
 
