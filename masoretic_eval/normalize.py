@@ -20,12 +20,21 @@ def normalize_for_scoring(text: str) -> str:
     presentation forms (U+FB2A–FB2D) as composition exclusions that decompose
     into base shin (U+05E9) + combining dagesh / sin-dot / shin-dot.
 
-    NFC is applied first (meta-marks schema v0.1 §"Normalization", tracked
-    follow-up §1) to canonicalize combining-mark order before the NFD pass.
-    U+05C4/U+05C5 share CCC values with trop accents; without NFC, two
-    canonical-equivalent strings score as character-level mismatches.
+    CGJ (U+034F) is stripped **first**, before the NFC/NFD passes. CGJ has
+    canonical combining class 0, so while present it blocks canonical
+    reordering of the combining marks around it. UXLC freezes meteg-vs-vowel
+    rendering order with CGJ (e.g. Deut 32:50 כַּאֲשֶׁר: kaf·dagesh·meteg·CGJ·patah).
+    The benchmark scores mark *presence* per cluster, not byte-order, so a
+    reading authored with CGJ and the same reading authored without it must
+    normalize identically. Stripping CGJ after normalizing would leave the
+    guarded marks in their pre-canonical order, scoring a false CER mismatch
+    (meta-marks schema v0.1 §"Normalization", tracked follow-up §1).
+
+    NFC then NFD canonicalize combining-mark order before tier comparison.
+    U+05C4/U+05C5 share CCC values with trop accents; without canonicalization
+    two canonical-equivalent strings score as character-level mismatches.
     """
-    # NFC mandate — meta-marks schema v0.1 §"Normalization": canonicalize
-    # combining-mark order before tier comparison (scorer-side requirement).
+    # Strip CGJ first so the marks it guards can canonically reorder.
+    text = strip_cgj(text)
     text = unicodedata.normalize("NFC", text)
-    return strip_cgj(unicodedata.normalize("NFD", text))
+    return unicodedata.normalize("NFD", text)
