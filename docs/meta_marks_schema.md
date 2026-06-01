@@ -56,6 +56,16 @@ the order.
 both reference and prediction strings before tier-1/2/3/4 CER computation.
 (Tracked follow-up — see *v0.1 follow-ups* below.)
 
+**CGJ (U+034F).** Stripped pre-normalization (before NFC/NFD), not after.
+CGJ has canonical combining class 0, so while present it blocks canonical
+reordering of the marks around it; stripping it first lets the guarded marks
+canonicalize. This is safe **because scoring is presence-per-cluster
+(order-agnostic post-NFD)** — every corpus CGJ site to date freezes
+meteg-vs-vowel *rendering* order only, which the benchmark does not score.
+**Tripwire:** if scoring ever becomes order-sensitive, revisit — the fix must
+then become "require annotators to reproduce CGJ," not strip it. This is a
+scoring-model condition, not a per-site scholar gate.
+
 **Annotation workflow.** At GT export, run text through
 `unicodedata.normalize("NFC", s)` (or eScriptorium's normalize-on-export
 setting if enabled). The GT pipeline pre-commit gate must verify NFC.

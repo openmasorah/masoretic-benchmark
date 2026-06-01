@@ -34,7 +34,10 @@ def normalize_for_scoring(text: str) -> str:
     U+05C4/U+05C5 share CCC values with trop accents; without canonicalization
     two canonical-equivalent strings score as character-level mismatches.
     """
-    # Strip CGJ first so the marks it guards can canonically reorder.
+    # CGJ stripped pre-normalization: scoring is presence-per-cluster
+    # (order-agnostic post-NFD). If scoring ever becomes order-sensitive,
+    # revisit — stripping CGJ first must move to "require annotators to
+    # reproduce CGJ" instead. Strip first so the marks it guards can reorder.
     text = strip_cgj(text)
     text = unicodedata.normalize("NFC", text)
     return unicodedata.normalize("NFD", text)
