@@ -227,6 +227,12 @@ block tier-4 scoring; track them so they don't evaporate.
    the v0.1 NFC test covers tier-2 only. Add coverage that two NFC-equivalent
    strings produce CER == 0 for tier-1, tier-3, and tier-4, and that
    `normalize_for_scoring` is a no-op on already-NFC input (idempotence).
+   *Status (v0.2): tier-3 now covered by the CGJ-ordering regression
+   (`tests/test_normalize.py::test_tier3_cer_is_zero_for_cgj_equivalent_strings`),
+   added alongside the strip-CGJ-first ordering fix. Idempotence is guarded by
+   `test_nfd_is_idempotent`. Tier-1 is mark-insensitive (consonants only), so its
+   equivalence is trivially satisfied. Tier-4 remains open — it needs a meta-mark
+   fixture, not a meteg+vowel cluster.*
 2. **Duplicate-scalar-token detection in `_parse_custom`** — repeated tokens
    for scalar fields (e.g. two `parashah:` or two
    `layout:stichographic_column@`) silently overwrite (last wins). Promote to

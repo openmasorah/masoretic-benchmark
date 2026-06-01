@@ -2,6 +2,7 @@ import unicodedata
 
 from masoretic_eval.normalize import normalize_for_scoring, strip_cgj
 from masoretic_eval.tiers.tier2_nikkud import Tier2Nikkud
+from masoretic_eval.tiers.tier3_trop import Tier3Trop
 
 
 def test_nfd_produces_decomposed_form():
@@ -104,4 +105,73 @@ def test_tier2_cer_is_zero_for_canonical_equivalent_strings():
     assert result.cer == 0.0, (
         f"Expected CER 0.0 for canonical-equivalent pair; got {result.cer}. "
         "This indicates the NFC pre-comparison fix is not in effect."
+    )
+
+
+# ---------------------------------------------------------------------------
+# CGJ ordering: a reading authored WITH the Combining Grapheme Joiner and the
+# SAME reading authored WITHOUT it must score CER == 0 for tiers 2 and 3.
+#
+# CGJ (U+034F, CCC=0) blocks canonical reordering of the marks around it. UXLC
+# freezes meteg-vs-vowel *rendering* order with CGJ; the benchmark scores mark
+# presence per cluster, not byte-order, so the two orderings are the same
+# reading. Stripping CGJ AFTER normalizing leaves the guarded marks
+# unreordered and scores a false mismatch — this guards the strip-CGJ-first
+# fix. Covers the tier-3 portion of meta_marks_schema.md "Deferred to v0.2 §1"
+# (the v0.1 NFC test covered tier-2 only; idempotence is guarded separately by
+# test_nfd_is_idempotent). Tier-1 is mark-insensitive (consonants only), so its
+# equivalence is trivially satisfied; tier-4 NFC-equivalence stays deferred —
+# it needs a meta-mark fixture, not a meteg+vowel cluster.
+#
+# SCHOLAR NOTE: both real corpus sites — F118B הָרָעָה and F119A כַּאֲשֶׁר
+# (Deut 32:50) — freeze meteg-vs-vowel placement only. If a future site ever
+# intends CGJ-frozen order as a *scored* distinction, the fix must change to
+# "require annotators to reproduce CGJ," not strip it.
+# ---------------------------------------------------------------------------
+
+
+def _make_cgj_pair() -> tuple[str, str]:
+    """Return (with_cgj, without_cgj) for the real Deut 32:50 site כַּאֲשֶׁר.
+
+    First cluster: kaf · dagesh(U+05BC) · meteg(U+05BD) · CGJ(U+034F) · patah(U+05B7).
+    The CGJ-free variant is the same multiset of marks without the joiner.
+    Both are the identical reading; only the frozen byte-order differs.
+    """
+    kaf = "כ"
+    dagesh = "ּ"
+    meteg = "ֽ"
+    cgj = "͏"
+    patah = "ַ"
+    with_cgj = kaf + dagesh + meteg + cgj + patah
+    without_cgj = kaf + dagesh + meteg + patah
+    # Sanity: byte-distinct before normalization.
+    assert with_cgj.encode("utf-8") != without_cgj.encode("utf-8"), (
+        "test setup error: CGJ pair is not byte-distinct"
+    )
+    return with_cgj, without_cgj
+
+
+def test_cgj_pair_normalizes_identically():
+    """strip-CGJ-first lets the guarded marks canonicalize to the same bytes."""
+    with_cgj, without_cgj = _make_cgj_pair()
+    assert normalize_for_scoring(with_cgj) == normalize_for_scoring(without_cgj)
+
+
+def test_tier2_cer_is_zero_for_cgj_equivalent_strings():
+    """Tier-2 CER == 0 for a CGJ reading vs its CGJ-free equivalent."""
+    with_cgj, without_cgj = _make_cgj_pair()
+    result = Tier2Nikkud().score(gt=with_cgj, pred=without_cgj)
+    assert result.cer == 0.0, (
+        f"Expected tier-2 CER 0.0 for CGJ-equivalent pair; got {result.cer}. "
+        "CGJ must be stripped BEFORE NFC/NFD so guarded marks canonicalize."
+    )
+
+
+def test_tier3_cer_is_zero_for_cgj_equivalent_strings():
+    """Tier-3 CER == 0 for a CGJ reading vs its CGJ-free equivalent."""
+    with_cgj, without_cgj = _make_cgj_pair()
+    result = Tier3Trop().score(gt=with_cgj, pred=without_cgj)
+    assert result.cer == 0.0, (
+        f"Expected tier-3 CER 0.0 for CGJ-equivalent pair; got {result.cer}. "
+        "CGJ must be stripped BEFORE NFC/NFD so guarded marks canonicalize."
     )
