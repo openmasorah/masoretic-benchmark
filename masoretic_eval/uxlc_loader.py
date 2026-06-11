@@ -95,7 +95,11 @@ def _word_text(w_el: etree._Element) -> str:
     for child in w_el:
         localname = etree.QName(child).localname
         if localname == "x":
-            # Skip tier-4 / annotation code — not part of the word's text.
+            # The <x> code char itself is not part of the word's text, but UXLC
+            # places <x> mid-word, so the word remainder is the element's TAIL
+            # and must be kept (else e.g. the Decalogue תרצח truncates).
+            if child.tail:
+                parts.append(child.tail)
             continue
         # <s t="large|small"> or other markup: include its text.
         if child.text:
@@ -127,11 +131,7 @@ def load_uxlc(path: Path | str) -> UXLCDoc:
 
     for book_el in root.iter("book"):
         name_el = book_el.find("names/name")
-        book_name = (
-            name_el.text.strip()
-            if name_el is not None and name_el.text
-            else "?"
-        )
+        book_name = name_el.text.strip() if name_el is not None and name_el.text else "?"
 
         for c_el in book_el.iter("c"):
             chapter = c_el.get("n", "?")
@@ -199,17 +199,12 @@ def load_uxlc(path: Path | str) -> UXLCDoc:
                             pending_ketiv = None
                         n = ordinal_by_type.get((ref, localname), 0) + 1
                         ordinal_by_type[(ref, localname)] = n
-                        metamarks.append(
-                            MetaMarkRecord(
-                                type=localname, verse_ref=ref, ordinal=n
-                            )
-                        )
+                        metamarks.append(MetaMarkRecord(type=localname, verse_ref=ref, ordinal=n))
 
                 # Flush any ketiv left at end of verse (no more siblings).
                 if pending_ketiv is not None:
                     _log.warning(
-                        "UXLC: ketiv %r has no qere sibling at verse %s;"
-                        " using ketiv as fallback",
+                        "UXLC: ketiv %r has no qere sibling at verse %s; using ketiv as fallback",
                         pending_ketiv,
                         ref,
                     )
@@ -226,9 +221,7 @@ def load_uxlc(path: Path | str) -> UXLCDoc:
                             n = ordinal_by_type.get((ref, mark_type), 0) + 1
                             ordinal_by_type[(ref, mark_type)] = n
                             metamarks.append(
-                                MetaMarkRecord(
-                                    type=mark_type, verse_ref=ref, ordinal=n
-                                )
+                                MetaMarkRecord(type=mark_type, verse_ref=ref, ordinal=n)
                             )
 
                 verses[ref] = " ".join(word_parts)
@@ -240,9 +233,7 @@ def _strip_range(text: str, lo: int, hi: int) -> str:
     return "".join(c for c in text if not (lo <= ord(c) <= hi))
 
 
-def load_tier_strings(
-    path: Path | str, tier: int
-) -> dict[str, str] | list[MetaMarkRecord]:
+def load_tier_strings(path: Path | str, tier: int) -> dict[str, str] | list[MetaMarkRecord]:
     """Return the tier-specific view of a UXLC document.
 
     - tier 1: consonants only (nikkud + trop + rafe + sin/shin dots stripped).

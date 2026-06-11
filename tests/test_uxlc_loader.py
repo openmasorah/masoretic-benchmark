@@ -20,8 +20,9 @@ def test_tier1_strips_nikkud_and_trop():
     strings = load_tier_strings(FIXTURE, tier=1)
     # Tier 1 = consonants only
     text = strings["Deut.6.4"]
-    assert all("א" <= c <= "ת" or c == " " or c == "־" for c in text), \
+    assert all("א" <= c <= "ת" or c == " " or c == "־" for c in text), (
         f"tier 1 contained non-consonantal codepoint: {text!r}"
+    )
 
 
 def test_tier1_deut_6_4_exact_string():
@@ -42,8 +43,7 @@ def test_tier2_includes_nikkud_strips_trop():
     text = strings["Deut.6.4"]
     # qamatz (U+05B8) and patach (U+05B7) are nikkud — should be present
     # Trop marks (U+0591–05AF) should be absent
-    assert all(not ("֑" <= c <= "֯") for c in text), \
-        f"tier 2 contained trop codepoint: {text!r}"
+    assert all(not ("֑" <= c <= "֯") for c in text), f"tier 2 contained trop codepoint: {text!r}"
 
 
 def test_tier3_includes_full():
@@ -51,8 +51,7 @@ def test_tier3_includes_full():
     text = strings["Deut.6.4"]
     # Full: consonants + nikkud + trop all present
     # Assert at least one trop mark exists (the fixture has trop)
-    assert any("֑" <= c <= "֯" for c in text), \
-        "tier 3 should retain trop"
+    assert any("֑" <= c <= "֯" for c in text), "tier 3 should retain trop"
 
 
 def test_qere_selected_by_default():
@@ -82,13 +81,13 @@ def test_tier4_metamarks_extracted_as_records():
 
 def test_qere_wins_over_ketiv(tmp_path):
     """When a verse has <k> and <q> siblings, the loader emits qere."""
-    xml = '''<?xml version="1.0" encoding="UTF-8"?>
+    xml = """<?xml version="1.0" encoding="UTF-8"?>
 <Tanach><tanach><book>
   <names><name>Deuteronomy</name></names>
   <c n="1">
     <v n="1"><w>דָּבָר</w><k>כְּתִיב</k><q>קְרֵי</q></v>
   </c>
-</book></tanach></Tanach>'''
+</book></tanach></Tanach>"""
     path = tmp_path / "kq.xml"
     path.write_text(xml, encoding="utf-8")
     doc = load_uxlc(path)
@@ -96,15 +95,36 @@ def test_qere_wins_over_ketiv(tmp_path):
     assert "כְּתִיב" not in doc.verses["Deut.1.1"]
 
 
+def test_word_text_keeps_tail_after_x_element(tmp_path):
+    """UXLC places <x> mid-word; the word remainder is the <x> element's tail.
+
+    The tail must not be dropped (real example: the Decalogue תרצח, encoded
+    <w>תִּֿרְצָ֖<x>c</x>ח׃</w>, must not truncate to תִּֿרְצָ֖). The <x> code
+    character itself is still excluded from the word text.
+    """
+    xml = """<?xml version="1.0" encoding="UTF-8"?>
+<Tanach><tanach><book>
+  <names><name>Deuteronomy</name></names>
+  <c n="6">
+    <v n="3"><w>אב<x>5</x>גד</w></v>
+  </c>
+</book></tanach></Tanach>"""
+    path = tmp_path / "xtail.xml"
+    path.write_text(xml, encoding="utf-8")
+
+    doc = load_uxlc(path)
+    assert doc.verses["Deut.6.3"] == "אבגד", f"dropped <x> tail: {doc.verses['Deut.6.3']!r}"
+
+
 def test_ketiv_fallback_when_no_qere(tmp_path, caplog):
     """When <k> has no <q> sibling, the loader falls back to ketiv and warns."""
-    xml = '''<?xml version="1.0" encoding="UTF-8"?>
+    xml = """<?xml version="1.0" encoding="UTF-8"?>
 <Tanach><tanach><book>
   <names><name>Deuteronomy</name></names>
   <c n="1">
     <v n="1"><w>דָּבָר</w><k>כְּתִיב</k></v>
   </c>
-</book></tanach></Tanach>'''
+</book></tanach></Tanach>"""
     path = tmp_path / "k_only.xml"
     path.write_text(xml, encoding="utf-8")
     with caplog.at_level(logging.WARNING, logger="masoretic_eval.uxlc_loader"):
