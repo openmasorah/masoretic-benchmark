@@ -110,6 +110,25 @@ def _word_text(w_el: etree._Element) -> str:
     return "".join(parts).strip()
 
 
+_MAQAF = "־"  # word-joiner (U+05BE); no space follows it in the codex
+
+
+def _join_word_parts(parts: list[str]) -> str:
+    """Join verse words with single spaces, except after a maqaf-joined part.
+
+    UXLC encodes a maqaf group as separate <w> elements with a trailing U+05BE
+    and no following space (e.g. אֶת־ + יְהוָ֣ה). A naive " ".join inserts a
+    spurious space that survives normalization (maqaf is retained in tiers 1-3
+    and _MULTISPACE only collapses 2+ spaces), scoring one bogus edit per maqaf.
+    """
+    out: list[str] = []
+    for part in parts:
+        out.append(part)
+        if not part.endswith(_MAQAF):
+            out.append(" ")
+    return "".join(out).rstrip()
+
+
 def _xcode_to_type(code: str) -> str | None:
     """Map UXLC <x> code to a tier-4 type. Codes 4–8 per spec Section 4 #9."""
     mapping = {
@@ -224,7 +243,7 @@ def load_uxlc(path: Path | str) -> UXLCDoc:
                                 MetaMarkRecord(type=mark_type, verse_ref=ref, ordinal=n)
                             )
 
-                verses[ref] = " ".join(word_parts)
+                verses[ref] = _join_word_parts(word_parts)
 
     return UXLCDoc(verses=verses, metamarks=metamarks)
 

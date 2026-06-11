@@ -95,6 +95,33 @@ def test_qere_wins_over_ketiv(tmp_path):
     assert "כְּתִיב" not in doc.verses["Deut.1.1"]
 
 
+def test_maqaf_joined_words_have_no_intervening_space(tmp_path):
+    """UXLC encodes a maqaf group as separate <w> elements with a trailing U+05BE.
+
+    The real codex has NO space after maqaf, so the verse text must not insert
+    one — otherwise every maqaf scores a spurious tier 1-3 edit against a
+    correctly transcribed prediction (maqaf is retained in tiers 1/2/3 and the
+    single space survives _MULTISPACE, which only collapses runs of 2+).
+    Non-maqaf word boundaries must still be space-separated.
+    """
+    xml = """<?xml version="1.0" encoding="UTF-8"?>
+<Tanach><tanach><book>
+  <names><name>Deuteronomy</name></names>
+  <c n="6">
+    <v n="2"><w>אֶת־</w><w>יְהוָ֣ה</w><w>אֱלֹהֶ֔יךָ</w></v>
+  </c>
+</book></tanach></Tanach>"""
+    path = tmp_path / "maqaf.xml"
+    path.write_text(xml, encoding="utf-8")
+
+    doc = load_uxlc(path)
+    verse = doc.verses["Deut.6.2"]
+    assert "אֶת־יְהוָ֣ה" in verse, f"maqaf join inserted a space: {verse!r}"
+    assert "אֶת־ " not in verse, f"spurious space after maqaf: {verse!r}"
+    # Normal (non-maqaf) word boundary is still a single space.
+    assert "יְהוָ֣ה אֱלֹהֶ֔יךָ" in verse, f"lost normal word space: {verse!r}"
+
+
 def test_word_text_keeps_tail_after_x_element(tmp_path):
     """UXLC places <x> mid-word; the word remainder is the <x> element's tail.
 
