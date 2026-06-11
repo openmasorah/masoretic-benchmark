@@ -55,7 +55,7 @@
       "manuscript": "leningrad"
     }
   ],
-  "frozen_at": "2026-05-01T06:36:29Z",
+  "frozen_at": "2026-06-11T19:30:00Z",
   "fuses_fired": [],
   "iaa_subset": [
     "leningrad_devarim_F118B_fixture",
@@ -109,6 +109,11 @@
       "new_frozen_at": "2026-05-01T06:36:29Z",
       "prev_frozen_at": "2026-05-01T03:18:50Z",
       "reason": "phase 3.1: biblia_nakdimon leningrad_devarim_F118B_fixture promoted"
+    },
+    {
+      "new_frozen_at": "2026-06-11T19:30:00Z",
+      "prev_frozen_at": "2026-05-01T06:36:29Z",
+      "reason": "phase 03.3: Step 2b maqaf-convention unification — tier-1 maqaf U+05BE retained, no trailing space (DECISIONS.md 2026-06-11). GT regenerated to bare maqaf across the 4 PAGE-XML exports + the 4 gt_adapter goldens; the F118B hand golden kept its 26 physical lines with 25 within-line codex maqafs injected by UXLC alignment (4 line-break-straddling joins left as line breaks); false UXLC-derived provenance corrected. results/scores/leningrad_devarim_F118B_fixture.json re-emitted from the corrected GT (real re-run): biblia_kraken 0.9162->0.9282, llm_vision 0.6662->0.6613, biblia_nakdimon/biblia_char_menaked 0.5965->0.6106, ranking preserved (nakdimon<llm_vision<kraken); gt_chars_normalized off-by-one 1421->1420 fixed. baselines/EVALUATION_PROTOCOL.md gains a paired methodology-table row. Per-folio gt_hash stays null (GT remains pre-Yosef-review/provisional)."
     }
   ],
   "nakdimon_model_hash": "8fd7722b8002a690",
