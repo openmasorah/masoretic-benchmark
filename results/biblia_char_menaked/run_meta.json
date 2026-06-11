@@ -20,7 +20,7 @@
     }
   },
   "hostname": "bens-MacBook-Air.local",
-  "manifest_hash": "c9a578520ce2f4e5",
+  "manifest_hash": "062a2a6c8646e831",
   "pins": {
     "dictabert_model_revision": "d311fbf7c403e50b040440e4859ac78064d025d0",
     "kraken_model_hash": "8514a0c7cc2b5b45",
