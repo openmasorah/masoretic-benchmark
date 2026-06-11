@@ -457,20 +457,21 @@ def test_f118b_fixture_roundtrip_no_regression() -> None:
     ``verse_ref`` tokens.
 
     Skipped if the fixture file is not accessible (operator-local sibling repo).
-    Path is constructed via Path.home() to avoid embedding operator userpath literals.
+    The path is supplied via the MASORETIC_F118B_FIXTURE environment variable so
+    the source file embeds no operator-local path or private-codename literal
+    (the private-path scanner rejects both as leaks).
     """
+    import os
+
     import pytest
 
-    # Resolve via home so the source file contains no operator-local path literal
-    # (private-path scanner denylist: /Users/<operator> is a reject pattern).
-    fixture = (
-        Path.home()
-        / "Workspace"
-        / "baalshem"
-        / "gt-infra"
-        / "exports"
-        / "leningrad_devarim_F118B_fixture.page.xml"
-    )
+    fixture_env = os.environ.get("MASORETIC_F118B_FIXTURE")
+    if not fixture_env:
+        pytest.skip(
+            "F118B fixture path not set; export MASORETIC_F118B_FIXTURE to the "
+            "operator-local sibling-repo PAGE-XML export to run this smoke test"
+        )
+    fixture = Path(fixture_env)
     if not fixture.exists():
         pytest.skip("F118B fixture not accessible from this environment")
 
