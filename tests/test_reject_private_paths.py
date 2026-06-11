@@ -8,9 +8,15 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = REPO_ROOT / "scripts" / "reject_private_paths.py"
 PRIVATE_PATTERNS = (
-    "Workspace/" + "openmasorah",
+    "baal" + "shem",
+    "Workspace/" + "masorah",
     "/Users/" + "benlamm",
 )
+# The exact contractually-immutable provenance occurrence in phase_0_manifest.json
+# (the append-only changelog row at :71). Legitimately names the codename; must
+# stay and must NOT be flagged. Built from fragments so this test file does not
+# itself trip the whole-tree scanner.
+_IMMUTABLE_PROVENANCE = "baal" + "shem" + "@bc7255ecaa3eb872885467d3a59e9e6352d5668a"
 
 
 @pytest.fixture()
@@ -63,3 +69,61 @@ def test_main_without_args_scans_git_ls_files(tmp_path, reject_private_paths, mo
     )
 
     assert reject_private_paths.main([]) == 1
+
+
+def test_matching_is_case_insensitive(tmp_path, reject_private_paths):
+    leaking = tmp_path / "leaking.txt"
+    # Upper-cased codename must still be caught.
+    leaking.write_text("see " + "BAAL" + "SHEM" + " in this dump\n", encoding="utf-8")
+
+    assert reject_private_paths.main([str(leaking)]) == 1
+
+
+def test_metatest_hardcoded_private_literals_are_rejected(tmp_path, reject_private_paths):
+    """Anti-regression antibody for the original incident.
+
+    The guard was silently neutered when a rename sweep edited DENYLIST to the
+    public org name; tests stayed green because they asserted the renamed value.
+    These literals are assembled here INDEPENDENTLY of DENYLIST (never imported
+    from it), so a future sweep that blinds the denylist turns this test RED.
+    Assembled from fragments so this test file does not itself trip the
+    whole-tree scanner.
+    """
+    codename = tmp_path / "codename.txt"
+    codename.write_text("stray ref /home/x/" + "baal" + "shem" + "/gt-infra\n", encoding="utf-8")
+    assert reject_private_paths.main([str(codename)]) == 1
+
+    # The operator path entry is equally blind-able by a sweep — pin it too.
+    operator = tmp_path / "operator.txt"
+    operator.write_text("traceback at " + "/Users/" + "benlamm" + "/x\n", encoding="utf-8")
+    assert reject_private_paths.main([str(operator)]) == 1
+
+
+def test_immutable_manifest_provenance_string_is_exempt(tmp_path, reject_private_paths):
+    """The append-only changelog row legitimately names the codename (CLAUDE.md).
+
+    The exact provenance occurrence must pass so the immutable manifest is not
+    held hostage by the guard.
+    """
+    manifest = tmp_path / "phase_0_manifest.json"
+    manifest.write_text(
+        '{"reason": "import from ' + _IMMUTABLE_PROVENANCE + '; values preserved"}\n',
+        encoding="utf-8",
+    )
+
+    assert reject_private_paths.main([str(manifest)]) == 0
+
+
+def test_other_codename_occurrence_is_still_rejected(tmp_path, reject_private_paths):
+    """Exemption is pinned to the exact known string — any OTHER occurrence trips.
+
+    Guards against the file-level allowlist failure mode: a real leak dropped
+    elsewhere in the manifest must still be caught.
+    """
+    manifest = tmp_path / "phase_0_manifest.json"
+    manifest.write_text(
+        '{"reason": "import from ' + "baal" + "shem" + '@deadbeef"}\n',
+        encoding="utf-8",
+    )
+
+    assert reject_private_paths.main([str(manifest)]) == 1

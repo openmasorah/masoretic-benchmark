@@ -10,9 +10,28 @@ import subprocess
 import sys
 from pathlib import Path
 
+# Private-leak needles. Assembled from fragments so this guard file does not
+# itself trip the whole-tree scan. Matching is case-insensitive (see _scan_path).
+# The first needle is the pre-rebrand internal codename; restoring it as a bare
+# token (not just the 'Workspace/<codename>' path form) is the core of the guard
+# regression fix — a future rename sweep that blinds this list must turn CI red
+# (enforced by the meta-test in tests/test_reject_private_paths.py). The needle
+# is assembled from fragments so this guard file does not match itself.
 DENYLIST: tuple[str, ...] = (
+    "baal" + "shem",
+    "Workspace/" + "masorah",
     "Workspace/" + "openmasorah",
     "/Users/" + "benlamm",
+)
+
+# Contractually-immutable provenance occurrences that legitimately contain a
+# denylisted token. Each exact string is removed from scanned text BEFORE
+# matching, so the known-good occurrence is exempt while ANY OTHER occurrence of
+# the same token still trips. Pinned to the exact string (not the file) so a
+# real leak dropped elsewhere in the same file is still caught.
+# Source: phase_0_manifest.json:71 — the append-only changelog row (CLAUDE.md).
+_ALLOWED_OCCURRENCES: tuple[str, ...] = (
+    "baal" + "shem" + "@bc7255ecaa3eb872885467d3a59e9e6352d5668a",
 )
 
 
@@ -36,7 +55,15 @@ def _scan_path(path: str) -> list[str]:
         text = p.read_text(encoding="utf-8", errors="ignore")
     except OSError:
         return []
-    return [f"REJECT (private path {pattern!r}): {path}" for pattern in DENYLIST if pattern in text]
+    # Case-insensitive matching; strip exempt provenance occurrences first.
+    haystack = text.lower()
+    for allowed in _ALLOWED_OCCURRENCES:
+        haystack = haystack.replace(allowed.lower(), "")
+    return [
+        f"REJECT (private path {pattern!r}): {path}"
+        for pattern in DENYLIST
+        if pattern.lower() in haystack
+    ]
 
 
 def main(argv: list[str]) -> int:
@@ -50,7 +77,8 @@ def main(argv: list[str]) -> int:
             print(error, file=sys.stderr)
         print(
             "\nGT-10/BL-08/REL-09: public-bound masoretic-benchmark files must "
-            "not contain private openmasorah workspace or local user path leaks.",
+            "not contain private workspace, pre-rebrand codename, or local user "
+            "path leaks.",
             file=sys.stderr,
         )
         return 1
