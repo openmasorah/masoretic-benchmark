@@ -39,13 +39,43 @@ phases.
 4. Concatenate GT lines with single-space separator → `gt_full`.
 5. Concatenate prediction `tier1` strings with single-space separator → `pred_full`.
 6. Apply `masoretic_eval.tiers.tier1_consonantal.Tier1Consonantal` normalization
-   to both strings (consonants-only keep set, maqaf-strip, etc.).
+   to both strings (consonants-only keep set; **maqaf U+05BE is retained as a
+   distinct scoring character with no trailing space**; runs of spaces are
+   collapsed). This matches the shipped scorer and the canonical tier-1 maqaf
+   convention (see "Maqaf convention" note below). *(Corrected 2026-06-11: this
+   step previously read "maqaf-strip," which never matched the implementation —
+   `Tier1Consonantal._strip_to_consonants` has always kept U+05BE.)*
 7. Compute `CER = Levenshtein(gt_norm, pred_norm) / max(len(gt_norm), 1)`.
 8. Repeat for tiers 2, 3 (when GT has those tiers populated).
 9. Tier 4: F1 over mesora marks (when GT has tier-4 records).
 10. Macro-average across tiers 1–3 (per-folio CER) and across folios (when more
     than one folio has been scored).
 11. Write per-baseline scores to `results/scores/<fixture_id>.json`.
+
+## Maqaf convention (clarified 2026-06-11)
+
+Canonical tier-1 representation of maqaf (U+05BE, ־): **retained as a distinct
+scoring character with no trailing space** (e.g. `אֶת־הַשָּׁמַיִם`). GT and all
+baseline predictions use this one convention so tier-1 CER measures recognition,
+not transcription style. This is, and always was, what the scorer keep-set
+(`tier1_consonantal.py`), the UXLC loader, and the pinned test
+`tests/test_uxlc_loader.py:98` implement; the rejected alternative (fold
+maqaf→space) breaks that test and corrupts the UXLC lexical path. Rationale and
+full decision: `DECISIONS.md` 2026-06-11.
+
+> **Step 2b regeneration (2026-06-11).** Three incompatible maqaf conventions
+> had drifted into the GT artifacts (scorer = retain; F118B hand golden =
+> maqaf-as-space; the four PAGE-XML exports + the F119A/F119B/F120A goldens =
+> maqaf+spurious-space, built by the pre-fix loader). All GT was regenerated to
+> the retain-no-space convention: the four exports and the three UXLC-derived
+> goldens were rebuilt with the fixed loader, and the F118B hand golden had its
+> 25 within-line codex maqaf-joins injected by alignment to UXLC (4 joins that
+> straddle a physical-line break are kept as line breaks to preserve
+> physical-line fidelity). `results/scores/leningrad_devarim_F118B_fixture.json`
+> was re-emitted from the corrected GT (real re-run, not hand-edit). Because this
+> moves published tier-1 numbers, the formal methodology-table row + paired
+> `phase_0_manifest.json` `manifest_changelog` fuse event are a deliberate
+> operator-landed step (D2 sign-off) and are **not** appended here inline.
 
 ## Pre-registration commitment
 
