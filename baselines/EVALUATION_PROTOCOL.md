@@ -7,6 +7,7 @@ Pipeline benchmark. Every change writes a new row with date + reason. Newest fir
 
 | Date | Headline metric | Tiers | Aggregation | Convention |
 |---|---|---|---|---|
+| 2026-06-11 | Macro-averaged whole-folio CER (tiers 1–3) / F1 (tier 4) *(metric unchanged)* | 1, 2, 3, 4 | *(unchanged)* | **Maqaf U+05BE retained, no trailing space** (makes the always-implemented scorer convention explicit; supersedes the doc's prior "maqaf-strip" misdescription). All GT regenerated to this convention; F118B published tier-1 CERs re-emitted. See "Maqaf convention" §. Paired with `phase_0_manifest.json` `manifest_changelog` row `2026-06-11T19:30:00Z` (hash `c9a578520ce2f4e5`→`062a2a6c8646e831`). |
 | 2026-04-30 | **Macro-averaged whole-folio CER (tiers 1–3) / F1 (tier 4)** | 1, 2, 3, 4 | Per frozen folio, then macro-averaged across folios | ICDAR-HTR (Sánchez et al., READ project, HIMANIS) |
 
 This row implements the pre-registered **BL-07** rule verbatim:
@@ -73,9 +74,11 @@ full decision: `DECISIONS.md` 2026-06-11.
 > straddle a physical-line break are kept as line breaks to preserve
 > physical-line fidelity). `results/scores/leningrad_devarim_F118B_fixture.json`
 > was re-emitted from the corrected GT (real re-run, not hand-edit). Because this
-> moves published tier-1 numbers, the formal methodology-table row + paired
-> `phase_0_manifest.json` `manifest_changelog` fuse event are a deliberate
-> operator-landed step (D2 sign-off) and are **not** appended here inline.
+> moves published tier-1 numbers, it was landed as a formal fuse event: the
+> 2026-06-11 methodology-table row above + the paired `phase_0_manifest.json`
+> `manifest_changelog` row (`2026-06-11T19:30:00Z`, hash
+> `c9a578520ce2f4e5`→`062a2a6c8646e831`), with the 11 hash-bound F118B result
+> artifacts rebound to the new manifest hash.
 
 ## Pre-registration commitment
 
