@@ -34,6 +34,31 @@ def test_disagreement_rate_math_with_mocked_oracle(monkeypatch):
     assert meta["dec"] == pytest.approx(expected_dec, abs=1e-9)
 
 
+def test_disagreement_rate_zero_for_perfect_oracle_across_sof_pasuq(monkeypatch):
+    """A perfect oracle over a multi-verse prediction must give rate 0.0 (ORA-04).
+
+    The prediction carries a mid-text sof pasuq (U+05C3 — the schema mandates one
+    per verse in text). The oracle is diacritized from the consonantal skeleton,
+    which has the sof pasuq stripped and spaces collapsed, so the prediction must
+    be reduced to that same oracle-reproducible (tier-2) view before factoring.
+    Otherwise the standalone sof pasuq cluster the oracle lacks shifts every
+    downstream cluster pairing and fabricates vowel disagreement where there is
+    none.
+    """
+    from oracles._strip import strip_to_with_nikkud
+
+    prediction = "שְׁמַע יִשְׂרָאֵל׃ וְאָהַבְתָּ"
+    # A perfect oracle reproduces the with-nikkud view of the prediction; it can
+    # never emit the sof pasuq because that is stripped from its skeleton input.
+    perfect = strip_to_with_nikkud(prediction)
+    monkeypatch.setattr("oracles.nakdimon_oss.diacritize", lambda skeleton: perfect)
+
+    from oracles.nakdimon_oss import disagreement_rate
+
+    rate, meta = disagreement_rate(prediction)
+    assert rate == 0.0, f"perfect oracle gave nonzero rate {rate} (meta={meta})"
+
+
 def test_audit_meta_shape(monkeypatch):
     # Use a passthrough oracle so we don't need TF loaded.
     monkeypatch.setattr("oracles.nakdimon_oss.diacritize", lambda c: c)

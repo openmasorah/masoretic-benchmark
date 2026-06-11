@@ -41,7 +41,7 @@ import nakdimon  # type: ignore[import-untyped]
 
 from masoretic_eval.metrics.nakdimon import nakdimon_factoring
 from oracles._hashing import compute_nakdimon_model_hash
-from oracles._strip import strip_to_consonantal
+from oracles._strip import strip_to_consonantal, strip_to_with_nikkud
 
 MODEL_HASH = compute_nakdimon_model_hash()  # 16-char hex, see oracles._hashing
 
@@ -67,7 +67,12 @@ def disagreement_rate(prediction: str) -> tuple[float, dict]:
     """
     skeleton = strip_to_consonantal(prediction)
     oracle_text = diacritize(skeleton)
-    result = nakdimon_factoring(prediction, oracle_text)
+    # Factor the prediction against the oracle in the SAME reduced view the
+    # oracle can reproduce: the oracle skeleton has sof pasuq / paseq stripped and
+    # spaces collapsed, so comparing the raw prediction (which keeps a standalone
+    # sof pasuq cluster per verse) shifts every downstream cluster pairing and
+    # fabricates disagreement (ORA-04). strip_to_with_nikkud is the tier-2 view.
+    result = nakdimon_factoring(strip_to_with_nikkud(prediction), oracle_text)
     rate = 1.0 - result.dec
     meta = {
         "oracle": "nakdimon_oss",

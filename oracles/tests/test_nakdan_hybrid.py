@@ -159,6 +159,26 @@ def test_disagreement_rate_returns_none_on_oracle_malformed(monkeypatch):
     assert meta["error"].startswith("bad shape")
 
 
+def test_disagreement_rate_zero_for_perfect_oracle_across_sof_pasuq(monkeypatch):
+    """Mirror of the nakdimon_oss ORA-04 fix for the DICTA hybrid oracle.
+
+    A perfect oracle over a multi-verse prediction with a mid-text sof pasuq must
+    yield rate 0.0; the prediction must be reduced to the oracle-reproducible
+    (tier-2) view before factoring so the standalone sof pasuq cluster does not
+    shift every downstream pairing.
+    """
+    from oracles._strip import strip_to_with_nikkud
+
+    prediction = "שְׁמַע יִשְׂרָאֵל׃ וְאָהַבְתָּ"
+    perfect = strip_to_with_nikkud(prediction)
+    monkeypatch.setattr("oracles.nakdan_hybrid.diacritize", lambda skeleton: perfect)
+
+    from oracles.nakdan_hybrid import disagreement_rate
+
+    rate, meta = disagreement_rate(prediction)
+    assert rate == 0.0, f"perfect oracle gave nonzero rate {rate} (meta={meta})"
+
+
 def test_throttle_acquire_called_before_post(monkeypatch, tmp_path):
     monkeypatch.setattr("oracles._audit._AUDIT_DIR", tmp_path / "audit")
     monkeypatch.setattr("oracles.nakdan_hybrid._resolve_ip", lambda _u: "1.2.3.4")

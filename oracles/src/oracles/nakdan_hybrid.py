@@ -32,7 +32,7 @@ from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_ex
 from masoretic_eval.metrics.nakdimon import nakdimon_factoring
 from oracles._audit import append_audit_record
 from oracles._errors import OracleMalformed, OracleUnavailable
-from oracles._strip import strip_to_consonantal
+from oracles._strip import strip_to_consonantal, strip_to_with_nikkud
 from oracles._throttle import DICTA_BUCKET
 
 ENDPOINT_URL: str = "https://nakdan-u1-0.loadbalancer.dicta.org.il/api"
@@ -161,7 +161,11 @@ def disagreement_rate(prediction: str) -> tuple[float | None, dict]:
         oracle_text = diacritize(skeleton)
     except (OracleUnavailable, OracleMalformed) as exc:
         return None, {"oracle": "nakdan_hybrid", "error": str(exc)}
-    result = nakdimon_factoring(prediction, oracle_text)
+    # Reduce the prediction to the oracle-reproducible (tier-2) view before
+    # factoring; the oracle skeleton drops sof pasuq / paseq and collapses
+    # spaces, so the raw prediction's standalone sof pasuq cluster would shift
+    # every downstream pairing and fabricate disagreement (ORA-04).
+    result = nakdimon_factoring(strip_to_with_nikkud(prediction), oracle_text)
     return 1.0 - result.dec, {
         "oracle": "nakdan_hybrid",
         "dec": result.dec,
