@@ -22,8 +22,8 @@ manifest manuscript ids must exist here before they can land in
    manifest -> catalog direction; missing entries fail the hook.
 3. Fill `identity`, `image_sources`, `ground_truth`, `pipeline`. `related`
    and `citations` are optional but recommended.
-4. For private manuscripts (Yosef's Cairo Shmuel scans, personal mss): set
-   `pipeline.public_distributable: false`. NEVER paste private image URLs or
+4. For private manuscripts (a collaborator's restricted scans, personal mss):
+   set `pipeline.public_distributable: false`. NEVER paste private image URLs or
    scan paths in this file — the `reject-private-paths` pre-commit hook will
    reject the commit.
 5. Run `python scripts/validate_corpus.py` locally before committing. The
