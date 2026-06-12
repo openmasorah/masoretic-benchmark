@@ -3,7 +3,7 @@
   "manifest_hash": "062a2a6c8646e831",
   "manuscript": "leningrad",
   "book": "devarim",
-  "verse_range": "Deut 31:28 (mid-verse) – Deut 32:22 (mid-verse)",
+  "verse_range": "Deut 31:28 (mid-verse) – Deut 32:23 (first two words; folio physically ends mid-32:23)",
   "physical_line_count": 26,
   "gt_source": {
     "path": "baselines/tests/fixtures/iaa_folio_leningrad_devarim_F118B_fixture.gt_adapter_golden.json",
@@ -107,7 +107,8 @@
     "Tier-1-only GT (Ben hand transcribed; tiers 2/3/4 await Yosef's deeper review pending eScriptorium pipeline restart)",
     "Single annotator (no second-annotator IAA; GT-11/GT-12 F8 gate deferred to v0.2)",
     "BL-02 zero-bbox regression in result file (whole-folio CER unaffected; per-line CER blocked until v0.2 re-promote)",
-    "BL-03 (Kraken→Nakdimon) blocked locally — Nakdimon TF 2.15 wheel requires AVX (x86_64), unavailable on Apple M2 (arm64+Rosetta). Must run on Linux+Py3.11 infrastructure."
+    "BL-03 (Kraken→Nakdimon) blocked locally — Nakdimon TF 2.15 wheel requires AVX (x86_64), unavailable on Apple M2 (arm64+Rosetta). Must run on Linux+Py3.11 infrastructure.",
+    "Step 2b convention scope: the BL-03/BL-04 GT-fed tier-2/3 diagnostic records (results/biblia_{nakdimon,char_menaked}/diagnostic/*.gt_fed.json) still carry the pre-Step-2b maqaf+space GT-fed convention (and char_menaked's off-label double-space output). They are genuine run-records of a deferred tier-2/3 diacritizer-isolation diagnostic — they feed NO published tier-1 number and were deliberately NOT hand-folded (editing a run-record fabricates its input/output). They will be regenerated to the canonical bare-maqaf convention when BL-03/BL-04 re-run on Linux infra. The Step 2b convergence to retain-no-space covers the four PAGE-XML exports, the four gt_adapter goldens, and the published F118B tier-1 scores."
   ],
   "next_steps": [
     "BL-03 (Kraken→Nakdimon) on F118B — must execute on Linux infrastructure (CI nightly cron or EC2 devbox); wiring landed in cd82adb",
