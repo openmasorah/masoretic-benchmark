@@ -1,0 +1,53 @@
+{
+  "folio_id": "leningrad_devarim_F118B_fixture",
+  "provisional": true,
+  "single_annotator": "David Moster (annotator B), pre-adjudication",
+  "gt_hash": null,
+  "iaa": "NOT computed — needs annotator A (Yosef); baseline cold-scoring only",
+  "fused": false,
+  "verse_range": "Deut.31.28 - Deut.32.22",
+  "gt_source": {
+    "path": "baselines/tests/fixtures/iaa_folio_leningrad_devarim_F118B_fixture.gt_adapter_golden.json",
+    "annotator": "David Zev Moster (annotator B)",
+    "annotation_model": "diplomatic hand transcription (DECISIONS.md 2026-06-12)",
+    "tiers_provided": [
+      "tier1"
+    ],
+    "tiers_deferred": [
+      "tier2",
+      "tier3",
+      "tier4"
+    ],
+    "line_count": 25
+  },
+  "ordering_note": "Tier-1 whole-folio CER is line-order-sensitive. HEADLINE = line_id-order (matches the published F118B leaderboard method; comparable). DIAGNOSTIC = reading-order (EVALUATION_PROTOCOL step 3 bbox sort). The two diverge materially and NOT uniformly (F119B is worse under reading-order) because Kraken bboxes are noisy — FLAGGED for Ben/Yosef methodology review; not silently canonicalized here.",
+  "notes": [
+    "char_menaked tier-1 == kraken tier-1 (chain reuses Kraken consonants).",
+    "char_menaked tier2/3 are diacritizer-chain diagnostics.",
+    "kraken tier2/3 are its raw (undiacritized) text vs pointed GT — expected high."
+  ],
+  "scores": {
+    "biblia_kraken": {
+      "tier1_cer_headline_line_id_order": 0.8863,
+      "tier1_cer_diagnostic_reading_order": 0.6154,
+      "tier1_edits": 909,
+      "tier1_denominator": 1477,
+      "tier2_cer_reading_order": 0.7312,
+      "tier3_cer_reading_order": 0.7312
+    },
+    "biblia_char_menaked": {
+      "tier1_cer_headline_line_id_order": 0.8863,
+      "tier1_cer_diagnostic_reading_order": 0.6154,
+      "tier1_edits": 909,
+      "tier1_denominator": 1477,
+      "tier2_cer_reading_order": 0.7312,
+      "tier3_cer_reading_order": 0.7312
+    },
+    "biblia_nakdimon": {
+      "status": "BLOCKED: python package 'nakdimon' not installed in sibling .venv"
+    },
+    "llm_vision": {
+      "status": "BLOCKED: ANTHROPIC_API_KEY + GOOGLE_API_KEY unset (GEMINI_API_KEY set but code reads GOOGLE_API_KEY); paid run (~$0.29/folio) deferred"
+    }
+  }
+}

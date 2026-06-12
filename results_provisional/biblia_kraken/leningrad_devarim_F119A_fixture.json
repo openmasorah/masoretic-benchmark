@@ -1,0 +1,1439 @@
+{
+  "schema_version": "0.1.0",
+  "baseline_id": "biblia_kraken",
+  "folio_id": "leningrad_devarim_F119A_fixture",
+  "manifest_hash": "062a2a6c8646e831",
+  "run_meta_ref": "run_meta.json",
+  "lines": [
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L002",
+      "bbox": [
+        1466,
+        109,
+        2974,
+        256
+      ],
+      "tier1": "אוסם וסזס חסזם סססח סחורסם זסס",
+      "tier2": "אוסם וסזס חסזם סססח סחורסם זסס",
+      "tier3": "אוסם וסזס חסזם סססח סחורסם זסס",
+      "tier4_records": [],
+      "kraken_confidence": 0.8041
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L003",
+      "bbox": [
+        1006,
+        477,
+        1608,
+        601
+      ],
+      "tier1": "סזטום ורזחם",
+      "tier2": "סזטום ורזחם",
+      "tier3": "סזטום ורזחם",
+      "tier4_records": [],
+      "kraken_confidence": 0.7303
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L004",
+      "bbox": [
+        2257,
+        475,
+        3417,
+        613
+      ],
+      "tier1": "חם וחזם אסגם ססטזם [ש']",
+      "tier2": "חם וחזם אסגם ססטזם [ש']",
+      "tier3": "חם וחזם אסגם ססטזם [ש']",
+      "tier4_records": [],
+      "kraken_confidence": 0.7309
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L006",
+      "bbox": [
+        1094,
+        1062,
+        3027,
+        1224
+      ],
+      "tier1": "להתל באק בוץ אטר סמה לישקלעז צרי כהילל בתותו או אלבה אקע הרים אה וברעה עליום יעלום יא",
+      "tier2": "להתל באק בוץ אטר סמה לישקלעז צרי כהילל בתותו או אלבה אקע הרים אה וברעה עליום יעלום יא",
+      "tier3": "להתל באק בוץ אטר סמה לישקלעז צרי כהילל בתותו או אלבה אקע הרים אה וברעה עליום יעלום יא",
+      "tier4_records": [],
+      "kraken_confidence": 0.6545
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L007",
+      "bbox": [
+        2372,
+        1156,
+        2638,
+        1271
+      ],
+      "tier1": "ושנו דז את עשך : ו]",
+      "tier2": "ושנו דז את עשך : ו]",
+      "tier3": "ושנו דז את עשך : ו]",
+      "tier4_records": [],
+      "kraken_confidence": 0.6119
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L008",
+      "bbox": [
+        953,
+        1445,
+        1109,
+        1551
+      ],
+      "tier1": "לל שער",
+      "tier2": "לל שער",
+      "tier3": "לל שער",
+      "tier4_records": [],
+      "kraken_confidence": 0.8412
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L009",
+      "bbox": [
+        947,
+        1525,
+        1091,
+        1643
+      ],
+      "tier1": " א יוש",
+      "tier2": " א יוש",
+      "tier3": " א יוש",
+      "tier4_records": [],
+      "kraken_confidence": 0.555
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L010",
+      "bbox": [
+        941,
+        1560,
+        1094,
+        1652
+      ],
+      "tier1": "חתת",
+      "tier2": "חתת",
+      "tier3": "חתת",
+      "tier4_records": [],
+      "kraken_confidence": 0.5393
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L011",
+      "bbox": [
+        1009,
+        1678,
+        1112,
+        1805
+      ],
+      "tier1": "בטש",
+      "tier2": "בטש",
+      "tier3": "בטש",
+      "tier4_records": [],
+      "kraken_confidence": 0.6675
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L012",
+      "bbox": [
+        1292,
+        1374,
+        2366,
+        1522
+      ],
+      "tier1": "ולחמי חשף וקטב מרירי ושז בהמות [ש]",
+      "tier2": "ולחמי חשף וקטב מרירי ושז בהמות [ש]",
+      "tier3": "ולחמי חשף וקטב מרירי ושז בהמות [ש]",
+      "tier4_records": [],
+      "kraken_confidence": 0.9472
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L013",
+      "bbox": [
+        1289,
+        1478,
+        2505,
+        1613
+      ],
+      "tier1": "מחוץ תתשכל חרב ומחדרים אימה גם בחולגם",
+      "tier2": "מחוץ תתשכל חרב ומחדרים אימה גם בחולגם",
+      "tier3": "מחוץ תתשכל חרב ומחדרים אימה גם בחולגם",
+      "tier4_records": [],
+      "kraken_confidence": 0.9841
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L014",
+      "bbox": [
+        1283,
+        1560,
+        2464,
+        1708
+      ],
+      "tier1": "אמרתי אפאיהם אשביתה מאנוש זברם : לולי",
+      "tier2": "אמרתי אפאיהם אשביתה מאנוש זברם : לולי",
+      "tier3": "אמרתי אפאיהם אשביתה מאנוש זברם : לולי",
+      "tier4_records": [],
+      "kraken_confidence": 0.9819
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L015",
+      "bbox": [
+        1307,
+        1664,
+        2452,
+        1796
+      ],
+      "tier1": "ואמרו ידינו רמה ולא יהוה פעל כלזאת : ביגו",
+      "tier2": "ואמרו ידינו רמה ולא יהוה פעל כלזאת : ביגו",
+      "tier3": "ואמרו ידינו רמה ולא יהוה פעל כלזאת : ביגו",
+      "tier4_records": [],
+      "kraken_confidence": 0.9792
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L016",
+      "bbox": [
+        970,
+        1770,
+        2443,
+        1891
+      ],
+      "tier1": "לו חכמו ישכילו זאת יבינו לאחריתם : איכה ביש ",
+      "tier2": "לו חכמו ישכילו זאת יבינו לאחריתם : איכה ביש ",
+      "tier3": "לו חכמו ישכילו זאת יבינו לאחריתם : איכה ביש ",
+      "tier4_records": [],
+      "kraken_confidence": 0.9805
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L017",
+      "bbox": [
+        929,
+        2074,
+        988,
+        2177
+      ],
+      "tier1": "בת']",
+      "tier2": "בת']",
+      "tier3": "בת']",
+      "tier4_records": [],
+      "kraken_confidence": 0.8741
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L018",
+      "bbox": [
+        1047,
+        1855,
+        1174,
+        1968
+      ],
+      "tier1": "בב']",
+      "tier2": "בב']",
+      "tier3": "בב']",
+      "tier4_records": [],
+      "kraken_confidence": 0.8939
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L019",
+      "bbox": [
+        994,
+        1909,
+        1112,
+        2006
+      ],
+      "tier1": "בימר'",
+      "tier2": "בימר'",
+      "tier3": "בימר'",
+      "tier4_records": [],
+      "kraken_confidence": 0.7088
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L021",
+      "bbox": [
+        1029,
+        2218,
+        1088,
+        2304
+      ],
+      "tier1": "זיט",
+      "tier2": "זיט",
+      "tier3": "זיט",
+      "tier4_records": [],
+      "kraken_confidence": 0.9394
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L022",
+      "bbox": [
+        1009,
+        2254,
+        1136,
+        2584
+      ],
+      "tier1": "אם פ ']",
+      "tier2": "אם פ ']",
+      "tier3": "אם פ ']",
+      "tier4_records": [],
+      "kraken_confidence": 0.5887
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L024",
+      "bbox": [
+        1083,
+        2221,
+        1121,
+        2307
+      ],
+      "tier1": "ע",
+      "tier2": "ע",
+      "tier3": "ע",
+      "tier4_records": [],
+      "kraken_confidence": 0.4109
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L026",
+      "bbox": [
+        1041,
+        2575,
+        1133,
+        2652
+      ],
+      "tier1": "אני",
+      "tier2": "אני",
+      "tier3": "אני",
+      "tier4_records": [],
+      "kraken_confidence": 0.9961
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L027",
+      "bbox": [
+        911,
+        2628,
+        1121,
+        2696
+      ],
+      "tier1": "אחיה ושאר",
+      "tier2": "אחיה ושאר",
+      "tier3": "אחיה ושאר",
+      "tier4_records": [],
+      "kraken_confidence": 0.9954
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L030",
+      "bbox": [
+        1292,
+        1852,
+        2449,
+        1973
+      ],
+      "tier1": "אם לא כי צורם מכרם ויהוה הקגירם : כי לא",
+      "tier2": "אם לא כי צורם מכרם ויהוה הקגירם : כי לא",
+      "tier3": "אם לא כי צורם מכרם ויהוה הקגירם : כי לא",
+      "tier4_records": [],
+      "kraken_confidence": 0.9852
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L031",
+      "bbox": [
+        2467,
+        1684,
+        2523,
+        1808
+      ],
+      "tier1": "פו",
+      "tier2": "פו",
+      "tier3": "פו",
+      "tier4_records": [],
+      "kraken_confidence": 0.5717
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L032",
+      "bbox": [
+        1301,
+        1947,
+        2523,
+        2068
+      ],
+      "tier1": "כי מגפז סדם גפנס ומשדמת עמרה ענבמו ענבי",
+      "tier2": "כי מגפז סדם גפנס ומשדמת עמרה ענבמו ענבי",
+      "tier3": "כי מגפז סדם גפנס ומשדמת עמרה ענבמו ענבי",
+      "tier4_records": [],
+      "kraken_confidence": 0.9514
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L033",
+      "bbox": [
+        1269,
+        2038,
+        2508,
+        2162
+      ],
+      "tier1": "חמת תנינס יינם וראשפתנים אבזר : הלא הוא",
+      "tier2": "חמת תנינס יינם וראשפתנים אבזר : הלא הוא",
+      "tier3": "חמת תנינס יינם וראשפתנים אבזר : הלא הוא",
+      "tier4_records": [],
+      "kraken_confidence": 0.9782
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L034",
+      "bbox": [
+        1295,
+        2398,
+        2508,
+        2513
+      ],
+      "tier1": "יהי עליכם סתרה : ראועתה כי אני אני הוא",
+      "tier2": "יהי עליכם סתרה : ראועתה כי אני אני הוא",
+      "tier3": "יהי עליכם סתרה : ראועתה כי אני אני הוא",
+      "tier4_records": [],
+      "kraken_confidence": 0.9833
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L035",
+      "bbox": [
+        1295,
+        2578,
+        2517,
+        2702
+      ],
+      "tier1": "חי אנכי לעלם : אם שנותי ברק חרבי ותאחז :",
+      "tier2": "חי אנכי לעלם : אם שנותי ברק חרבי ותאחז :",
+      "tier3": "חי אנכי לעלם : אם שנותי ברק חרבי ותאחז :",
+      "tier4_records": [],
+      "kraken_confidence": 0.9817
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L036",
+      "bbox": [
+        1289,
+        2752,
+        2505,
+        2897
+      ],
+      "tier1": "מראש פרעות אויב : הרנינו גוים עמו כי דם [ש']",
+      "tier2": "מראש פרעות אויב : הרנינו גוים עמו כי דם [ש']",
+      "tier3": "מראש פרעות אויב : הרנינו גוים עמו כי דם [ש']",
+      "tier4_records": [],
+      "kraken_confidence": 0.9408
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L037",
+      "bbox": [
+        1286,
+        2864,
+        1921,
+        2988
+      ],
+      "tier1": "וכפר אדמתו עמו ˙ :",
+      "tier2": "וכפר אדמתו עמו ˙ :",
+      "tier3": "וכפר אדמתו עמו ˙ :",
+      "tier4_records": [],
+      "kraken_confidence": 0.983
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L038",
+      "bbox": [
+        938,
+        2938,
+        1295,
+        3059
+      ],
+      "tier1": "לאלהים",
+      "tier2": "לאלהים",
+      "tier3": "לאלהים",
+      "tier4_records": [],
+      "kraken_confidence": 0.8497
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L039",
+      "bbox": [
+        1062,
+        3115,
+        1215,
+        3227
+      ],
+      "tier1": "['",
+      "tier2": "['",
+      "tier3": "['",
+      "tier4_records": [],
+      "kraken_confidence": 0.922
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L040",
+      "bbox": [
+        1050,
+        3298,
+        1086,
+        3407
+      ],
+      "tier1": "ב']",
+      "tier2": "ב']",
+      "tier3": "ב']",
+      "tier4_records": [],
+      "kraken_confidence": 0.7057
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L042",
+      "bbox": [
+        1021,
+        3490,
+        1186,
+        3608
+      ],
+      "tier1": "יו",
+      "tier2": "יו",
+      "tier3": "יו",
+      "tier4_records": [],
+      "kraken_confidence": 0.9231
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L045",
+      "bbox": [
+        1003,
+        3753,
+        1189,
+        3865
+      ],
+      "tier1": "בת]",
+      "tier2": "בת]",
+      "tier3": "בת]",
+      "tier4_records": [],
+      "kraken_confidence": 0.823
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L047",
+      "bbox": [
+        1018,
+        3877,
+        1077,
+        3947
+      ],
+      "tier1": "מל']",
+      "tier2": "מל']",
+      "tier3": "מל']",
+      "tier4_records": [],
+      "kraken_confidence": 0.9672
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L048",
+      "bbox": [
+        988,
+        3918,
+        1100,
+        4015
+      ],
+      "tier1": "בתיר",
+      "tier2": "בתיר",
+      "tier3": "בתיר",
+      "tier4_records": [],
+      "kraken_confidence": 0.8904
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L049",
+      "bbox": [
+        2030,
+        2876,
+        2511,
+        2983
+      ],
+      "tier1": " ",
+      "tier2": " ",
+      "tier3": " ",
+      "tier4_records": [],
+      "kraken_confidence": 0.6266
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L050",
+      "bbox": [
+        2700,
+        1401,
+        3500,
+        1546
+      ],
+      "tier1": "רעות חצי אבלה בם : מזי רעב",
+      "tier2": "רעות חצי אבלה בם : מזי רעב",
+      "tier3": "רעות חצי אבלה בם : מזי רעב",
+      "tier4_records": [],
+      "kraken_confidence": 0.9814
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L051",
+      "bbox": [
+        2721,
+        1498,
+        3517,
+        1646
+      ],
+      "tier1": "אשלה בסעם חמת וחלי עפר",
+      "tier2": "אשלה בסעם חמת וחלי עפר",
+      "tier3": "אשלה בסעם חמת וחלי עפר",
+      "tier4_records": [],
+      "kraken_confidence": 0.9956
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L052",
+      "bbox": [
+        2744,
+        1605,
+        3517,
+        1734
+      ],
+      "tier1": "בתולה יונק עם איש שיבה :",
+      "tier2": "בתולה יונק עם איש שיבה :",
+      "tier3": "בתולה יונק עם איש שיבה :",
+      "tier4_records": [],
+      "kraken_confidence": 0.9945
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L053",
+      "bbox": [
+        2709,
+        1687,
+        3506,
+        1829
+      ],
+      "tier1": "בעס אויכא גור פזינכרו צרימא",
+      "tier2": "בעס אויכא גור פזינכרו צרימא",
+      "tier3": "בעס אויכא גור פזינכרו צרימא",
+      "tier4_records": [],
+      "kraken_confidence": 0.9309
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L054",
+      "bbox": [
+        2614,
+        1779,
+        3514,
+        1911
+      ],
+      "tier1": "אבר עצות המה ואין בהם תבונה",
+      "tier2": "אבר עצות המה ואין בהם תבונה",
+      "tier3": "אבר עצות המה ואין בהם תבונה",
+      "tier4_records": [],
+      "kraken_confidence": 0.9648
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L055",
+      "bbox": [
+        2638,
+        1879,
+        3503,
+        2003
+      ],
+      "tier1": "ירדף אחד אלף ושמסיניקו דבבה",
+      "tier2": "ירדף אחד אלף ושמסיניקו דבבה",
+      "tier3": "ירדף אחד אלף ושמסיניקו דבבה",
+      "tier4_records": [],
+      "kraken_confidence": 0.9702
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L056",
+      "bbox": [
+        1307,
+        2118,
+        2650,
+        2257
+      ],
+      "tier1": "לי נקם ושלם לעת תמוט רגלם כי קרוב יום אודם",
+      "tier2": "לי נקם ושלם לעת תמוט רגלם כי קרוב יום אודם",
+      "tier3": "לי נקם ושלם לעת תמוט רגלם כי קרוב יום אודם",
+      "tier4_records": [],
+      "kraken_confidence": 0.9857
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L057",
+      "bbox": [
+        1269,
+        2218,
+        2496,
+        2336
+      ],
+      "tier1": "עמו ועל עכדיו יתנחם כי יראה בי אזלתיד ואפס",
+      "tier2": "עמו ועל עכדיו יתנחם כי יראה בי אזלתיד ואפס",
+      "tier3": "עמו ועל עכדיו יתנחם כי יראה בי אזלתיד ואפס",
+      "tier4_records": [],
+      "kraken_confidence": 0.9689
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L058",
+      "bbox": [
+        1283,
+        2310,
+        2440,
+        2422
+      ],
+      "tier1": "צורחקיובו : אשר חלב זבחימו ואכלו ושתו",
+      "tier2": "צורחקיובו : אשר חלב זבחימו ואכלו ושתו",
+      "tier3": "צורחקיובו : אשר חלב זבחימו ואכלו ושתו",
+      "tier4_records": [],
+      "kraken_confidence": 0.9742
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L059",
+      "bbox": [
+        1395,
+        2484,
+        2358,
+        2611
+      ],
+      "tier1": "מחצתי ואני ארפא ואין מידי מציל",
+      "tier2": "מחצתי ואני ארפא ואין מידי מציל",
+      "tier3": "מחצתי ואני ארפא ואין מידי מציל",
+      "tier4_records": [],
+      "kraken_confidence": 0.996
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L060",
+      "bbox": [
+        906,
+        2667,
+        2481,
+        2803
+      ],
+      "tier1": "ולמשנאי אשלם : אשביר חצימדם וחלבו ˙ ",
+      "tier2": "ולמשנאי אשלם : אשביר חצימדם וחלבו ˙ ",
+      "tier3": "ולמשנאי אשלם : אשביר חצימדם וחלבו ˙ ",
+      "tier4_records": [],
+      "kraken_confidence": 0.9574
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L061",
+      "bbox": [
+        944,
+        2741,
+        1091,
+        2888
+      ],
+      "tier1": " ש",
+      "tier2": " ש",
+      "tier3": " ש",
+      "tier4_records": [],
+      "kraken_confidence": 0.3884
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L062",
+      "bbox": [
+        941,
+        2867,
+        1035,
+        2950
+      ],
+      "tier1": "פמוק",
+      "tier2": "פמוק",
+      "tier3": "פמוק",
+      "tier4_records": [],
+      "kraken_confidence": 0.9925
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L063",
+      "bbox": [
+        941,
+        3027,
+        1035,
+        3160
+      ],
+      "tier1": "ליש",
+      "tier2": "ליש",
+      "tier3": "ליש",
+      "tier4_records": [],
+      "kraken_confidence": 0.7992
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L067",
+      "bbox": [
+        2765,
+        1956,
+        3517,
+        2086
+      ],
+      "tier1": "כצודנו צורם ואיבינו פלילום",
+      "tier2": "כצודנו צורם ואיבינו פלילום",
+      "tier3": "כצודנו צורם ואיבינו פלילום",
+      "tier4_records": [],
+      "kraken_confidence": 0.9451
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L068",
+      "bbox": [
+        2791,
+        2041,
+        3520,
+        2174
+      ],
+      "tier1": "רוש אשכלת מררת למו :",
+      "tier2": "רוש אשכלת מררת למו :",
+      "tier3": "רוש אשכלת מררת למו :",
+      "tier4_records": [],
+      "kraken_confidence": 0.979
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L069",
+      "bbox": [
+        2788,
+        2136,
+        3506,
+        2277
+      ],
+      "tier1": "כמס עמדי חתם בא וצרתי",
+      "tier2": "כמס עמדי חתם בא וצרתי",
+      "tier3": "כמס עמדי חתם בא וצרתי",
+      "tier4_records": [],
+      "kraken_confidence": 0.9821
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L070",
+      "bbox": [
+        2567,
+        2502,
+        3497,
+        2646
+      ],
+      "tier1": "ראין אלהום עמדי אני אמית ואחיו",
+      "tier2": "ראין אלהום עמדי אני אמית ואחיו",
+      "tier3": "ראין אלהום עמדי אני אמית ואחיו",
+      "tier4_records": [],
+      "kraken_confidence": 0.9827
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L071",
+      "bbox": [
+        2794,
+        2699,
+        3511,
+        2823
+      ],
+      "tier1": "במשפט ידי אשיב נקם לי",
+      "tier2": "במשפט ידי אשיב נקם לי",
+      "tier3": "במשפט ידי אשיב נקם לי",
+      "tier4_records": [],
+      "kraken_confidence": 0.9593
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L072",
+      "bbox": [
+        2632,
+        2776,
+        3506,
+        2915
+      ],
+      "tier1": "תאכל בשר מדק חלל ושביה",
+      "tier2": "תאכל בשר מדק חלל ושביה",
+      "tier3": "תאכל בשר מדק חלל ושביה",
+      "tier4_records": [],
+      "kraken_confidence": 0.994
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L073",
+      "bbox": [
+        1443,
+        3301,
+        3517,
+        3410
+      ],
+      "tier1": "התורה הזאת : כי לא דבררק הוא מכם כי הוא חייכם ובדבר הזה תאריבו ימים",
+      "tier2": "התורה הזאת : כי לא דבררק הוא מכם כי הוא חייכם ובדבר הזה תאריבו ימים",
+      "tier3": "התורה הזאת : כי לא דבררק הוא מכם כי הוא חייכם ובדבר הזה תאריבו ימים",
+      "tier4_records": [],
+      "kraken_confidence": 0.9836
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L074",
+      "bbox": [
+        1956,
+        3393,
+        3506,
+        3525
+      ],
+      "tier1": "האדמה אשראתם ע ברים אתהירדן שמה לרשתה :ו",
+      "tier2": "האדמה אשראתם ע ברים אתהירדן שמה לרשתה :ו",
+      "tier3": "האדמה אשראתם ע ברים אתהירדן שמה לרשתה :ו",
+      "tier4_records": [],
+      "kraken_confidence": 0.9862
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L075",
+      "bbox": [
+        1227,
+        3472,
+        3485,
+        3629
+      ],
+      "tier1": "יידבר יהוה אל משה בעצם היום הזה לאמר : עלהאל הר העברים הגה הר גבו אשר",
+      "tier2": "יידבר יהוה אל משה בעצם היום הזה לאמר : עלהאל הר העברים הגה הר גבו אשר",
+      "tier3": "יידבר יהוה אל משה בעצם היום הזה לאמר : עלהאל הר העברים הגה הר גבו אשר",
+      "tier4_records": [],
+      "kraken_confidence": 0.9761
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L076",
+      "bbox": [
+        1333,
+        3581,
+        3461,
+        3714
+      ],
+      "tier1": "ארץ מואב אשר עלפני יקחו ורא האת ארץ בנען אשר אני נתן לבני ישראל",
+      "tier2": "ארץ מואב אשר עלפני יקחו ורא האת ארץ בנען אשר אני נתן לבני ישראל",
+      "tier3": "ארץ מואב אשר עלפני יקחו ורא האת ארץ בנען אשר אני נתן לבני ישראל",
+      "tier4_records": [],
+      "kraken_confidence": 0.9855
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L077",
+      "bbox": [
+        1369,
+        3664,
+        3370,
+        3791
+      ],
+      "tier1": "את בהר אשר אתה עלה שמה והאסף אל עמיך באשר מת אהרן אחי",
+      "tier2": "את בהר אשר אתה עלה שמה והאסף אל עמיך באשר מת אהרן אחי",
+      "tier3": "את בהר אשר אתה עלה שמה והאסף אל עמיך באשר מת אהרן אחי",
+      "tier4_records": [],
+      "kraken_confidence": 0.958
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L078",
+      "bbox": [
+        3399,
+        3741,
+        3526,
+        3812
+      ],
+      "tier1": "ב",
+      "tier2": "ב",
+      "tier3": "ב",
+      "tier4_records": [],
+      "kraken_confidence": 0.2021
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L079",
+      "bbox": [
+        1227,
+        3750,
+        3514,
+        3885
+      ],
+      "tier1": "בהר ההר ויאסף אל עמיו : על אשר מעלתם בי בתוך בני ישראל במי מרי בתקדש",
+      "tier2": "בהר ההר ויאסף אל עמיו : על אשר מעלתם בי בתוך בני ישראל במי מרי בתקדש",
+      "tier3": "בהר ההר ויאסף אל עמיו : על אשר מעלתם בי בתוך בני ישראל במי מרי בתקדש",
+      "tier4_records": [],
+      "kraken_confidence": 0.9883
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L080",
+      "bbox": [
+        1266,
+        3829,
+        3511,
+        3992
+      ],
+      "tier1": "מדברצו על אשר לא קדשתם אותי בתוך בני ישראל : כי מנגד תראה את הארץ",
+      "tier2": "מדברצו על אשר לא קדשתם אותי בתוך בני ישראל : כי מנגד תראה את הארץ",
+      "tier3": "מדברצו על אשר לא קדשתם אותי בתוך בני ישראל : כי מנגד תראה את הארץ",
+      "tier4_records": [],
+      "kraken_confidence": 0.9926
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L081",
+      "bbox": [
+        3680,
+        1534,
+        3768,
+        2077
+      ],
+      "tier1": "פזפפ'גית [פ']",
+      "tier2": "פזפפ'גית [פ']",
+      "tier3": "פזפפ'גית [פ']",
+      "tier4_records": [],
+      "kraken_confidence": 0.7793
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L082",
+      "bbox": [
+        3665,
+        2038,
+        3765,
+        2100
+      ],
+      "tier1": "לאי:",
+      "tier2": "לאי:",
+      "tier3": "לאי:",
+      "tier4_records": [],
+      "kraken_confidence": 0.7896
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L086",
+      "bbox": [
+        3573,
+        2428,
+        3756,
+        2569
+      ],
+      "tier1": "בליש ",
+      "tier2": "בליש ",
+      "tier3": "בליש ",
+      "tier4_records": [],
+      "kraken_confidence": 0.6952
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L087",
+      "bbox": [
+        3706,
+        2528,
+        3745,
+        2628
+      ],
+      "tier1": "א]",
+      "tier2": "א]",
+      "tier3": "א]",
+      "tier4_records": [],
+      "kraken_confidence": 0.6232
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L088",
+      "bbox": [
+        3585,
+        2578,
+        3748,
+        2705
+      ],
+      "tier1": "כמוץ [ל']",
+      "tier2": "כמוץ [ל']",
+      "tier3": "כמוץ [ל']",
+      "tier4_records": [],
+      "kraken_confidence": 0.7751
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L089",
+      "bbox": [
+        3659,
+        2652,
+        3742,
+        2729
+      ],
+      "tier1": "אית",
+      "tier2": "אית",
+      "tier3": "אית",
+      "tier4_records": [],
+      "kraken_confidence": 0.9835
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L090",
+      "bbox": [
+        3641,
+        2705,
+        3745,
+        2782
+      ],
+      "tier1": "בורו/]",
+      "tier2": "בורו/]",
+      "tier3": "בורו/]",
+      "tier4_records": [],
+      "kraken_confidence": 0.9182
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L092",
+      "bbox": [
+        3674,
+        2755,
+        3739,
+        2835
+      ],
+      "tier1": "ואין",
+      "tier2": "ואין",
+      "tier3": "ואין",
+      "tier4_records": [],
+      "kraken_confidence": 0.8243
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L093",
+      "bbox": [
+        3653,
+        2811,
+        3742,
+        2909
+      ],
+      "tier1": "אן",
+      "tier2": "אן",
+      "tier3": "אן",
+      "tier4_records": [],
+      "kraken_confidence": 0.5835
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L094",
+      "bbox": [
+        3632,
+        2926,
+        3777,
+        3030
+      ],
+      "tier1": "[",
+      "tier2": "[",
+      "tier3": "[",
+      "tier4_records": [],
+      "kraken_confidence": 0.4734
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L096",
+      "bbox": [
+        3585,
+        2991,
+        3739,
+        3092
+      ],
+      "tier1": "קום",
+      "tier2": "קום",
+      "tier3": "קום",
+      "tier4_records": [],
+      "kraken_confidence": 0.772
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L097",
+      "bbox": [
+        3691,
+        3053,
+        3753,
+        3160
+      ],
+      "tier1": "ל",
+      "tier2": "ל",
+      "tier3": "ל",
+      "tier4_records": [],
+      "kraken_confidence": 0.5215
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L099",
+      "bbox": [
+        3635,
+        3213,
+        3759,
+        3310
+      ],
+      "tier1": "[",
+      "tier2": "[",
+      "tier3": "[",
+      "tier4_records": [],
+      "kraken_confidence": 0.6568
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L103",
+      "bbox": [
+        3547,
+        3670,
+        3736,
+        3820
+      ],
+      "tier1": "הם",
+      "tier2": "הם",
+      "tier3": "הם",
+      "tier4_records": [],
+      "kraken_confidence": 0.3826
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L104",
+      "bbox": [
+        3686,
+        3803,
+        3756,
+        3856
+      ],
+      "tier1": "[",
+      "tier2": "[",
+      "tier3": "[",
+      "tier4_records": [],
+      "kraken_confidence": 0.5329
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L105",
+      "bbox": [
+        1041,
+        4039,
+        3733,
+        4169
+      ],
+      "tier1": "ל מל בתור וכיבניהון עלאשר לאו קישתם כי אמל עדי האותי לא אוצי במרמה השכל וידע ואכממיהו זה גורלך על אושרעזבו כנבור עריץ ווממי להד לבולא וכבעימו ביבולי",
+      "tier2": "ל מל בתור וכיבניהון עלאשר לאו קישתם כי אמל עדי האותי לא אוצי במרמה השכל וידע ואכממיהו זה גורלך על אושרעזבו כנבור עריץ ווממי להד לבולא וכבעימו ביבולי",
+      "tier3": "ל מל בתור וכיבניהון עלאשר לאו קישתם כי אמל עדי האותי לא אוצי במרמה השכל וידע ואכממיהו זה גורלך על אושרעזבו כנבור עריץ ווממי להד לבולא וכבעימו ביבולי",
+      "tier4_records": [],
+      "kraken_confidence": 0.8863
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L106",
+      "bbox": [
+        1029,
+        4124,
+        3733,
+        4231
+      ],
+      "tier1": "לד אד בי נתום מלימוכם גדפויעו שכחת ב' בו במראה נחשת אשרגדט גוריגור דאגית ב' בו ידבשון אך תיר אי פרת ניחג ביאם אחותו גממחום היו מזראים וכול והרשע[ושמ']",
+      "tier2": "לד אד בי נתום מלימוכם גדפויעו שכחת ב' בו במראה נחשת אשרגדט גוריגור דאגית ב' בו ידבשון אך תיר אי פרת ניחג ביאם אחותו גממחום היו מזראים וכול והרשע[ושמ']",
+      "tier3": "לד אד בי נתום מלימוכם גדפויעו שכחת ב' בו במראה נחשת אשרגדט גוריגור דאגית ב' בו ידבשון אך תיר אי פרת ניחג ביאם אחותו גממחום היו מזראים וכול והרשע[ושמ']",
+      "tier4_records": [],
+      "kraken_confidence": 0.9083
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L107",
+      "bbox": [
+        2142,
+        4186,
+        2892,
+        4287
+      ],
+      "tier1": "בות' ב' מ'ב' חט בשלחמשה את מש הומום :",
+      "tier2": "בות' ב' מ'ב' חט בשלחמשה את מש הומום :",
+      "tier3": "בות' ב' מ'ב' חט בשלחמשה את מש הומום :",
+      "tier4_records": [],
+      "kraken_confidence": 0.9196
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L109",
+      "bbox": [
+        3591,
+        2065,
+        3762,
+        2221
+      ],
+      "tier1": "לם]",
+      "tier2": "לם]",
+      "tier3": "לם]",
+      "tier4_records": [],
+      "kraken_confidence": 0.608
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L110",
+      "bbox": [
+        3576,
+        2330,
+        3647,
+        2454
+      ],
+      "tier1": "[/",
+      "tier2": "[/",
+      "tier3": "[/",
+      "tier4_records": [],
+      "kraken_confidence": 0.438
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L111",
+      "bbox": [
+        1269,
+        2971,
+        3609,
+        3160
+      ],
+      "tier1": "ויבא משה וידבראת כל דברי השירה הואת באוני העם הוא והו שעבונו : ויבלמשה",
+      "tier2": "ויבא משה וידבראת כל דברי השירה הואת באוני העם הוא והו שעבונו : ויבלמשה",
+      "tier3": "ויבא משה וידבראת כל דברי השירה הואת באוני העם הוא והו שעבונו : ויבלמשה",
+      "tier4_records": [],
+      "kraken_confidence": 0.97
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L112",
+      "bbox": [
+        1395,
+        3115,
+        3494,
+        3251
+      ],
+      "tier1": "לדבר את כל הדברים האלה אל כל ישראל : ויאמר אלהם שימו לבבכם לכל הד",
+      "tier2": "לדבר את כל הדברים האלה אל כל ישראל : ויאמר אלהם שימו לבבכם לכל הד",
+      "tier3": "לדבר את כל הדברים האלה אל כל ישראל : ויאמר אלהם שימו לבבכם לכל הד",
+      "tier4_records": [],
+      "kraken_confidence": 0.979
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L113",
+      "bbox": [
+        1454,
+        3219,
+        3506,
+        3342
+      ],
+      "tier1": "אשר אנכי מעוד בכם היום אשר תצום את בניכם לשמר לעשות את כל :",
+      "tier2": "אשר אנכי מעוד בכם היום אשר תצום את בניכם לשמר לעשות את כל :",
+      "tier3": "אשר אנכי מעוד בכם היום אשר תצום את בניכם לשמר לעשות את כל :",
+      "tier4_records": [],
+      "kraken_confidence": 0.9728
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L116",
+      "bbox": [
+        2723,
+        2236,
+        3691,
+        2366
+      ],
+      "tier1": "וחש עתדת למו : כי ידין יהוה",
+      "tier2": "וחש עתדת למו : כי ידין יהוה",
+      "tier3": "וחש עתדת למו : כי ידין יהוה",
+      "tier4_records": [],
+      "kraken_confidence": 0.9862
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L117",
+      "bbox": [
+        2715,
+        2325,
+        3485,
+        2460
+      ],
+      "tier1": "עצות ועזוב : ואמר או אלהימ",
+      "tier2": "עצות ועזוב : ואמר או אלהימ",
+      "tier3": "עצות ועזוב : ואמר או אלהימ",
+      "tier4_records": [],
+      "kraken_confidence": 0.9486
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L118",
+      "bbox": [
+        2818,
+        2416,
+        3503,
+        2552
+      ],
+      "tier1": "ויו נסיכם יקומו ויעזרכם",
+      "tier2": "ויו נסיכם יקומו ויעזרכם",
+      "tier3": "ויו נסיכם יקומו ויעזרכם",
+      "tier4_records": [],
+      "kraken_confidence": 0.9522
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L119",
+      "bbox": [
+        2685,
+        2602,
+        3497,
+        2729
+      ],
+      "tier1": "אשא אל שמים ידי ואמתתי",
+      "tier2": "אשא אל שמים ידי ואמתתי",
+      "tier3": "אשא אל שמים ידי ואמתתי",
+      "tier4_records": [],
+      "kraken_confidence": 0.9579
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L120",
+      "bbox": [
+        2030,
+        2959,
+        2697,
+        3027
+      ],
+      "tier1": "     ",
+      "tier2": "     ",
+      "tier3": "     ",
+      "tier4_records": [],
+      "kraken_confidence": 0.5653
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L121",
+      "bbox": [
+        2912,
+        2879,
+        3526,
+        3006
+      ],
+      "tier1": "יקום ונקסישוב לצרי",
+      "tier2": "יקום ונקסישוב לצרי",
+      "tier3": "יקום ונקסישוב לצרי",
+      "tier4_records": [],
+      "kraken_confidence": 0.9532
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L123",
+      "bbox": [
+        1561,
+        5207,
+        1702,
+        5308
+      ],
+      "tier1": "סום",
+      "tier2": "סום",
+      "tier3": "סום",
+      "tier4_records": [],
+      "kraken_confidence": 0.689
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L124",
+      "bbox": [
+        1732,
+        5207,
+        1912,
+        5308
+      ],
+      "tier1": "ספ]",
+      "tier2": "ספ]",
+      "tier3": "ספ]",
+      "tier4_records": [],
+      "kraken_confidence": 0.5792
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L125",
+      "bbox": [
+        1971,
+        5213,
+        2092,
+        5308
+      ],
+      "tier1": "חוא",
+      "tier2": "חוא",
+      "tier3": "חוא",
+      "tier4_records": [],
+      "kraken_confidence": 0.8571
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L126",
+      "bbox": [
+        2195,
+        5213,
+        2296,
+        5308
+      ],
+      "tier1": "חסצם",
+      "tier2": "חסצם",
+      "tier3": "חסצם",
+      "tier4_records": [],
+      "kraken_confidence": 0.7463
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L127",
+      "bbox": [
+        2396,
+        5210,
+        2517,
+        5308
+      ],
+      "tier1": "וש",
+      "tier2": "וש",
+      "tier3": "וש",
+      "tier4_records": [],
+      "kraken_confidence": 0.5558
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L128",
+      "bbox": [
+        2573,
+        5216,
+        3154,
+        5308
+      ],
+      "tier1": "אוסוורץ חם הוזם מזחספכלה",
+      "tier2": "אוסוורץ חם הוזם מזחספכלה",
+      "tier3": "אוסוורץ חם הוזם מזחספכלה",
+      "tier4_records": [],
+      "kraken_confidence": 0.7561
+    },
+    {
+      "line_id": "leningrad_devarim_F119A_fixture_L129",
+      "bbox": [
+        3222,
+        5190,
+        3361,
+        5308
+      ],
+      "tier1": "הבים",
+      "tier2": "הבים",
+      "tier3": "הבים",
+      "tier4_records": [],
+      "kraken_confidence": 0.7258
+    }
+  ],
+  "_provisional": true,
+  "_single_annotator": "Moster B (pre-adjudication); gt_hash null"
+}
