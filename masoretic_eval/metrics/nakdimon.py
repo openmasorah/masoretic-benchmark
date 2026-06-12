@@ -7,17 +7,26 @@ Definitions:
 - CHA: character-level accuracy over full strings (consonants + nikkud).
 - WOR: word-level perfect-match accuracy (whole-token equality).
 - VOC: character-level accuracy restricted to vocalization codepoints (nikkud).
+
+All four are tier-2 diagnostics, so they are computed on the tier-2 view
+(strip_for_tier2) — matching the tier-2 score, which excludes trop (tier 3) and
+rafe (tier 4). DEC/CHA/VOC pair clusters via the same Needleman-Wunsch alignment
+the tier CER uses, so a single inserted/deleted cluster does not cascade-misalign
+every later pair (the prior implementation paired by raw positional index).
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 
+from masoretic_eval.metrics.cer import _cluster_align
 from masoretic_eval.normalize import normalize_for_scoring
 from masoretic_eval.segment import segment_clusters
+from masoretic_eval.strip import strip_for_tier2
 
-VOWEL_RANGE = (0x05B0, 0x05BD)  # vowel points + dagesh
+VOWEL_RANGE = (0x05B0, 0x05BD)  # vowel points + dagesh + meteg
 SIN_SHIN_DOTS = (0x05C1, 0x05C2)
+QAMATS_QATAN = 0x05C7  # retained by the tier-2 view; classed as a vowel here
 
 
 @dataclass
@@ -34,6 +43,8 @@ def _is_vowel_codepoint(c: str) -> bool:
         return True
     if cp in SIN_SHIN_DOTS:
         return True
+    if cp == QAMATS_QATAN:
+        return True
     return False
 
 
@@ -42,45 +53,49 @@ def _vowel_decision_class(cluster: str) -> tuple[int, ...]:
     return tuple(sorted(ord(c) for c in cluster if _is_vowel_codepoint(c)))
 
 
-def nakdimon_factoring(gt: str, pred: str) -> NakdimonResult:
-    gt_n = normalize_for_scoring(gt)
-    pred_n = normalize_for_scoring(pred)
+def _has_consonant(cluster: str) -> bool:
+    return any(0x05D0 <= ord(c) <= 0x05EA for c in cluster)
 
-    # DEC: per-cluster decision-class match.
+
+def nakdimon_factoring(gt: str, pred: str) -> NakdimonResult:
+    gt_n = strip_for_tier2(normalize_for_scoring(gt))
+    pred_n = strip_for_tier2(normalize_for_scoring(pred))
+
     gt_clusters = list(segment_clusters(gt_n))
     pred_clusters = list(segment_clusters(pred_n))
+    alignment = _cluster_align(gt_clusters, pred_clusters)
 
-    # Align 1:1 when cluster counts match; else pad shorter side.
-    n = max(len(gt_clusters), len(pred_clusters))
-    dec_correct = 0
-    dec_total = 0
-    for i in range(n):
-        g = gt_clusters[i] if i < len(gt_clusters) else ""
-        p = pred_clusters[i] if i < len(pred_clusters) else ""
-        # Skip purely-punctuation clusters from DEC denominator.
-        if g and any(0x05D0 <= ord(c) <= 0x05EA for c in g):
+    dec_correct = dec_total = 0
+    cha_correct = cha_total = 0
+    voc_correct = voc_total = 0
+    for g, p in alignment:
+        g = g or ""
+        p = p or ""
+        # DEC: per GT consonant cluster, decision-class match.
+        if _has_consonant(g):
             dec_total += 1
             if _vowel_decision_class(g) == _vowel_decision_class(p):
                 dec_correct += 1
+        # CHA: codepoint accuracy within the aligned pair (clusters are NFD
+        # canonical-ordered, so positional comparison inside a cluster is valid;
+        # alignment across clusters prevents insertion/deletion cascade).
+        cha_total += max(len(g), len(p))
+        cha_correct += sum(1 for a, b in zip(g, p, strict=False) if a == b)
+        # VOC: same, restricted to vocalization codepoints.
+        g_v = [c for c in g if _is_vowel_codepoint(c)]
+        p_v = [c for c in p if _is_vowel_codepoint(c)]
+        voc_total += max(len(g_v), len(p_v))
+        voc_correct += sum(1 for a, b in zip(g_v, p_v, strict=False) if a == b)
+
     dec = dec_correct / dec_total if dec_total else 1.0
-
-    # CHA: character-level over aligned strings (pad shorter).
-    cha_total = max(len(gt_n), len(pred_n))
-    cha_correct = sum(1 for a, b in zip(gt_n, pred_n, strict=False) if a == b)
     cha = cha_correct / cha_total if cha_total else 1.0
+    voc = voc_correct / voc_total if voc_total else 1.0
 
-    # WOR: whole-token equality (space-separated tokens).
+    # WOR: whole-token equality on the tier-2 view (space-separated tokens).
     gt_tokens = gt_n.split()
     pred_tokens = pred_n.split()
     wor_total = max(len(gt_tokens), len(pred_tokens))
     wor_correct = sum(1 for a, b in zip(gt_tokens, pred_tokens, strict=False) if a == b)
     wor = wor_correct / wor_total if wor_total else 1.0
-
-    # VOC: char-level restricted to vowel codepoints.
-    gt_vowels = [c for c in gt_n if _is_vowel_codepoint(c)]
-    pred_vowels = [c for c in pred_n if _is_vowel_codepoint(c)]
-    voc_total = max(len(gt_vowels), len(pred_vowels))
-    voc_correct = sum(1 for a, b in zip(gt_vowels, pred_vowels, strict=False) if a == b)
-    voc = voc_correct / voc_total if voc_total else 1.0
 
     return NakdimonResult(dec=dec, cha=cha, wor=wor, voc=voc)

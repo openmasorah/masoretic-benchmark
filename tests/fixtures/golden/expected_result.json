@@ -20,8 +20,8 @@
       "edits": 0,
       "denominator": 134,
       "dec": 1.0,
-      "cha": 0.03424657534246575,
-      "wor": 0.9230769230769231,
+      "cha": 1.0,
+      "wor": 1.0,
       "voc": 1.0,
       "nakdimon_disagreement_rate": null,
       "dicta_disagreement_rate": null
@@ -54,9 +54,6 @@
       },
       "patach": {
         "patach": 3
-      },
-      "__absent__": {
-        "__absent__": 31
       },
       "hiriq": {
         "hiriq": 1
