@@ -215,9 +215,11 @@ Frozen baseline predictions and the headline scores per folio live in
 - `results/scores/leningrad_devarim_F118B_fixture.json` — published headline
   scores for F118B across all four baselines.
 
-The benchmark text is CC-BY-4.0; only IIIF/archive.org references are stored
-for the manuscript images. No manuscript images are redistributed in this
-repository.
+Benchmark text licensing differs per folio: F118B tier-1 GT is hand-transcribed
+(CC-BY-4.0); F119A/F119B/F120A tier-1 GT is UXLC-derived (CC0-1.0, UXLC v4.20 /
+tanach.us). See the README "IAA benchmark fixtures" section and each fixture's
+`_provenance` block. Only IIIF/archive.org references are stored for the
+manuscript images; no manuscript images are redistributed in this repository.
 
 ## Common setup issues
 
