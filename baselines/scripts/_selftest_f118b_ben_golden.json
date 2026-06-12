@@ -1,0 +1,41 @@
+{
+  "folio_id": "leningrad_devarim_F118B_fixture",
+  "provisional": true,
+  "_provenance": {
+    "method": "hand-transcribed from photograph (PDM 1.0 archive.org scan of Leningrad Codex); maqaf U+05BE retained per DECISIONS.md 2026-06-11 (Step 2b)",
+    "annotator": "Ben Lamm (operator)",
+    "physical_line_count": 26,
+    "verse_span": "Deut 31:28 (mid-verse) – Deut 32:23 (first two words; folio physically ends mid-32:23)",
+    "maqaf_convention": "bare maqaf, no trailing space; 25 within-line codex maqaf-joins injected by alignment to UXLC tier-1; 4 codex maqaf-joins that straddle a physical-line break (מן־הדרך, כל־קהל, על־גוזליו, עד־שאול) are represented by the line break (space on whole-folio concat) to preserve physical-line fidelity",
+    "supersedes": "prior _provenance falsely claimed 'UXLC-derived via gt_infra.uxlc_import' (verse_count=25); content is hand-transcribed 26 physical lines per commit 98c3836/da4f356",
+    "yosef_review_status": "deferred to [YOSEF-REVIEW] gate"
+  },
+  "lines": [
+    "ואעידה בם את־השמים ואת־הארץ כי ידעתי",
+    "אחרי מותי כי־השחת תשחתון וסרתם מן",
+    "הדרך אשר צויתי אתכם וקראת אתכם הרעה",
+    "באחרית הימים כי־תעשו את־הרע בעיני יהוה",
+    "להכעיסו במעשה ידיכם וידבר משה באזני כל",
+    "קהל ישראל את־דברי השירה הזאת עד תמם",
+    "האזינו השמים ואדברה ותשמע הארץ אמרי־פי יערף כמטר לקחי תזל",
+    "כטל אמרתי כשעירם עלי־דשא וכרביבים עלי־עשב כי שם יהוה אקרא",
+    "הבו גדל לאלהינו הצור תמים פעלו כי כל־דרכיו משפט אל אמונה ואין",
+    "עול צדיק וישר הוא שחת לו לא בניו מומם דור עקש ופתלתל",
+    "ה־ליהוה תגמלו־זאת עם נבל ולא חכם הלוא־הוא אביך קנך הוא עשך ",
+    "ויכננך זכר ימות עולם בינו שנות דור־ודור שאל אביך ויגדך זקניך",
+    "ויאמרו לך בהנחל עליון גוים בהפרידו בני אדם יצב גבלת עמים למספר",
+    "בני ישראל כי חלק יהוה עמו יעקב חבל נחלתו ימצאהו בארץ מדבר",
+    "ובתהו ילל ישמן יסבבנהו יבוננהו יצרנהו כאישון עינוכנשר יעיר קנו על",
+    "גוזליו ירחף יפרש כנפיו יקחהו ישאהו על־אברתו יהוה בדד ינחנו ואין עמו",
+    "אל נכר ירכבהו על־במתי ארץ ויאכל תנובת שדי וינקהו דבש מסלע",
+    "ושמן מחלמיש צור חמאת בקר וחלב צאן עם־חלב כרים ואילים בני־בשן",
+    "ועתודים עם־חלב כליות חטה ודם־ענב תשתה־חמר וישמן ישרון ויבעט",
+    "שמנת עבית כשית ויטש אלוה עשהו וינבל צור ישעתו יקנאהו",
+    "בזרים בתועבת יכעיסהו יזבחו לשדים לא אלה אלהים לא ידעום חדשים",
+    "מקרב באו לא שערום אבתיכם צור ילדך תשי ותשכח אל מחללך וירא",
+    "יהוה וינאץ מכעס בניו ובנתיו ויאמר אסתירה פני מהם אראה מה אחריתם",
+    "כי דור תהפכת המה בנים לא־אמן בם הם קנאוני בלא־אל כעסוני בהבליהם",
+    "ואני אקניאם בלא־עם בגוי נבל אכעיסם כי־אש קדחה באפי ותיקד עד",
+    "שאול תחתית ותאכל ארץ ויבלה ותלהט מוסדי הרים אספה עלימו"
+  ]
+}
