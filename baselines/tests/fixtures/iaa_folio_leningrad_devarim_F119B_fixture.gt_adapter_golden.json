@@ -1,17 +1,23 @@
 {
   "folio_id": "leningrad_devarim_F119B_fixture",
   "provisional": true,
+  "single_annotator": true,
+  "pre_adjudication": true,
+  "gt_hash": null,
   "_provenance": {
-    "phase": "03.2",
-    "method": "UXLC-derived via gt_infra.uxlc_import.build_baseline_page_xml + baselines._gt_adapter.load_tier1_per_line",
-    "uxlc_source": "tanach.us Deuteronomy.xml (cached at baselines/tests/fixtures/_uxlc_cache/Deuteronomy.xml; re-fetch via gt_infra.uxlc_import.fetch_uxlc.fetch_uxlc_book)",
+    "method": "diplomatic hand transcription by annotator B, projected to tier-1 via baselines._gt_adapter.load_tier1_per_line; maqaf U+05BE retained no-space (DECISIONS.md 2026-06-11/12)",
+    "annotator": "David Zev Moster (annotator B)",
+    "annotation_model": "diplomatic (faithful hand transcription off the Leningrad folio image); DECISIONS.md 2026-06-12 GT-model",
+    "source_page_xml": "baselines/tests/fixtures/iaa_folio_leningrad_devarim_F119B_fixture.page.xml (annotator-B IAA export, gt-infra ingest quick 260607-olw, Deut 31:28-34:12)",
     "verse_range_first": "Deut.32.52",
     "verse_range_last": "Deut.33.29",
-    "verse_count": 30,
-    "image_w": 4499,
-    "image_h": 5273,
-    "yosef_review_status": "deferred to Plan 03.1-05 [YOSEF-REVIEW] gate per CONTEXT.md R4",
-    "loader_fix": "regenerated with fixed uxlc_loader (sibling commits a37773e maqaf-space, 19418b1 <x>-tail) per DECISIONS.md 2026-06-11: bare maqaf U+05BE, no trailing space (Step 2b)"
+    "line_count": 30,
+    "single_annotator": true,
+    "pre_adjudication": true,
+    "gt_hash": null,
+    "iaa_status": "NOT computed - needs annotator A (Yosef); baseline cold-scoring only",
+    "personnel_note": "annotator-B work delivered under the name 'Marcus' is David Moster's (STATE.md 2026-06-12 correction); 'Marcus' is advisory only",
+    "supersedes": "UXLC-derived via gt_infra.uxlc_import.build_baseline_page_xml + baselines._gt_adapter.load_tier1_per_line"
   },
   "lines": [
     "כי מנגד תראה את־הארץ ושמה לא תבוא אל־הארץ אשר־אני נתן לבני ישראל",
