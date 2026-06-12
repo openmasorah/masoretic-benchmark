@@ -64,6 +64,9 @@ jobs:
       - name: Reject private path leaks
         run: python scripts/reject_private_paths.py
 
+      - name: Release egress audit
+        run: python scripts/audit_release.py --all
+
       - name: Detect hardcoded secrets
         uses: gacts/gitleaks@v1.3.2
         with:
