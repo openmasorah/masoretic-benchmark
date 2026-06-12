@@ -34,6 +34,42 @@ _ALLOWED_OCCURRENCES: tuple[str, ...] = (
     "baal" + "shem" + "@bc7255ecaa3eb872885467d3a59e9e6352d5668a",
 )
 
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+# (token -> exact repo-relative paths) that legitimately contain that token.
+# The recovered release-audit machinery references the codename as detection
+# logic (scripts/audit_release.py, its red-team test) and one fixture IS an
+# intentionally-planted leak the red-team test must detect. Mirrors the path
+# whitelist audit_release.py applies for the same token. The exemption is pinned
+# to (token, path): any OTHER denylist token in these files still trips, and the
+# token in any OTHER file still trips — so this is not a blanket file skip and
+# cannot hide an unrelated leak (see the token-scoping meta-test).
+_PATH_EXEMPTIONS: dict[str, frozenset[str]] = {
+    "baal" + "shem": frozenset(
+        {
+            "scripts/audit_release.py",
+            "tests/release/test_audit_release_red_team.py",
+            "tests/release/fixtures/planted_" + "baal" + "shem" + "_string.txt",
+        }
+    ),
+}
+
+
+def _is_path_exempt(path: str | None, pattern: str) -> bool:
+    """True if `pattern` is legitimately present in the file at `path`.
+
+    `path` is resolved relative to the repo root; paths outside the repo (e.g.
+    pytest tmp files) never match, so the meta-test's planted literals still
+    trip.
+    """
+    if path is None:
+        return False
+    try:
+        rel = Path(path).resolve().relative_to(REPO_ROOT).as_posix()
+    except (ValueError, OSError):
+        return False
+    return rel in _PATH_EXEMPTIONS.get(pattern, frozenset())
+
 
 def _git_ls_files() -> list[str]:
     result = subprocess.run(
@@ -62,7 +98,7 @@ def _scan_path(path: str) -> list[str]:
     return [
         f"REJECT (private path {pattern!r}): {path}"
         for pattern in DENYLIST
-        if pattern.lower() in haystack
+        if pattern.lower() in haystack and not _is_path_exempt(path, pattern)
     ]
 
 

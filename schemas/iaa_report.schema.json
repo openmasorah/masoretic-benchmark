@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:openmesorah:iaa_report.schema:v0.1",
+  "title": "iaa_report.json",
+  "type": "object",
+  "required": ["folios", "tier1", "tier2", "tier3", "tier4", "adjudication_summary"],
+  "additionalProperties": true,
+  "properties": {
+    "folios": {"type": "array", "items": {"type": "string"}, "minItems": 3, "maxItems": 5},
+    "tier1": {"$ref": "#/$defs/cer_tier"},
+    "tier2": {"$ref": "#/$defs/cer_tier"},
+    "tier3": {"$ref": "#/$defs/cer_tier"},
+    "tier4": {"$ref": "#/$defs/f1_tier"},
+    "adjudication_summary": {
+      "type": "object",
+      "required": ["tier1_disagreements_reconciled", "tier2_disagreements_reconciled", "tier3_disagreements_reconciled", "tier4_disagreements_reconciled"],
+      "properties": {
+        "tier1_disagreements_reconciled": {"type": "integer", "minimum": 0},
+        "tier2_disagreements_reconciled": {"type": "integer", "minimum": 0},
+        "tier3_disagreements_reconciled": {"type": "integer", "minimum": 0},
+        "tier4_disagreements_reconciled": {"type": "integer", "minimum": 0}
+      }
+    }
+  },
+  "$defs": {
+    "cer_tier": {
+      "type": "object",
+      "required": ["bidirectional_cer_mean", "ci95"],
+      "properties": {
+        "bidirectional_cer_mean": {"type": "number", "minimum": 0},
+        "ci95": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2}
+      }
+    },
+    "f1_tier": {
+      "type": "object",
+      "required": ["f1_mean", "ci95"],
+      "properties": {
+        "f1_mean": {"type": "number", "minimum": 0, "maximum": 1},
+        "ci95": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2}
+      }
+    }
+  }
+}

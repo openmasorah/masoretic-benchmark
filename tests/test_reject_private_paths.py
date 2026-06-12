@@ -127,3 +127,36 @@ def test_other_codename_occurrence_is_still_rejected(tmp_path, reject_private_pa
     )
 
     assert reject_private_paths.main([str(manifest)]) == 1
+
+
+def test_guard_infra_paths_with_codename_are_exempt(reject_private_paths):
+    """The recovered release-audit machinery legitimately carries the codename.
+
+    audit_release.py and its red-team test reference the codename as detection
+    logic; the planted fixture IS an intentional leak the red-team test must
+    detect. These exact repo-relative paths are exempt for the codename token
+    only — mirrors the path whitelist audit_release.py applies for that token.
+    """
+    codename = "baal" + "shem"
+    for rel in (
+        "scripts/audit_release.py",
+        "tests/release/test_audit_release_red_team.py",
+        "tests/release/fixtures/planted_" + codename + "_string.txt",
+    ):
+        assert reject_private_paths.main([rel]) == 0, rel
+
+
+def test_path_exemption_is_token_scoped(reject_private_paths):
+    """Exemption is pinned to (token, path): a DIFFERENT denylist token in an
+    exempt path still trips, and the codename token in any OTHER path still
+    trips. This is what keeps the path exemption from becoming a blanket hole.
+    """
+    codename = "baal" + "shem"
+    operator = "/Users/" + "benlamm"
+    # The codename is exempt for the audit script...
+    assert reject_private_paths._is_path_exempt("scripts/audit_release.py", codename)
+    # ...but an operator-path leak in that SAME file is not exempt.
+    assert not reject_private_paths._is_path_exempt("scripts/audit_release.py", operator)
+    # ...and the codename in a non-listed path is not exempt.
+    assert not reject_private_paths._is_path_exempt("masoretic_eval/cli.py", codename)
+    assert not reject_private_paths._is_path_exempt(None, codename)
