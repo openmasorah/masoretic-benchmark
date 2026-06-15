@@ -22,9 +22,8 @@
   },
   "ordering_note": "Tier-1 whole-folio CER is line-order-sensitive. HEADLINE = line_id-order (matches the published F118B leaderboard method; comparable). DIAGNOSTIC = reading-order (EVALUATION_PROTOCOL step 3 bbox sort). The two diverge materially and NOT uniformly (F119B is worse under reading-order) because Kraken bboxes are noisy — FLAGGED for Ben/Yosef methodology review; not silently canonicalized here.",
   "notes": [
-    "char_menaked tier-1 == kraken tier-1 (chain reuses Kraken consonants).",
-    "char_menaked tier2/3 are diacritizer-chain diagnostics.",
-    "kraken tier2/3 are its raw (undiacritized) text vs pointed GT — expected high."
+    "biblia_kraken == biblia_nakdimon == biblia_char_menaked at tier-1 (all three share Kraken's consonant transcription; the diacritizers differ only at tiers 2-3, which are not scorable here). One distinct tier-1 OCR signal + llm_vision.",
+    "All provisional preds carry REAL bboxes (no zero-bbox order-pinning); the published results/biblia_kraken zero-bbox defect is NOT present here."
   ],
   "scores": {
     "biblia_kraken": {
@@ -32,22 +31,36 @@
       "tier1_cer_diagnostic_reading_order": 0.8865,
       "tier1_edits": 1547,
       "tier1_denominator": 1745,
-      "tier2_cer_reading_order": 0.9393,
-      "tier3_cer_reading_order": 0.941
+      "tier2_cer": "not_scored (tier-1-only diplomatic golden; no nikkud reference)",
+      "tier3_cer": "not_scored (tier-1-only diplomatic golden; no trop reference)",
+      "tier4_f1": "not_scored (metamark GT + IAA gated on annotator A / Yosef)"
     },
     "biblia_char_menaked": {
       "tier1_cer_headline_line_id_order": 0.7845,
       "tier1_cer_diagnostic_reading_order": 0.8865,
       "tier1_edits": 1547,
       "tier1_denominator": 1745,
-      "tier2_cer_reading_order": 0.9393,
-      "tier3_cer_reading_order": 0.941
+      "tier2_cer": "not_scored (tier-1-only diplomatic golden; no nikkud reference)",
+      "tier3_cer": "not_scored (tier-1-only diplomatic golden; no trop reference)",
+      "tier4_f1": "not_scored (metamark GT + IAA gated on annotator A / Yosef)"
     },
     "biblia_nakdimon": {
-      "status": "BLOCKED: python package 'nakdimon' not installed in sibling .venv"
+      "tier1_cer_headline_line_id_order": 0.7845,
+      "tier1_cer_diagnostic_reading_order": 0.8865,
+      "tier1_edits": 1547,
+      "tier1_denominator": 1745,
+      "tier2_cer": "not_scored (tier-1-only diplomatic golden; no nikkud reference)",
+      "tier3_cer": "not_scored (tier-1-only diplomatic golden; no trop reference)",
+      "tier4_f1": "not_scored (metamark GT + IAA gated on annotator A / Yosef)"
     },
     "llm_vision": {
-      "status": "BLOCKED: ANTHROPIC_API_KEY + GOOGLE_API_KEY unset (GEMINI_API_KEY set but code reads GOOGLE_API_KEY); paid run (~$0.29/folio) deferred"
+      "tier1_cer_headline_line_id_order": 0.8464,
+      "tier1_cer_diagnostic_reading_order": 0.8441,
+      "tier1_edits": 1473,
+      "tier1_denominator": 1745,
+      "tier2_cer": "not_scored (tier-1-only diplomatic golden; no nikkud reference)",
+      "tier3_cer": "not_scored (tier-1-only diplomatic golden; no trop reference)",
+      "tier4_f1": "not_scored (metamark GT + IAA gated on annotator A / Yosef)"
     }
   }
 }
