@@ -42,9 +42,11 @@ HEBREW_PUNCT_MARKS = (0x05BF, 0x05C7)  # rafe through qamats-qatan (excl. maqaf 
 TROP_RANGE = (0x0591, 0x05AF)  # taamim / cantillation marks
 
 # Codepoints stripped from tier 2 that fall outside TROP_RANGE but are also
-# not consonants or nikkud: rafe (U+05BF), paseq (U+05C0), sof-pasuq (U+05C3),
-# nun-hafukha (U+05C6).  Sin-dot (U+05C1) and shin-dot (U+05C2) are retained.
-_TIER2_EXTRA_STRIP = (0x05BF, 0x05C0, 0x05C3, 0x05C6)
+# not consonants or nikkud: meteg/ga'ya (U+05BD), rafe (U+05BF), paseq (U+05C0),
+# sof-pasuq (U+05C3), nun-hafukha (U+05C6).  Sin-dot (U+05C1) and shin-dot
+# (U+05C2) are retained.  Meteg added per DECISIONS.md 2026-06-15 (scored at
+# tier 3, not tier 2).  MUST stay in sync with strip.py::_TIER2_EXTRA_STRIP.
+_TIER2_EXTRA_STRIP = (0x05BD, 0x05BF, 0x05C0, 0x05C3, 0x05C6)
 
 META_MARK_TAGS = {"pe", "samekh", "reversednun"}
 

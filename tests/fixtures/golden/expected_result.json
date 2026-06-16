@@ -18,7 +18,7 @@
     "tier2": {
       "cer": 0.0,
       "edits": 0,
-      "denominator": 134,
+      "denominator": 132,
       "dec": 1.0,
       "cha": 1.0,
       "wor": 1.0,
@@ -78,9 +78,6 @@
       },
       "segol": {
         "segol": 3
-      },
-      "meteg": {
-        "meteg": 2
       }
     }
   },
