@@ -1,0 +1,16 @@
+{
+    "version": "1.0",
+    "name": "Open Masorah — Masorah Marks",
+    "author": "Open Masorah",
+    "wrapPrefix": "",
+    "wrapSuffix": "",
+    "characters": [
+        {"row": 0, "column": 0, "character": "[:SofPs:]", "keyboard_code": 190},
+        {"row": 0, "column": 1, "character": "[:Paseq:]", "keyboard_code": 80},
+        {"row": 0, "column": 2, "character": "[:Maqaf:]", "keyboard_code": 189},
+        {"row": 0, "column": 3, "character": "[:DotA:]",  "keyboard_code": null},
+        {"row": 0, "column": 4, "character": "[:DotB:]",  "keyboard_code": null},
+        {"row": 0, "column": 5, "character": "[:NunH:]",  "keyboard_code": 78},
+        {"row": 0, "column": 6, "character": "[:Circ:]",  "keyboard_code": null}
+    ]
+}
