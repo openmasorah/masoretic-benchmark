@@ -163,6 +163,46 @@ def _match_one_bucket(
     )
 
 
+def detections_covering_type(detections: list[Detection], t: str) -> list[Detection]:
+    """Filter detections to those that "cover" type ``t``.
+
+    A detection covers ``t`` if its kind is ``t`` directly or ``"both"`` —
+    the consonant carried both circellus and rafe, which means it carried
+    ``t`` along with the other type. All matching detections are
+    relabeled to ``t`` so they share a single bipartite-matching bucket
+    when handed to :func:`f1_with_tolerance`.
+
+    Used to derive per-type F1 without re-running parsing or coalescing
+    the multi-type matcher. A circellus detection on A vs a circellus
+    detection on B always matches on the per-type-circellus F1; a "both"
+    detection on A vs a circellus on B also matches (both sides agreed
+    a circellus is present at that ordinal).
+    """
+    return [
+        Detection(t, d.verse_ref, d.ordinal) for d in detections if d.type == t or d.type == "both"
+    ]
+
+
+def f1_for_type(
+    a_detections: list[Detection],
+    b_detections: list[Detection],
+    *,
+    t: str,
+    tolerance: int = 1,
+) -> F1Result:
+    """Per-type F1 with ±tolerance window.
+
+    Equivalent to running :func:`f1_with_tolerance` over the
+    ``detections_covering_type(t)`` view of each side. The matched-pair
+    audit trail in the returned ``F1Result`` therefore lives in a single
+    ``(verse_ref, t)`` bucket per verse, consistent with the headline F1's
+    structure.
+    """
+    a_filt = detections_covering_type(a_detections, t)
+    b_filt = detections_covering_type(b_detections, t)
+    return f1_with_tolerance(a_filt, b_filt, tolerance=tolerance)
+
+
 def f1_with_tolerance(
     a_detections: list[Detection],
     b_detections: list[Detection],
