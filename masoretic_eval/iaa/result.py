@@ -8,6 +8,7 @@ output's stability (`asdict()` preserves insertion order).
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Any
 
 CI_METHOD = "verse_bootstrap_2.5_97.5"
 
@@ -101,4 +102,4 @@ class IaaResult:
     tier2: TierCERResult
     tier3: TierCERResult
     tier4: Tier4Result
-    metadata: dict
+    metadata: dict[str, Any]
