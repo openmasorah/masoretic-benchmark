@@ -72,7 +72,7 @@ def _gt_hash_from_manifest(manifest_path: Path | None) -> str | None:
     for folio in raw.get("folios", []):
         gh = folio.get("gt_hash")
         if gh:
-            return gh
+            return str(gh)
     return None
 
 
@@ -84,7 +84,7 @@ def _to_dict(value: Any) -> Any:
     want). Plain recursion gives us explicit control over ordering when
     needed later.
     """
-    if is_dataclass(value):
+    if is_dataclass(value) and not isinstance(value, type):
         return {k: _to_dict(v) for k, v in asdict(value).items()}
     if isinstance(value, dict):
         return {k: _to_dict(v) for k, v in value.items()}

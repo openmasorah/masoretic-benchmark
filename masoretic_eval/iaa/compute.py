@@ -285,16 +285,23 @@ def compute_iaa(
     # and bootstrap config.
     f1_by_type: dict[str, dict[str, MetricWithCI]] = {}
     for t in ("circellus", "rafe"):
+
+        def _exact(ps: list[tuple[list[Detection], list[Detection]]], t: str = t) -> float:
+            return _f1_for_type_over_verses(ps, t=t, tolerance=0).f1
+
+        def _tol1(ps: list[tuple[list[Detection], list[Detection]]], t: str = t) -> float:
+            return _f1_for_type_over_verses(ps, t=t, tolerance=1).f1
+
         f1_by_type[t] = {
             "exact": bootstrap_metric(
                 f1_payloads,
-                lambda ps, t=t: _f1_for_type_over_verses(ps, t=t, tolerance=0).f1,
+                _exact,
                 b=bootstrap_b,
                 seed=bootstrap_seed,
             ),
             "tolerance_1": bootstrap_metric(
                 f1_payloads,
-                lambda ps, t=t: _f1_for_type_over_verses(ps, t=t, tolerance=1).f1,
+                _tol1,
                 b=bootstrap_b,
                 seed=bootstrap_seed,
             ),
