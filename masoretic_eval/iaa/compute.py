@@ -31,12 +31,9 @@ from masoretic_eval.iaa.cer import per_verse_cer
 from masoretic_eval.iaa.f1 import (
     Detection,
     F1Result,
+    detections_covering_type,
     detections_from_records,
     f1_with_tolerance,
-)
-from masoretic_eval.iaa.kappa import (
-    _filter_universe,
-    cohen_kappa_binary,
 )
 from masoretic_eval.iaa.offset import offset_distribution
 from masoretic_eval.iaa.parse import (
@@ -47,6 +44,7 @@ from masoretic_eval.iaa.parse import (
 )
 from masoretic_eval.iaa.result import (
     IaaResult,
+    MetricWithCI,
     Tier4Result,
     TierCERResult,
 )
@@ -116,16 +114,26 @@ def _alpha_over_verses(
     return krippendorff_alpha_nominal(units)
 
 
-def _kappa_over_verses(
-    verse_payloads: Sequence[tuple[list[Tier4Record], list[Tier4Record], str, int]],
+def _f1_for_type_over_verses(
+    verse_payloads: Sequence[tuple[list[Detection], list[Detection]]],
     *,
     t: str,
-) -> float:
-    units: list[tuple[str, str]] = []
-    for a_recs, b_recs, vref, n_cons in verse_payloads:
-        units.extend(units_per_verse(a_recs, b_recs, n_cons, vref, canonicalize=True))
-    binary_pairs = _filter_universe(units, t)
-    return cohen_kappa_binary(binary_pairs)
+    tolerance: int,
+) -> F1Result:
+    """Per-type F1 across resampled verses.
+
+    Filters each side's per-verse detections to those covering type ``t``
+    (treating ``"both"`` as covering both types), relabels them to a single
+    bucket, and runs the headline bipartite-matching F1. This keeps the
+    matching algorithm identical to the headline F1 — only the input
+    detection set changes.
+    """
+    a_all: list[Detection] = []
+    b_all: list[Detection] = []
+    for a_dets, b_dets in verse_payloads:
+        a_all.extend(detections_covering_type(a_dets, t))
+        b_all.extend(detections_covering_type(b_dets, t))
+    return f1_with_tolerance(a_all, b_all, tolerance=tolerance)
 
 
 def _macro_cer(per_verse: list[float]) -> float:
@@ -270,19 +278,27 @@ def compute_iaa(
         seed=bootstrap_seed,
     )
 
-    # κ per type.
-    kappa_circellus = bootstrap_metric(
-        alpha_payloads,
-        lambda ps: _kappa_over_verses(ps, t="circellus"),
-        b=bootstrap_b,
-        seed=bootstrap_seed,
-    )
-    kappa_rafe = bootstrap_metric(
-        alpha_payloads,
-        lambda ps: _kappa_over_verses(ps, t="rafe"),
-        b=bootstrap_b,
-        seed=bootstrap_seed,
-    )
+    # Per-type F1 (replaces the κ-per-type breakouts that this module used
+    # to ship). κ was dropped because Cohen's prevalence paradox produced
+    # spurious negative values under extreme positive-class skew; F1 is
+    # interpretable directly. Bootstrap reuses the headline F1 payloads
+    # and bootstrap config.
+    f1_by_type: dict[str, dict[str, MetricWithCI]] = {}
+    for t in ("circellus", "rafe"):
+        f1_by_type[t] = {
+            "exact": bootstrap_metric(
+                f1_payloads,
+                lambda ps, t=t: _f1_for_type_over_verses(ps, t=t, tolerance=0).f1,
+                b=bootstrap_b,
+                seed=bootstrap_seed,
+            ),
+            "tolerance_1": bootstrap_metric(
+                f1_payloads,
+                lambda ps, t=t: _f1_for_type_over_verses(ps, t=t, tolerance=1).f1,
+                b=bootstrap_b,
+                seed=bootstrap_seed,
+            ),
+        }
 
     # Offset distribution — single computation over the full data's matched
     # circellus pairs at tolerance=1.
@@ -292,12 +308,11 @@ def compute_iaa(
     tier4 = Tier4Result(
         f1_exact=f1_exact,
         f1_tolerance_1=f1_tol1,
+        f1_by_type=f1_by_type,
         alpha_full_canon=alpha_full_canon,
         alpha_positive_canon=alpha_positive_canon,
         alpha_full_raw=alpha_full_raw,
         alpha_positive_raw=alpha_positive_raw,
-        kappa_circellus=kappa_circellus,
-        kappa_rafe=kappa_rafe,
         offset_distribution=offset,
     )
 
@@ -318,7 +333,7 @@ def compute_iaa(
             for v, _ in verse_folio_map
         }
         # Per-folio bootstrap CI: resample verses within that folio.
-        per_folio: dict[str, MetricWithCI] = {}  # noqa: F821
+        per_folio: dict[str, MetricWithCI] = {}
         for folio, verse_list in verses_by_folio.items():
             folio_payloads = [per_verse_cers[v] for v in verse_list]
             per_folio[folio] = bootstrap_metric(

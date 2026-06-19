@@ -50,21 +50,33 @@ class OffsetDistribution:
 class Tier4Result:
     """All tier-4 metrics for the headline IAA table.
 
-    F1 fields are flat (no nested CI dict — `MetricWithCI` already carries
-    the CI). The α field naming pairs `{full|positive}` universe × `{canon|raw}`
-    canonicalization, matching the falsification's 4-cell layout. ``kappa_*``
-    fields are per-type binary Cohen's κ. ``offset_distribution`` summarizes
-    the signed-offset histogram over matched circellus pairs.
+    ``f1_exact`` / ``f1_tolerance_1`` are the all-types-combined headline
+    numbers. ``f1_by_type`` reports per-type detection performance — outer
+    key ∈ ``{"circellus", "rafe"}``, inner key ∈ ``{"exact", "tolerance_1"}``,
+    each value is a ``MetricWithCI`` from the same verse-bootstrap.
+
+    Per-type Cohen's κ was deliberately omitted: under the extreme
+    positive-class skew (~5% prevalence) seen on Devarim, Cohen's κ
+    prevalence-paradox produces spuriously negative values even when F1
+    is high. Under a binary recode against the full universe the per-type
+    κ also collapses to α in this regime, so it adds no information beyond
+    what α already reports. Per-type F1 gives DH/philology reviewers an
+    interpretable per-type detection number without κ's chance-model
+    baggage. See SPEC 260619-n3u upstream for the decision rationale.
+
+    The α fields pair ``{full|positive}`` universe × ``{canon|raw}``
+    canonicalization, matching the falsification's 4-cell layout.
+    ``offset_distribution`` summarizes the signed-offset histogram over
+    matched circellus pairs.
     """
 
     f1_exact: MetricWithCI
     f1_tolerance_1: MetricWithCI
+    f1_by_type: dict[str, dict[str, MetricWithCI]]
     alpha_full_canon: MetricWithCI
     alpha_positive_canon: MetricWithCI
     alpha_full_raw: MetricWithCI
     alpha_positive_raw: MetricWithCI
-    kappa_circellus: MetricWithCI
-    kappa_rafe: MetricWithCI
     offset_distribution: OffsetDistribution
 
 

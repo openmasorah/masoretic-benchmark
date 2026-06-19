@@ -1,10 +1,11 @@
-"""End-to-end smoke test: re-derive the published Devarim α cells.
+"""End-to-end smoke test: re-derive the published Devarim α cells + per-type F1.
 
 Skipped by default because the Devarim round-0 .txt files are NOT in this
 repo — they are CC-BY-4.0-eligible but live in a separate upstream landing
 task. When the data lands, set ``MASORETIC_IAA_DATA_DIR=/path/to/dir`` and
 this test verifies that ``compute_iaa()`` reproduces the falsification's α
-values within 1e-4.
+values within 1e-4 AND the per-type F1 breakouts produced by the post-κ-drop
+implementation.
 
 Expected files inside ``MASORETIC_IAA_DATA_DIR``:
 
@@ -59,7 +60,7 @@ def test_smoke_devarim_4folio_reproduces_published_alpha():
     falsify = json.loads(falsify_path.read_text(encoding="utf-8"))
     cells = falsify["cells"]
 
-    # 4-cell verification against published numbers (1e-4 per SPEC).
+    # 4-cell α verification against published numbers (1e-4 per SPEC).
     assert math.isclose(
         result.tier4.alpha_full_canon.point, cells["A_canon"]["alpha"], abs_tol=1e-4
     )
@@ -74,3 +75,22 @@ def test_smoke_devarim_4folio_reproduces_published_alpha():
         cells["B_raw"]["alpha"],
         abs_tol=1e-4,
     )
+
+    # Headline F1 (all types combined) — pinned to the published-numbers rerun.
+    # These are the values the post-κ-drop implementation produces on the
+    # frozen Devarim 96-verse set; bump within 1e-4 if the matcher
+    # implementation changes semantically.
+    assert math.isclose(result.tier4.f1_exact.point, 0.8988, abs_tol=1e-4)
+    assert math.isclose(result.tier4.f1_tolerance_1.point, 0.9332, abs_tol=1e-4)
+
+    # Per-type F1 — replaces the dropped κ_circellus / κ_rafe breakouts.
+    # Values pinned from the upstream-data rerun documented in the refactor
+    # commit (SPEC 260619-n3u post-conclave).
+    assert math.isclose(result.tier4.f1_by_type["circellus"]["exact"].point, 0.8725, abs_tol=1e-4)
+    assert math.isclose(
+        result.tier4.f1_by_type["circellus"]["tolerance_1"].point,
+        0.9363,
+        abs_tol=1e-4,
+    )
+    assert math.isclose(result.tier4.f1_by_type["rafe"]["exact"].point, 0.9262, abs_tol=1e-4)
+    assert math.isclose(result.tier4.f1_by_type["rafe"]["tolerance_1"].point, 0.9463, abs_tol=1e-4)
