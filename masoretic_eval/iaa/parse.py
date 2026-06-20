@@ -16,6 +16,42 @@ Three positional types are extracted:
 Type folding to {circellus, rafe, both, none} happens later, in
 :mod:`masoretic_eval.iaa.alpha` (canon vs raw). This module emits raw
 records only.
+
+Per-annotator ordinal anchoring — design + caveat (FINDING 3)
+-------------------------------------------------------------
+
+This extractor is run *independently* on each annotator's raw chunk:
+ordinals derive from that annotator's own consonant stream. Two consequences:
+
+1. **Design (what this buys).** Each side's tier-4 detections live in the same
+   ordinal coordinate system as that side's tier-1 transcription. No
+   cross-side alignment computation is required to score F1 / α / κ within
+   one annotator's data, and the round-trip equivalence between raw .txt and
+   the published positional projection JSONs (see
+   :mod:`masoretic_eval.iaa.projection`) holds per-annotator without
+   reference to the other side or to an external backbone.
+
+2. **Caveat (the tier-1-into-tier-4 propagation).** If annotator A's chunk
+   has N consonants and B's has N+1 for the same verse (a tier-1 insertion,
+   deletion, or different irregular-letter convention), every mark on B
+   placed after the disagreement sits at an ordinal one step away from the
+   matching mark on A. The headline F1's ±1 tolerance phase absorbs the
+   offset as "anchor ambiguity," but the offset is in part tier-1 alignment
+   noise — not the schema-anchor question the metric is meant to surface.
+
+   Quantification on the v0.2.0 Devarim 4-folio subset (single annotator pair,
+   round-0): tier-1 CER is ≤0.57% per folio (0.29% overall). At ~25–60
+   consonants per verse, expected insertions/deletions from tier-1
+   disagreement are ~0.1–0.3 per verse. The contamination of the F1
+   exact-vs-±1 gap (the §6.1 anchor-ambiguity statistic in the paper) is
+   bounded by this and is small in proportion, but it is non-zero.
+
+   The optional UXLC-backbone reprojection path (planned for v0.3) removes
+   this contamination entirely by deriving both annotators' ordinals from a
+   shared reference consonant stream. The current published projection JSONs
+   carry per-annotator ordinals; consumers comparing across sides should be
+   aware of the caveat. See ``masoretic_eval/iaa/ALIGNMENT.md`` for the full
+   algorithm specification and the v0.3 reprojection plan.
 """
 
 from __future__ import annotations
