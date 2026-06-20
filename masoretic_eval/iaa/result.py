@@ -12,6 +12,8 @@ from typing import Any
 
 CI_METHOD = "verse_bootstrap_2.5_97.5"
 CI_METHOD_CLUSTER = "folio_clustered_bootstrap_2.5_97.5"
+CI_METHOD_BCA = "verse_bootstrap_BCa_95"
+CI_METHOD_CLUSTER_BCA = "folio_clustered_bootstrap_BCa_95"
 
 
 @dataclass(frozen=True)
@@ -57,14 +59,18 @@ class Tier4Result:
     key ∈ ``{"circellus", "rafe"}``, inner key ∈ ``{"exact", "tolerance_1"}``,
     each value is a ``MetricWithCI`` from the same verse-bootstrap.
 
-    Per-type Cohen's κ was deliberately omitted: under the extreme
-    positive-class skew (~5% prevalence) seen on Devarim, Cohen's κ
-    prevalence-paradox produces spuriously negative values even when F1
-    is high. Under a binary recode against the full universe the per-type
-    κ also collapses to α in this regime, so it adds no information beyond
-    what α already reports. Per-type F1 gives DH/philology reviewers an
-    interpretable per-type detection number without κ's chance-model
-    baggage. See SPEC 260619-n3u upstream for the decision rationale.
+    ``kappa_by_type`` reports per-type chance-corrected agreement
+    coefficients alongside the per-type F1 — outer key ∈ ``{"circellus",
+    "rafe"}``, inner key ∈ ``{"cohen", "pabak", "ac1"}``, each value is a
+    ``MetricWithCI``. Cohen's κ is reported for comparability with prior
+    IAA literature; PABAK and Gwet's AC1 are reported to surface the
+    prevalence-paradox interaction explicitly (Cohen's κ understates
+    agreement under extreme positive-class skew, while PABAK and AC1
+    are stable in that regime). The paper-methodology prose should call
+    out the three coefficients together so the reader sees the chance-
+    corrected story end-to-end. Headline framing still uses F1 because
+    F1 reads directly for DH/philology audiences without the chance-
+    model baggage.
 
     The α fields pair ``{full|positive}`` universe × ``{canon|raw}``
     canonicalization, matching the falsification's 4-cell layout.
@@ -75,6 +81,7 @@ class Tier4Result:
     f1_exact: MetricWithCI
     f1_tolerance_1: MetricWithCI
     f1_by_type: dict[str, dict[str, MetricWithCI]]
+    kappa_by_type: dict[str, dict[str, MetricWithCI]]
     alpha_full_canon: MetricWithCI
     alpha_positive_canon: MetricWithCI
     alpha_full_raw: MetricWithCI
