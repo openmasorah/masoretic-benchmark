@@ -277,6 +277,7 @@ def compute_iaa(
             "a_sha256": a_sha,
             "b_sha256": b_sha,
             "gt_hash": gt_hash,
+            "uxlc_anchored": False,
         },
     )
 

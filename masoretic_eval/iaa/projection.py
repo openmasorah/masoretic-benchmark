@@ -327,5 +327,123 @@ def compute_iaa_from_positional(
             "a_sha256": a_sha,
             "b_sha256": b_sha,
             "gt_hash": gt_hash,
+            "uxlc_anchored": False,
+        },
+    )
+
+
+def compute_iaa_uxlc_anchored_from_positional(
+    a_projection_path: Path,
+    b_projection_path: Path,
+    uxlc_text_by_verse: dict[str, str],
+    *,
+    bootstrap_b: int = DEFAULT_B,
+    bootstrap_seed: int = DEFAULT_SEED,
+    expected_a_sha256: str | None = None,
+    expected_b_sha256: str | None = None,
+    gt_hash: str | None = None,
+    force: bool = False,
+) -> IaaResult:
+    """Headline IAA with FINDING 3 contamination removed.
+
+    Identical to :func:`compute_iaa_from_positional` *except* each side's
+    tier-4 records are reprojected from per-annotator ordinals to UXLC-frame
+    ordinals before scoring (see :mod:`masoretic_eval.iaa.reproject` and
+    ``masoretic_eval/iaa/ALIGNMENT.md`` for the alignment algorithm and the
+    motivation).
+
+    The per-annotator path (``compute_iaa_from_positional``) is the
+    backwards-compatible sensitivity baseline; the paper reports the
+    UXLC-anchored numbers as headline and the per-annotator numbers as a
+    FINDING 3 sensitivity column.
+
+    Schema impact: NONE. The published positional projection JSONs keep
+    per-annotator ordinals (no v0.3 schema bump, no manifest fuse). UXLC is
+    a separate runtime input — publicly available CC0 from UXLC 2.5 — that
+    the scorer fetches alongside the projection JSONs. Without UXLC the
+    scorer reproduces the per-annotator sensitivity number; with UXLC it
+    reproduces the headline number.
+
+    Records that anchor on a side-only consonant (a tier-1 insertion with
+    no UXLC counterpart) are dropped from the reprojected set and the count
+    surfaces in ``metadata["dropped_record_counts"]`` so the caller can
+    audit the size of the dropped set.
+    """
+    from masoretic_eval.iaa.compute import IaaInputMismatch, _compute_from_verse_data
+    from masoretic_eval.iaa.reproject import consonants_of, reproject_records
+
+    a_path = Path(a_projection_path)
+    b_path = Path(b_projection_path)
+    a_sha = _sha256(a_path)
+    b_sha = _sha256(b_path)
+    if not force:
+        if expected_a_sha256 is not None and a_sha != expected_a_sha256:
+            raise IaaInputMismatch(
+                f"A-side projection SHA256 mismatch: expected {expected_a_sha256}, got {a_sha}"
+            )
+        if expected_b_sha256 is not None and b_sha != expected_b_sha256:
+            raise IaaInputMismatch(
+                f"B-side projection SHA256 mismatch: expected {expected_b_sha256}, got {b_sha}"
+            )
+
+    a_proj = load_projection(a_path)
+    b_proj = load_projection(b_path)
+
+    if len(a_proj.verses) != len(b_proj.verses):
+        raise PositionalProjectionInvalid(
+            f"verse-count mismatch: A has {len(a_proj.verses)} verses, B has {len(b_proj.verses)}"
+        )
+    verse_folio_map: list[tuple[str, str]] = []
+    a_records_by_verse: dict[str, list[Tier4Record]] = {}
+    b_records_by_verse: dict[str, list[Tier4Record]] = {}
+    n_cons_by_verse: dict[str, int] = {}
+    chunks_by_verse: dict[str, tuple[str, str, str]] = {}
+    dropped_a = 0
+    dropped_b = 0
+    missing_uxlc: list[str] = []
+    for a_v, b_v in zip(a_proj.verses, b_proj.verses, strict=True):
+        if (a_v.verse_ref, a_v.folio) != (b_v.verse_ref, b_v.folio):
+            raise PositionalProjectionInvalid(
+                f"verse_folio_map disagreement between A and B sides: "
+                f"A=({a_v.verse_ref!r}, {a_v.folio!r}) vs "
+                f"B=({b_v.verse_ref!r}, {b_v.folio!r})"
+            )
+        uxlc_text = uxlc_text_by_verse.get(a_v.verse_ref)
+        if uxlc_text is None:
+            missing_uxlc.append(a_v.verse_ref)
+            continue
+        verse_folio_map.append((a_v.verse_ref, a_v.folio))
+        a_re = reproject_records(list(a_v.tier4_positional), a_v.chunk, uxlc_text)
+        b_re = reproject_records(list(b_v.tier4_positional), b_v.chunk, uxlc_text)
+        dropped_a += len(a_re.dropped)
+        dropped_b += len(b_re.dropped)
+        a_records_by_verse[a_v.verse_ref] = a_re.kept
+        b_records_by_verse[a_v.verse_ref] = b_re.kept
+        # n_cons becomes the UXLC consonant axis (the new ordinal domain).
+        n_cons_by_verse[a_v.verse_ref] = len(consonants_of(uxlc_text))
+        chunks_by_verse[a_v.verse_ref] = (a_v.folio, a_v.chunk, b_v.chunk)
+
+    if missing_uxlc:
+        raise PositionalProjectionInvalid(
+            f"uxlc_text_by_verse missing {len(missing_uxlc)} verse_refs "
+            f"(first: {missing_uxlc[0]!r}); cannot anchor tier-4 ordinals"
+        )
+
+    assert len(chunks_by_verse) == len(verse_folio_map)
+
+    return _compute_from_verse_data(
+        verse_folio_map=verse_folio_map,
+        a_records_by_verse=a_records_by_verse,
+        b_records_by_verse=b_records_by_verse,
+        n_cons_by_verse=n_cons_by_verse,
+        chunks_by_verse=chunks_by_verse,
+        bootstrap_b=bootstrap_b,
+        bootstrap_seed=bootstrap_seed,
+        metadata_extra={
+            "a_sha256": a_sha,
+            "b_sha256": b_sha,
+            "gt_hash": gt_hash,
+            "uxlc_anchored": True,
+            "dropped_record_counts": {"a_side": dropped_a, "b_side": dropped_b},
         },
     )
