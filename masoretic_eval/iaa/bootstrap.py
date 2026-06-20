@@ -101,6 +101,7 @@ def bootstrap_metric(
     rng = random.Random(seed)
     samples: list[float] = []
 
+    resampled: list[T]
     if cluster_by is None:
         for _ in range(b):
             idxs = [rng.randrange(n) for _ in range(n)]
@@ -121,7 +122,7 @@ def bootstrap_metric(
             cluster_indices[label].append(i)
         n_clusters = len(cluster_order)
         for _ in range(b):
-            resampled: list[T] = []
+            resampled = []
             for _ in range(n_clusters):
                 drawn = cluster_order[rng.randrange(n_clusters)]
                 members = cluster_indices[drawn]
