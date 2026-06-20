@@ -29,6 +29,11 @@ baselines/.cache/
 # (each gt_adapter golden's _provenance block records the source).
 baselines/tests/fixtures/_uxlc_cache/
 
+# Regen artifact from scripts/regenerate_paper_iaa_results.py.
+# Source-of-truth IAA numbers live in the paper repo, not here; regenerating
+# locally is for operator/CI verification, not commit.
+paper_iaa_results.json
+
 # Local agent / editor / OS metadata — never commit
 .claude/
 .mcp.json
