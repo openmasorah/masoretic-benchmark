@@ -45,7 +45,10 @@ from masoretic_eval.iaa.bootstrap import DEFAULT_B, DEFAULT_SEED  # noqa: E402
 from masoretic_eval.iaa.projection import (  # noqa: E402
     compute_iaa_from_positional,
     compute_iaa_uxlc_anchored_from_positional,
+    load_projection,
 )
+from masoretic_eval.iaa.reproject import consonants_of, reproject_records  # noqa: E402
+from masoretic_eval.iaa.stratify import stratify_tier4  # noqa: E402
 from masoretic_eval.uxlc_loader import load_tier_strings  # noqa: E402
 
 A_PROJ = _REPO_ROOT / "iaa_data" / "devarim_4folio" / "ginsberg_round0_positional.json"
@@ -89,10 +92,42 @@ def main() -> int:
         bootstrap_seed=DEFAULT_SEED,
     )
 
+    # Per-folio + Ha'azinu-vs-prose stratification (SF-1 from the v3 paper plan).
+    # Computed on both anchoring frames so the paper can pick which to quote.
+    a_proj = load_projection(A_PROJ)
+    b_proj = load_projection(B_PROJ)
+    verse_folio_map = [(v.verse_ref, v.folio) for v in a_proj.verses]
+    a_recs_per_anno = {v.verse_ref: list(v.tier4_positional) for v in a_proj.verses}
+    b_recs_per_anno = {v.verse_ref: list(v.tier4_positional) for v in b_proj.verses}
+    n_cons_per_anno = {v.verse_ref: v.consonant_count for v in a_proj.verses}
+    per_anno_strat = stratify_tier4(
+        verse_folio_map, a_recs_per_anno, b_recs_per_anno, n_cons_per_anno
+    )
+
+    a_recs_uxlc: dict[str, list] = {}
+    b_recs_uxlc: dict[str, list] = {}
+    n_cons_uxlc: dict[str, int] = {}
+    for a_v, b_v in zip(a_proj.verses, b_proj.verses, strict=True):
+        uxlc_text = uxlc_strings[a_v.verse_ref]
+        a_recs_uxlc[a_v.verse_ref] = reproject_records(
+            list(a_v.tier4_positional), a_v.chunk, uxlc_text
+        ).kept
+        b_recs_uxlc[a_v.verse_ref] = reproject_records(
+            list(b_v.tier4_positional), b_v.chunk, uxlc_text
+        ).kept
+        n_cons_uxlc[a_v.verse_ref] = len(consonants_of(uxlc_text))
+    headline_strat = stratify_tier4(verse_folio_map, a_recs_uxlc, b_recs_uxlc, n_cons_uxlc)
+
     out: dict[str, Any] = {
-        "headline": _to_dict(headline),
+        "headline": {
+            **_to_dict(headline),
+            "stratification": _to_dict(headline_strat),
+        },
         "sensitivity": {
-            "per_annotator": _to_dict(per_anno),
+            "per_annotator": {
+                **_to_dict(per_anno),
+                "stratification": _to_dict(per_anno_strat),
+            },
         },
         "regeneration": {
             "script": "scripts/regenerate_paper_iaa_results.py",
