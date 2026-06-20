@@ -35,6 +35,12 @@ from masoretic_eval.iaa.f1 import (
     detections_from_records,
     f1_with_tolerance,
 )
+from masoretic_eval.iaa.kappa import (
+    BinaryAgreementUnit,
+    cohens_kappa_binary,
+    gwet_ac1_binary,
+    pabak_binary,
+)
 from masoretic_eval.iaa.offset import offset_distribution
 from masoretic_eval.iaa.parse import (
     Tier4Record,
@@ -255,11 +261,25 @@ def _compute_from_verse_data(
     b_detections_by_verse = _detections_per_verse(b_records_by_verse)
     n_verses = len(verse_folio_map)
 
-    # Cluster labels parallel to per-verse payloads. Headline CIs use
-    # cluster-by-folio (paper-grade SPEC 260619-n3u follow-up) — within-folio
-    # correlation (scribe hand, page wear, annotator session, layout density)
-    # makes plain verse-bootstrap CIs narrow.
-    verse_folios = [folio for _, folio in verse_folio_map]
+    # Cluster labels parallel to per-verse payloads. NOT used for headline
+    # CIs (see methodology note below). Retained on the helper so callers
+    # who want a sensitivity check can request cluster-by-folio explicitly.
+    #
+    # METHODOLOGY (post-adversarial-review pivot, 260619-n3u):
+    # Headline CIs use verse-bootstrap (cluster_by=None) — point estimates
+    # are contained, intervals are mathematically well-defined at n=96.
+    # Folio-clustering was tried as a headline CI per architect review;
+    # adversarial review (Cameron–Miller / MacKinnon–Webb) showed G=4 outer
+    # clusters does NOT support nominal-coverage CI estimation. The
+    # cluster-bootstrap CIs ran ~20% wider than verse-only (confirming real
+    # within-folio correlation, a sensitivity finding) but two metrics had
+    # point > CI_upper under the percentile method (the small-G downward
+    # bias artifact), and BCa over-corrected at G=4 (point < CI_lower).
+    # We document within-folio correlation as a paper limitation rather
+    # than report a broken CI as if it were nominal. Verse-bootstrap is
+    # the published interval; cluster-bootstrap remains available as a
+    # diagnostic via the public ``bootstrap_metric`` API.
+    verse_folios = [folio for _, folio in verse_folio_map]  # noqa: F841 (kept for API symmetry / future use)
 
     # --- Tier 4 ---
     # F1: payload per verse = (a_detections, b_detections). Statistic counts
@@ -273,14 +293,12 @@ def _compute_from_verse_data(
         lambda ps: _f1_over_verses(ps, tolerance=0).f1,
         b=bootstrap_b,
         seed=bootstrap_seed,
-        cluster_by=verse_folios,
     )
     f1_tol1 = bootstrap_metric(
         f1_payloads,
         lambda ps: _f1_over_verses(ps, tolerance=1).f1,
         b=bootstrap_b,
         seed=bootstrap_seed,
-        cluster_by=verse_folios,
     )
 
     # α: payload per verse = (a_records, b_records, verse_ref, n_cons).
@@ -298,35 +316,27 @@ def _compute_from_verse_data(
         lambda ps: _alpha_over_verses(ps, canonicalize=True, positive_only=False),
         b=bootstrap_b,
         seed=bootstrap_seed,
-        cluster_by=verse_folios,
     )
     alpha_positive_canon = bootstrap_metric(
         alpha_payloads,
         lambda ps: _alpha_over_verses(ps, canonicalize=True, positive_only=True),
         b=bootstrap_b,
         seed=bootstrap_seed,
-        cluster_by=verse_folios,
     )
     alpha_full_raw = bootstrap_metric(
         alpha_payloads,
         lambda ps: _alpha_over_verses(ps, canonicalize=False, positive_only=False),
         b=bootstrap_b,
         seed=bootstrap_seed,
-        cluster_by=verse_folios,
     )
     alpha_positive_raw = bootstrap_metric(
         alpha_payloads,
         lambda ps: _alpha_over_verses(ps, canonicalize=False, positive_only=True),
         b=bootstrap_b,
         seed=bootstrap_seed,
-        cluster_by=verse_folios,
     )
 
-    # Per-type F1 (replaces the κ-per-type breakouts that this module used
-    # to ship). κ was dropped because Cohen's prevalence paradox produced
-    # spurious negative values under extreme positive-class skew; F1 is
-    # interpretable directly. Bootstrap reuses the headline F1 payloads,
-    # bootstrap config, and folio-cluster labels.
+    # Per-type F1 — headline detection metric per type.
     f1_by_type: dict[str, dict[str, MetricWithCI]] = {}
     for t in ("circellus", "rafe"):
 
@@ -342,14 +352,79 @@ def _compute_from_verse_data(
                 _exact,
                 b=bootstrap_b,
                 seed=bootstrap_seed,
-                cluster_by=verse_folios,
             ),
             "tolerance_1": bootstrap_metric(
                 f1_payloads,
                 _tol1,
                 b=bootstrap_b,
                 seed=bootstrap_seed,
-                cluster_by=verse_folios,
+            ),
+        }
+
+    # Per-type chance-corrected agreement: Cohen's κ + PABAK + Gwet's AC1.
+    # Payload per verse = a list of `BinaryAgreementUnit` per type, where each
+    # unit recodes one consonant ordinal as (positive | negative) for that
+    # type. The headline F1 reads directly for DH/philology audiences; these
+    # three coefficients are reported alongside to surface the prevalence-
+    # paradox interaction. Cohen's κ understates agreement on Devarim (~5%
+    # positive class); PABAK and AC1 are stable in that regime. Methodology
+    # prose calls out the three together.
+    units_by_type: dict[str, list[list[BinaryAgreementUnit]]] = {
+        t: [] for t in ("circellus", "rafe")
+    }
+    for v, _folio in verse_folio_map:
+        n_cons = n_cons_by_verse[v]
+        a_ords: dict[str, set[int]] = {"circellus": set(), "rafe": set()}
+        b_ords: dict[str, set[int]] = {"circellus": set(), "rafe": set()}
+        for r in a_records_by_verse[v]:
+            # double_rafe codes positive for rafe (the canonicalization
+            # decision from the paper SPEC); "both" codes positive for both.
+            if r.type in ("rafe", "double_rafe", "both"):
+                a_ords["rafe"].add(r.ordinal)
+            if r.type in ("circellus", "both"):
+                a_ords["circellus"].add(r.ordinal)
+        for r in b_records_by_verse[v]:
+            if r.type in ("rafe", "double_rafe", "both"):
+                b_ords["rafe"].add(r.ordinal)
+            if r.type in ("circellus", "both"):
+                b_ords["circellus"].add(r.ordinal)
+        for t in ("circellus", "rafe"):
+            verse_units = [
+                BinaryAgreementUnit(
+                    a_positive=(o in a_ords[t]),
+                    b_positive=(o in b_ords[t]),
+                )
+                for o in range(1, n_cons + 1)
+            ]
+            units_by_type[t].append(verse_units)
+
+    def _flatten(payloads: list[list[BinaryAgreementUnit]]) -> list[BinaryAgreementUnit]:
+        out: list[BinaryAgreementUnit] = []
+        for p in payloads:
+            out.extend(p)
+        return out
+
+    kappa_by_type: dict[str, dict[str, MetricWithCI]] = {}
+    for t in ("circellus", "rafe"):
+        kappa_payloads = units_by_type[t]
+        kappa_by_type[t] = {
+            "cohen": bootstrap_metric(
+                kappa_payloads,
+                lambda ps: cohens_kappa_binary(_flatten(ps)),
+                b=bootstrap_b,
+                seed=bootstrap_seed,
+            ),
+            "pabak": bootstrap_metric(
+                kappa_payloads,
+                lambda ps: pabak_binary(_flatten(ps)),
+                b=bootstrap_b,
+                seed=bootstrap_seed,
+            ),
+            "ac1": bootstrap_metric(
+                kappa_payloads,
+                lambda ps: gwet_ac1_binary(_flatten(ps)),
+                b=bootstrap_b,
+                seed=bootstrap_seed,
             ),
         }
 
@@ -362,6 +437,7 @@ def _compute_from_verse_data(
         f1_exact=f1_exact,
         f1_tolerance_1=f1_tol1,
         f1_by_type=f1_by_type,
+        kappa_by_type=kappa_by_type,
         alpha_full_canon=alpha_full_canon,
         alpha_positive_canon=alpha_positive_canon,
         alpha_full_raw=alpha_full_raw,
@@ -400,7 +476,6 @@ def _compute_from_verse_data(
             _macro_cer,
             b=bootstrap_b,
             seed=bootstrap_seed,
-            cluster_by=verse_folios,
         )
         tier_results[tier] = TierCERResult(cer_per_folio=per_folio, cer_overall=overall)
 
