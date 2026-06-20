@@ -223,6 +223,12 @@ def compute_iaa(
     a_detections_by_verse = _detections_per_verse(a_records_by_verse)
     b_detections_by_verse = _detections_per_verse(b_records_by_verse)
 
+    # Cluster labels parallel to per-verse payloads. Headline CIs use
+    # cluster-by-folio (paper-grade SPEC 260619-n3u follow-up) — within-folio
+    # correlation (scribe hand, page wear, annotator session, layout density)
+    # makes plain verse-bootstrap CIs narrow.
+    verse_folios = [folio for _, folio in verse_folio_map]
+
     # --- Tier 4 ---
     # F1: payload per verse = (a_detections, b_detections). Statistic counts
     # TP/FP/FN across the resampled verses and computes F1.
@@ -235,12 +241,14 @@ def compute_iaa(
         lambda ps: _f1_over_verses(ps, tolerance=0).f1,
         b=bootstrap_b,
         seed=bootstrap_seed,
+        cluster_by=verse_folios,
     )
     f1_tol1 = bootstrap_metric(
         f1_payloads,
         lambda ps: _f1_over_verses(ps, tolerance=1).f1,
         b=bootstrap_b,
         seed=bootstrap_seed,
+        cluster_by=verse_folios,
     )
 
     # α: payload per verse = (a_records, b_records, verse_ref, n_cons).
@@ -258,31 +266,35 @@ def compute_iaa(
         lambda ps: _alpha_over_verses(ps, canonicalize=True, positive_only=False),
         b=bootstrap_b,
         seed=bootstrap_seed,
+        cluster_by=verse_folios,
     )
     alpha_positive_canon = bootstrap_metric(
         alpha_payloads,
         lambda ps: _alpha_over_verses(ps, canonicalize=True, positive_only=True),
         b=bootstrap_b,
         seed=bootstrap_seed,
+        cluster_by=verse_folios,
     )
     alpha_full_raw = bootstrap_metric(
         alpha_payloads,
         lambda ps: _alpha_over_verses(ps, canonicalize=False, positive_only=False),
         b=bootstrap_b,
         seed=bootstrap_seed,
+        cluster_by=verse_folios,
     )
     alpha_positive_raw = bootstrap_metric(
         alpha_payloads,
         lambda ps: _alpha_over_verses(ps, canonicalize=False, positive_only=True),
         b=bootstrap_b,
         seed=bootstrap_seed,
+        cluster_by=verse_folios,
     )
 
     # Per-type F1 (replaces the κ-per-type breakouts that this module used
     # to ship). κ was dropped because Cohen's prevalence paradox produced
     # spurious negative values under extreme positive-class skew; F1 is
-    # interpretable directly. Bootstrap reuses the headline F1 payloads
-    # and bootstrap config.
+    # interpretable directly. Bootstrap reuses the headline F1 payloads,
+    # bootstrap config, and folio-cluster labels.
     f1_by_type: dict[str, dict[str, MetricWithCI]] = {}
     for t in ("circellus", "rafe"):
 
@@ -298,12 +310,14 @@ def compute_iaa(
                 _exact,
                 b=bootstrap_b,
                 seed=bootstrap_seed,
+                cluster_by=verse_folios,
             ),
             "tolerance_1": bootstrap_metric(
                 f1_payloads,
                 _tol1,
                 b=bootstrap_b,
                 seed=bootstrap_seed,
+                cluster_by=verse_folios,
             ),
         }
 
@@ -349,13 +363,16 @@ def compute_iaa(
                 b=bootstrap_b,
                 seed=bootstrap_seed,
             )
-        # Overall bootstrap CI: resample verses across the whole set.
+        # Overall bootstrap CI: resample folios with replacement, then verses
+        # within each drawn folio with replacement. Cluster-by-folio matches
+        # the headline tier-4 CIs.
         overall_payloads = [per_verse_cers[v] for v, _ in verse_folio_map]
         overall = bootstrap_metric(
             overall_payloads,
             _macro_cer,
             b=bootstrap_b,
             seed=bootstrap_seed,
+            cluster_by=verse_folios,
         )
         tier_results[tier] = TierCERResult(cer_per_folio=per_folio, cer_overall=overall)
 
