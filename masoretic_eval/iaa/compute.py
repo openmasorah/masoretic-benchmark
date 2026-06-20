@@ -31,6 +31,7 @@ from masoretic_eval.iaa.cer import per_verse_cer
 from masoretic_eval.iaa.f1 import (
     Detection,
     F1Result,
+    MatchedPair,
     detections_covering_type,
     detections_from_records,
     f1_with_tolerance,
@@ -82,17 +83,56 @@ def _detections_per_verse(
     return {v: detections_from_records(rs) for v, rs in records_by_verse.items()}
 
 
+def _aggregate_f1(per_verse_results: list[F1Result]) -> F1Result:
+    """Sum per-verse TP/FP/FN and recompute precision/recall/F1 from totals.
+
+    The bipartite matcher in :mod:`masoretic_eval.iaa.f1` assumes each
+    ``(verse_ref, type, ordinal)`` triple is unique — its phase-1 ``b_used``
+    set deduplicates on ordinal value, which is correct on the original data
+    (one detection per ordinal) but silently collapses duplicates under a
+    bootstrap resample that draws the same verse multiple times. To preserve
+    verse-multiplicity, we run the matcher one verse at a time and sum
+    TP/FP/FN over the resampled list, so a verse drawn N times contributes
+    its per-verse counts N times. Equivalent to the previous global-flatten
+    aggregation on unique-verse input (the point estimate); diverges only
+    under resampling, which is the bug surface FINDING 1 documents.
+    """
+    matched: list[MatchedPair] = []
+    tp = fp = fn = 0
+    for r in per_verse_results:
+        tp += r.tp
+        fp += r.fp
+        fn += r.fn
+        matched.extend(r.matched)
+    if tp + fp == 0:
+        precision = 1.0 if tp + fn == 0 else 0.0
+    else:
+        precision = tp / (tp + fp)
+    if tp + fn == 0:
+        recall = 1.0 if tp + fp == 0 else 0.0
+    else:
+        recall = tp / (tp + fn)
+    f1 = 0.0 if precision + recall == 0 else 2 * precision * recall / (precision + recall)
+    return F1Result(
+        f1=f1,
+        precision=precision,
+        recall=recall,
+        tp=tp,
+        fp=fp,
+        fn=fn,
+        matched=matched,
+    )
+
+
 def _f1_over_verses(
     verse_payloads: Sequence[tuple[list[Detection], list[Detection]]],
     *,
     tolerance: int,
 ) -> F1Result:
-    a_all: list[Detection] = []
-    b_all: list[Detection] = []
-    for a_dets, b_dets in verse_payloads:
-        a_all.extend(a_dets)
-        b_all.extend(b_dets)
-    return f1_with_tolerance(a_all, b_all, tolerance=tolerance)
+    per_verse = [
+        f1_with_tolerance(a_dets, b_dets, tolerance=tolerance) for a_dets, b_dets in verse_payloads
+    ]
+    return _aggregate_f1(per_verse)
 
 
 def _alpha_over_verses(
@@ -123,17 +163,20 @@ def _f1_for_type_over_verses(
     """Per-type F1 across resampled verses.
 
     Filters each side's per-verse detections to those covering type ``t``
-    (treating ``"both"`` as covering both types), relabels them to a single
-    bucket, and runs the headline bipartite-matching F1. This keeps the
-    matching algorithm identical to the headline F1 — only the input
-    detection set changes.
+    (treating ``"both"`` as covering both types) and runs the headline
+    bipartite-matching F1 per verse, then aggregates TP/FP/FN. Uses the
+    same per-verse aggregation as :func:`_f1_over_verses` so verse
+    multiplicity under resampling is preserved (FINDING 1).
     """
-    a_all: list[Detection] = []
-    b_all: list[Detection] = []
-    for a_dets, b_dets in verse_payloads:
-        a_all.extend(detections_covering_type(a_dets, t))
-        b_all.extend(detections_covering_type(b_dets, t))
-    return f1_with_tolerance(a_all, b_all, tolerance=tolerance)
+    per_verse = [
+        f1_with_tolerance(
+            detections_covering_type(a_dets, t),
+            detections_covering_type(b_dets, t),
+            tolerance=tolerance,
+        )
+        for a_dets, b_dets in verse_payloads
+    ]
+    return _aggregate_f1(per_verse)
 
 
 def _macro_cer(per_verse: list[float]) -> float:
