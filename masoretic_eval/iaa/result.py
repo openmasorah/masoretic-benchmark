@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 CI_METHOD = "verse_bootstrap_2.5_97.5"
+CI_METHOD_CLUSTER = "folio_clustered_bootstrap_2.5_97.5"
 
 
 @dataclass(frozen=True)
