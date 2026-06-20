@@ -50,6 +50,7 @@ import json
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 from masoretic_eval.iaa.bootstrap import DEFAULT_B, DEFAULT_SEED
 from masoretic_eval.iaa.parse import (
@@ -137,7 +138,7 @@ def project_side(
     )
 
 
-def _verse_to_dict(v: PositionalVerse) -> dict:
+def _verse_to_dict(v: PositionalVerse) -> dict[str, Any]:
     return {
         "verse_ref": v.verse_ref,
         "folio": v.folio,
@@ -163,7 +164,7 @@ def serialize_projection(projection: PositionalProjection) -> str:
     return json.dumps(doc, indent=2, sort_keys=True, ensure_ascii=False)
 
 
-def _verse_from_dict(raw: dict) -> PositionalVerse:
+def _verse_from_dict(raw: dict[str, Any]) -> PositionalVerse:
     try:
         vref = raw["verse_ref"]
         folio = raw["folio"]
