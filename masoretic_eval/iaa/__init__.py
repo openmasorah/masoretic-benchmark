@@ -17,6 +17,15 @@ function per file. The CLI lives at `masoretic_eval/iaa/cli.py` and runs via
 """
 
 from masoretic_eval.iaa.compute import IaaInputMismatch, compute_iaa
+from masoretic_eval.iaa.projection import (
+    PositionalProjection,
+    PositionalProjectionInvalid,
+    PositionalVerse,
+    compute_iaa_from_positional,
+    load_projection,
+    project_side,
+    serialize_projection,
+)
 from masoretic_eval.iaa.result import (
     IaaResult,
     MetricWithCI,
@@ -27,10 +36,17 @@ from masoretic_eval.iaa.result import (
 
 __all__ = [
     "compute_iaa",
+    "compute_iaa_from_positional",
     "IaaResult",
     "IaaInputMismatch",
     "MetricWithCI",
     "OffsetDistribution",
+    "PositionalProjection",
+    "PositionalProjectionInvalid",
+    "PositionalVerse",
     "Tier4Result",
     "TierCERResult",
+    "load_projection",
+    "project_side",
+    "serialize_projection",
 ]
