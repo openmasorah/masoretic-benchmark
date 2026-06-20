@@ -203,25 +203,57 @@ def compute_iaa(
             f"a_chunks={len(a_chunks)}, b_chunks={len(b_chunks)}"
         )
 
-    # Build per-verse records, detections, and consonant counts. The reference
+    # Build per-verse records, chunks, and consonant counts. The reference
     # consonant count uses the A-side chunk (matches the falsification's
     # "both sides agree at tier-1 to ~0.1%" convention).
-    a_records_all: list[Tier4Record] = []
-    b_records_all: list[Tier4Record] = []
     a_records_by_verse: dict[str, list[Tier4Record]] = {}
     b_records_by_verse: dict[str, list[Tier4Record]] = {}
     n_cons_by_verse: dict[str, int] = {}
-    for (vref, _folio), a_chunk, b_chunk in zip(verse_folio_map, a_chunks, b_chunks, strict=True):
-        a_recs = extract_positional(a_chunk, vref)
-        b_recs = extract_positional(b_chunk, vref)
-        a_records_all.extend(a_recs)
-        b_records_all.extend(b_recs)
-        a_records_by_verse[vref] = a_recs
-        b_records_by_verse[vref] = b_recs
+    chunks_by_verse: dict[str, tuple[str, str, str]] = {}
+    for (vref, folio), a_chunk, b_chunk in zip(verse_folio_map, a_chunks, b_chunks, strict=True):
+        a_records_by_verse[vref] = extract_positional(a_chunk, vref)
+        b_records_by_verse[vref] = extract_positional(b_chunk, vref)
         n_cons_by_verse[vref] = count_consonants(a_chunk)
+        chunks_by_verse[vref] = (folio, a_chunk, b_chunk)
 
+    return _compute_from_verse_data(
+        verse_folio_map=verse_folio_map,
+        a_records_by_verse=a_records_by_verse,
+        b_records_by_verse=b_records_by_verse,
+        n_cons_by_verse=n_cons_by_verse,
+        chunks_by_verse=chunks_by_verse,
+        bootstrap_b=bootstrap_b,
+        bootstrap_seed=bootstrap_seed,
+        metadata_extra={
+            "a_sha256": a_sha,
+            "b_sha256": b_sha,
+            "gt_hash": gt_hash,
+        },
+    )
+
+
+def _compute_from_verse_data(
+    *,
+    verse_folio_map: Sequence[tuple[str, str]],
+    a_records_by_verse: dict[str, list[Tier4Record]],
+    b_records_by_verse: dict[str, list[Tier4Record]],
+    n_cons_by_verse: dict[str, int],
+    chunks_by_verse: dict[str, tuple[str, str, str]],
+    bootstrap_b: int,
+    bootstrap_seed: int,
+    metadata_extra: dict[str, object],
+) -> IaaResult:
+    """Shared post-parse kernel for raw-.txt and positional-projection paths.
+
+    Both ``compute_iaa`` (raw .txt) and ``compute_iaa_from_positional``
+    (CC-BY-4.0 projection JSON) build the same intermediate
+    per-verse state and route through here. This is what makes their
+    outputs byte-identical given the same source data — there is no
+    second copy of the bootstrap / α / F1 / CER orchestration to drift.
+    """
     a_detections_by_verse = _detections_per_verse(a_records_by_verse)
     b_detections_by_verse = _detections_per_verse(b_records_by_verse)
+    n_verses = len(verse_folio_map)
 
     # Cluster labels parallel to per-verse payloads. Headline CIs use
     # cluster-by-folio (paper-grade SPEC 260619-n3u follow-up) — within-folio
@@ -339,10 +371,6 @@ def compute_iaa(
 
     # --- Tier 1/2/3 ---
     # Per-verse CER list; per-folio aggregates macro-average those.
-    chunks_by_verse: dict[str, tuple[str, str, str]] = {}
-    for (vref, folio), a_chunk, b_chunk in zip(verse_folio_map, a_chunks, b_chunks, strict=True):
-        chunks_by_verse[vref] = (folio, a_chunk, b_chunk)
-
     verses_by_folio: dict[str, list[str]] = defaultdict(list)
     for vref, folio in verse_folio_map:
         verses_by_folio[folio].append(vref)
@@ -376,10 +404,8 @@ def compute_iaa(
         )
         tier_results[tier] = TierCERResult(cer_per_folio=per_folio, cer_overall=overall)
 
-    metadata = {
-        "a_sha256": a_sha,
-        "b_sha256": b_sha,
-        "gt_hash": gt_hash,
+    metadata: dict[str, object] = {
+        **metadata_extra,
         "n_verses": n_verses,
         "n_folios": len(verses_by_folio),
         "bootstrap_b": bootstrap_b,

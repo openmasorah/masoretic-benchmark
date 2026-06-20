@@ -1,27 +1,30 @@
 """CLI for `python -m masoretic_eval.iaa`.
 
-Inputs:
+Two input paths produce the byte-identical headline output:
 
-* ``--a-side`` / ``--b-side``: raw round-0 .txt files.
-* ``--manifest``: path to ``phase_0_manifest.json``. Used to source the
-  ``gt_hash`` (if present in the manifest's per-folio block) for metadata.
-* ``--verse-folio-map``: path to a JSON file shaped as
-  ``{"folios": {"<folio>": ["<verse_ref>", ...]}}`` (the shape produced by
-  the upstream IAA ingest pipeline). The manifest does not (yet) carry the
-  per-verse breakdown; this flag bridges the gap until that lands in the
-  manifest.
+* **Raw .txt path** (``--a-side`` / ``--b-side``): private round-0
+  transcriptions in Yosef's layout-preserving format. ``--verse-folio-map``
+  is required (the manifest does not yet carry the per-verse breakdown).
+* **Positional-projection path** (``--a-positional`` / ``--b-positional``):
+  CC-BY-4.0 projection JSONs at ``iaa_data/devarim_4folio/``. The
+  ``verse_folio_map`` is sourced from the projections themselves;
+  ``--verse-folio-map`` is unused.
 
 Output:
 
 * ``--output paper_iaa_results.json``: deterministic JSON. Re-running with
-  the same inputs + same seed produces a byte-identical file. The CI test
-  ``test_bootstrap_determinism.py`` pins this contract.
+  the same inputs + same seed produces a byte-identical file. The CI tests
+  ``test_bootstrap_determinism.py`` and
+  ``test_positional_projection_round_trip.py`` pin this contract.
 
 Pinning:
 
 * If ``--output`` already exists and contains ``metadata.a_sha256`` /
   ``metadata.b_sha256`` values, the CLI checks the on-disk file SHAs against
   them. Mismatch raises ``IaaInputMismatch`` unless ``--force`` is passed.
+  The SHAs identify the input file — raw .txt and projection JSON have
+  different bytes (hence different SHAs), but every downstream number is
+  identical.
 """
 
 from __future__ import annotations
@@ -35,6 +38,10 @@ from typing import Any
 
 from masoretic_eval.iaa.bootstrap import DEFAULT_B, DEFAULT_SEED
 from masoretic_eval.iaa.compute import IaaInputMismatch, compute_iaa
+from masoretic_eval.iaa.projection import (
+    PositionalProjectionInvalid,
+    compute_iaa_from_positional,
+)
 from masoretic_eval.iaa.result import IaaResult
 
 
@@ -126,13 +133,27 @@ def build_parser() -> argparse.ArgumentParser:
         prog="python -m masoretic_eval.iaa",
         description="Paper-grade IAA over Devarim 4-folio benchmark (SPEC 260619-n3u).",
     )
-    parser.add_argument("--a-side", type=Path, required=True, help="A-side raw .txt")
-    parser.add_argument("--b-side", type=Path, required=True, help="B-side raw .txt")
+    # Raw .txt path — private round-0 transcriptions.
+    parser.add_argument("--a-side", type=Path, default=None, help="A-side raw .txt")
+    parser.add_argument("--b-side", type=Path, default=None, help="B-side raw .txt")
     parser.add_argument(
         "--verse-folio-map",
         type=Path,
-        required=True,
-        help="JSON file mapping folio → [verse_ref, ...]",
+        default=None,
+        help="JSON file mapping folio → [verse_ref, ...] (required for raw .txt path)",
+    )
+    # Positional-projection path — CC-BY-4.0 publication surface.
+    parser.add_argument(
+        "--a-positional",
+        type=Path,
+        default=None,
+        help="A-side positional projection JSON (CC-BY-4.0)",
+    )
+    parser.add_argument(
+        "--b-positional",
+        type=Path,
+        default=None,
+        help="B-side positional projection JSON (CC-BY-4.0)",
     )
     parser.add_argument(
         "--manifest",
@@ -156,28 +177,67 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _select_input_mode(args: argparse.Namespace) -> str:
+    """Validate the input flags and return ``"raw"`` or ``"positional"``."""
+    raw_set = args.a_side is not None or args.b_side is not None
+    pos_set = args.a_positional is not None or args.b_positional is not None
+    if raw_set and pos_set:
+        raise SystemExit(
+            "ERROR: cannot mix raw (--a-side/--b-side) and positional "
+            "(--a-positional/--b-positional) inputs in one run.\n"
+        )
+    if pos_set:
+        if args.a_positional is None or args.b_positional is None:
+            raise SystemExit("ERROR: --a-positional and --b-positional must both be provided.\n")
+        return "positional"
+    if args.a_side is None or args.b_side is None:
+        raise SystemExit(
+            "ERROR: provide either --a-side/--b-side (raw .txt) or "
+            "--a-positional/--b-positional (CC-BY projection).\n"
+        )
+    if args.verse_folio_map is None:
+        raise SystemExit("ERROR: --verse-folio-map is required for the raw .txt path.\n")
+    return "raw"
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 
-    verse_folio_map = _load_verse_folio_map(args.verse_folio_map)
+    mode = _select_input_mode(args)
     gt_hash = _gt_hash_from_manifest(args.manifest)
     pinned_a, pinned_b = _read_pinned_sha256s(args.output)
 
     try:
-        result = compute_iaa(
-            a_side_path=args.a_side,
-            b_side_path=args.b_side,
-            verse_folio_map=verse_folio_map,
-            bootstrap_b=args.bootstrap_b,
-            bootstrap_seed=args.bootstrap_seed,
-            expected_a_sha256=pinned_a,
-            expected_b_sha256=pinned_b,
-            gt_hash=gt_hash,
-            force=args.force,
-        )
+        if mode == "raw":
+            verse_folio_map = _load_verse_folio_map(args.verse_folio_map)
+            result = compute_iaa(
+                a_side_path=args.a_side,
+                b_side_path=args.b_side,
+                verse_folio_map=verse_folio_map,
+                bootstrap_b=args.bootstrap_b,
+                bootstrap_seed=args.bootstrap_seed,
+                expected_a_sha256=pinned_a,
+                expected_b_sha256=pinned_b,
+                gt_hash=gt_hash,
+                force=args.force,
+            )
+        else:
+            result = compute_iaa_from_positional(
+                a_projection_path=args.a_positional,
+                b_projection_path=args.b_positional,
+                bootstrap_b=args.bootstrap_b,
+                bootstrap_seed=args.bootstrap_seed,
+                expected_a_sha256=pinned_a,
+                expected_b_sha256=pinned_b,
+                gt_hash=gt_hash,
+                force=args.force,
+            )
     except IaaInputMismatch as exc:
         sys.stderr.write(f"ERROR: {exc}\nPass --force to override.\n")
+        return 2
+    except PositionalProjectionInvalid as exc:
+        sys.stderr.write(f"ERROR: invalid positional projection: {exc}\n")
         return 2
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
