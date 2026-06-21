@@ -101,16 +101,28 @@ class TierCERResult:
     populated it is ``{"a": TierCERResult, "b": TierCERResult}`` where each
     sub-result is that annotator's round-0 transcription scored against the
     *consensus gold* (gold as the CER reference, i.e. denominator = gold
-    length — the same orientation as the Nakdimon-vs-UXLC tier-2 baseline, so
-    the two are structurally comparable). It is ``None`` on the headline
-    pair-CER result (A round-0 vs B round-0) unless a gold reference was
-    supplied, and always ``None`` on the nested per-annotator sub-results
-    (no recursion in practice). Serializes to ``null`` when absent.
+    length). It is the benchmark's internal human-vs-gold reference and is
+    populated on all of tier 1/2/3.
+
+    ``cer_vs_uxlc`` is the same ``{"a", "b"}`` decomposition but scored
+    against the *UXLC 2.5* tier-2 string instead of the consensus gold —
+    populated on **tier 2 only**, because that is the reference and tier the
+    Nakdimon diacritization baseline uses (``nakdimon_tier2_baseline.json``).
+    cer_vs_uxlc.{a,b} are therefore the strictly-comparable human counterparts
+    to Nakdimon-vs-UXLC (same UXLC reference, same tier-2 strip, same
+    ``cluster_aligned_cer`` path, gold as denominator). cer_vs_gold and
+    Nakdimon use *different* references (they diverge ~0.023 at tier 2), so
+    cer_vs_uxlc is the surface the v4 abstract cites against Nakdimon.
+
+    Both are ``None`` unless the corresponding reference was supplied, and
+    always ``None`` on nested sub-results (no recursion in practice).
+    Serialize to ``null`` when absent.
     """
 
     cer_per_folio: dict[str, MetricWithCI]
     cer_overall: MetricWithCI
     cer_vs_gold: dict[str, TierCERResult] | None = None
+    cer_vs_uxlc: dict[str, TierCERResult] | None = None
 
 
 @dataclass(frozen=True)

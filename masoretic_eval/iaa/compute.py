@@ -199,6 +199,7 @@ def _tier_cer_result(
     bootstrap_b: int,
     bootstrap_seed: int,
     cer_vs_gold: dict[str, TierCERResult] | None = None,
+    cer_vs_uxlc: dict[str, TierCERResult] | None = None,
 ) -> TierCERResult:
     """Build a per-folio + overall ``TierCERResult`` from per-verse CERs.
 
@@ -215,7 +216,12 @@ def _tier_cer_result(
         )
     overall_payloads = [per_verse_cers[v] for v, _ in verse_folio_map]
     overall = bootstrap_metric(overall_payloads, _macro_cer, b=bootstrap_b, seed=bootstrap_seed)
-    return TierCERResult(cer_per_folio=per_folio, cer_overall=overall, cer_vs_gold=cer_vs_gold)
+    return TierCERResult(
+        cer_per_folio=per_folio,
+        cer_overall=overall,
+        cer_vs_gold=cer_vs_gold,
+        cer_vs_uxlc=cer_vs_uxlc,
+    )
 
 
 def compute_iaa(
@@ -320,6 +326,7 @@ def _compute_from_verse_data(
     bootstrap_seed: int,
     metadata_extra: dict[str, object],
     gold_chunks_by_verse: dict[str, str] | None = None,
+    uxlc_tier2_by_verse: dict[str, str] | None = None,
 ) -> IaaResult:
     """Shared post-parse kernel for raw-.txt and positional-projection paths.
 
@@ -561,6 +568,36 @@ def _compute_from_verse_data(
                     bootstrap_seed=bootstrap_seed,
                 ),
             }
+        # cer_vs_uxlc — tier 2 ONLY. The UXLC 2.5 tier-2 string is the
+        # reference (denominator), identical to the Nakdimon-vs-UXLC baseline's
+        # computation (strip_for_tier2 ∘ normalize, cluster_aligned_cer), so
+        # cer_vs_uxlc.{a,b} are the strictly-comparable human counterparts.
+        cer_vs_uxlc: dict[str, TierCERResult] | None = None
+        if uxlc_tier2_by_verse is not None and tier == 2:
+            a_vs_uxlc_cers = {
+                v: per_verse_cer(uxlc_tier2_by_verse[v], chunks_by_verse[v][1], tier=2)
+                for v, _ in verse_folio_map
+            }
+            b_vs_uxlc_cers = {
+                v: per_verse_cer(uxlc_tier2_by_verse[v], chunks_by_verse[v][2], tier=2)
+                for v, _ in verse_folio_map
+            }
+            cer_vs_uxlc = {
+                "a": _tier_cer_result(
+                    a_vs_uxlc_cers,
+                    verse_folio_map,
+                    verses_by_folio,
+                    bootstrap_b=bootstrap_b,
+                    bootstrap_seed=bootstrap_seed,
+                ),
+                "b": _tier_cer_result(
+                    b_vs_uxlc_cers,
+                    verse_folio_map,
+                    verses_by_folio,
+                    bootstrap_b=bootstrap_b,
+                    bootstrap_seed=bootstrap_seed,
+                ),
+            }
         tier_results[tier] = _tier_cer_result(
             per_verse_cers,
             verse_folio_map,
@@ -568,6 +605,7 @@ def _compute_from_verse_data(
             bootstrap_b=bootstrap_b,
             bootstrap_seed=bootstrap_seed,
             cer_vs_gold=cer_vs_gold,
+            cer_vs_uxlc=cer_vs_uxlc,
         )
 
     metadata: dict[str, object] = {

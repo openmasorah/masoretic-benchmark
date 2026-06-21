@@ -55,6 +55,7 @@ A_PROJ = _REPO_ROOT / "iaa_data" / "devarim_4folio" / "ginsberg_round0_positiona
 B_PROJ = _REPO_ROOT / "iaa_data" / "devarim_4folio" / "moster_round0_positional.json"
 GOLD_PROJ = _REPO_ROOT / "iaa_data" / "devarim_4folio" / "consensus_gold_positional.json"
 UXLC_XML = _REPO_ROOT / "baselines" / "tests" / "fixtures" / "_uxlc_cache" / "Deuteronomy.xml"
+NAKDIMON = _REPO_ROOT / "nakdimon_tier2_baseline.json"
 OUTPUT = _REPO_ROOT / "paper_iaa_results.json"
 
 
@@ -79,6 +80,14 @@ def main() -> int:
         sys.stderr.write("ERROR: UXLC loader returned a non-dict tier-1 payload\n")
         return 2
 
+    # UXLC tier-2 (consonants + nikkud) — reference for the Nakdimon-comparable
+    # human-vs-UXLC tier-2 CER (cer_vs_uxlc). Same reference + tier-2 strip as
+    # the Nakdimon baseline, so cer_vs_uxlc.{a,b} sit on identical footing.
+    uxlc_tier2 = load_tier_strings(UXLC_XML, tier=2)
+    if not isinstance(uxlc_tier2, dict):
+        sys.stderr.write("ERROR: UXLC loader returned a non-dict tier-2 payload\n")
+        return 2
+
     # A2a — consensus-gold chunks for the human-vs-reference CER decomposition.
     # The gold projection's per-verse chunk IS the reference text; tier 1/2/3
     # CER of each annotator's round-0 chunk against it (gold as reference) lands
@@ -93,6 +102,7 @@ def main() -> int:
         bootstrap_b=DEFAULT_B,
         bootstrap_seed=DEFAULT_SEED,
         gold_chunks_by_verse=gold_chunks_by_verse,
+        uxlc_tier2_by_verse=uxlc_tier2,
     )
     per_anno = compute_iaa_from_positional(
         A_PROJ,
@@ -154,11 +164,42 @@ def main() -> int:
                 "Bootstrap CIs use the FINDING 1 multiplicity-safe aggregator "
                 "(commit-or-later than the matcher-multiplicity-fix in this branch). "
                 "headline.tier{1,2,3}.cer_vs_gold.{a,b} (A2a) = each annotator's "
-                "round-0 CER against the consensus gold (gold as CER reference), "
-                "structurally comparable to the Nakdimon-vs-UXLC tier-2 baseline."
+                "round-0 CER against the consensus gold (gold as CER reference) — "
+                "the benchmark's internal human-vs-gold reference. "
+                "headline.tier2.cer_vs_uxlc.{a,b} = the same but against UXLC 2.5 "
+                "tier-2 (tier 2 only) — the strictly Nakdimon-comparable surface "
+                "(same UXLC reference + tier-2 strip as nakdimon_tier2_baseline.json, "
+                "mirrored here under nakdimon_tier2_vs_uxlc)."
             ),
         },
     }
+
+    # Mirror the Nakdimon tier-2-vs-UXLC baseline into this single results
+    # file so the v4 abstract can cite A, B, and Nakdimon (all vs UXLC tier-2,
+    # same verse-bootstrap percentile CI shape) from one place. This is a
+    # verified COPY of the canonical artifact (nakdimon_tier2_baseline.json,
+    # produced by scripts/regenerate_nakdimon_tier2_baseline.py with its own
+    # model-hash provenance) — not a recomputation — so it cannot drift the
+    # number; it only co-locates it. Absent that file, the block is omitted
+    # and a notice prints (run the Nakdimon regen first to populate it).
+    if NAKDIMON.exists():
+        nak = json.loads(NAKDIMON.read_text(encoding="utf-8"))
+        out["nakdimon_tier2_vs_uxlc"] = {
+            "_source": "nakdimon_tier2_baseline.json",
+            "_note": (
+                "Verified copy of the canonical Nakdimon baseline. cer_overall / "
+                "cer_per_folio mirror headline.tier2.cer_vs_uxlc's shape so the "
+                "abstract cites A / B / Nakdimon with one CI convention."
+            ),
+            "model_hash": nak.get("model_hash"),
+            "cer_overall": nak.get("overall_cer"),
+            "cer_per_folio": nak.get("per_folio_cer"),
+        }
+    else:
+        sys.stdout.write(
+            "NOTE: nakdimon_tier2_baseline.json absent — nakdimon_tier2_vs_uxlc "
+            "mirror omitted (run scripts/regenerate_nakdimon_tier2_baseline.py).\n"
+        )
 
     OUTPUT.write_text(json.dumps(out, indent=2, sort_keys=True, ensure_ascii=False) + "\n")
     sys.stdout.write(f"wrote {OUTPUT}\n")
@@ -187,6 +228,16 @@ def main() -> int:
             f"A2a tier{tier} cer_vs_gold: "
             f"A={a.point:.4f} [{a.ci_lower:.4f}, {a.ci_upper:.4f}]  "
             f"B={b.point:.4f} [{b.ci_lower:.4f}, {b.ci_upper:.4f}]\n"
+        )
+    # cer_vs_uxlc — tier-2 only, the Nakdimon-comparable surface.
+    if headline.tier2.cer_vs_uxlc is not None:
+        a = headline.tier2.cer_vs_uxlc["a"].cer_overall
+        b = headline.tier2.cer_vs_uxlc["b"].cer_overall
+        sys.stdout.write(
+            f"tier2 cer_vs_uxlc: "
+            f"A={a.point:.4f} [{a.ci_lower:.4f}, {a.ci_upper:.4f}]  "
+            f"B={b.point:.4f} [{b.ci_lower:.4f}, {b.ci_upper:.4f}]  "
+            f"(Nakdimon-vs-UXLC: see nakdimon_tier2_vs_uxlc block)\n"
         )
     return 0
 

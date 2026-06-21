@@ -42,7 +42,7 @@ _B = {
 _VERSE_FOLIO_MAP = [("Deut.1.1", "F1"), ("Deut.1.2", "F1")]
 
 
-def _kernel(with_gold: bool):
+def _kernel(with_gold: bool, with_uxlc: bool = False):
     a_records = {v: [] for v, _ in _VERSE_FOLIO_MAP}
     b_records = {v: [] for v, _ in _VERSE_FOLIO_MAP}
     n_cons = {v: len([c for c in _GOLD[v] if "א" <= c <= "ת"]) for v, _ in _VERSE_FOLIO_MAP}
@@ -57,6 +57,7 @@ def _kernel(with_gold: bool):
         bootstrap_seed=0xBEEF,
         metadata_extra={},
         gold_chunks_by_verse={v: _GOLD[v] for v, _ in _VERSE_FOLIO_MAP} if with_gold else None,
+        uxlc_tier2_by_verse={v: _GOLD[v] for v, _ in _VERSE_FOLIO_MAP} if with_uxlc else None,
     )
 
 
@@ -84,6 +85,25 @@ def test_annotator_equal_to_gold_scores_zero():
     # A is byte-identical to gold on both verses → CER 0 at every tier.
     for tier in (res.tier1, res.tier2, res.tier3):
         assert tier.cer_vs_gold["a"].cer_overall.point == 0.0
+
+
+def test_cer_vs_uxlc_is_tier2_only():
+    # cer_vs_uxlc is populated on tier 2 ONLY (the Nakdimon-comparable tier);
+    # tier 1 and tier 3 stay None even when a UXLC reference is supplied.
+    res = _kernel(with_gold=True, with_uxlc=True)
+    assert res.tier1.cer_vs_uxlc is None
+    assert res.tier3.cer_vs_uxlc is None
+    assert res.tier2.cer_vs_uxlc is not None
+    assert set(res.tier2.cer_vs_uxlc) == {"a", "b"}
+    assert res.tier2.cer_vs_uxlc["a"].cer_vs_uxlc is None  # no recursion
+    # Here the synthetic UXLC reference == gold, so A (== gold) scores 0.
+    assert res.tier2.cer_vs_uxlc["a"].cer_overall.point == 0.0
+
+
+def test_cer_vs_uxlc_none_when_not_supplied():
+    res = _kernel(with_gold=True, with_uxlc=False)
+    for tier in (res.tier1, res.tier2, res.tier3):
+        assert tier.cer_vs_uxlc is None
 
 
 def test_gold_is_the_cer_reference_denominator():
