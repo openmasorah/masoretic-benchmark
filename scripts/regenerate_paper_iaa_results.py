@@ -53,6 +53,7 @@ from masoretic_eval.uxlc_loader import load_tier_strings  # noqa: E402
 
 A_PROJ = _REPO_ROOT / "iaa_data" / "devarim_4folio" / "ginsberg_round0_positional.json"
 B_PROJ = _REPO_ROOT / "iaa_data" / "devarim_4folio" / "moster_round0_positional.json"
+GOLD_PROJ = _REPO_ROOT / "iaa_data" / "devarim_4folio" / "consensus_gold_positional.json"
 UXLC_XML = _REPO_ROOT / "baselines" / "tests" / "fixtures" / "_uxlc_cache" / "Deuteronomy.xml"
 OUTPUT = _REPO_ROOT / "paper_iaa_results.json"
 
@@ -68,7 +69,7 @@ def _to_dict(value: Any) -> Any:
 
 
 def main() -> int:
-    for p in (A_PROJ, B_PROJ, UXLC_XML):
+    for p in (A_PROJ, B_PROJ, GOLD_PROJ, UXLC_XML):
         if not p.exists():
             sys.stderr.write(f"ERROR: required input missing: {p}\n")
             return 2
@@ -78,12 +79,20 @@ def main() -> int:
         sys.stderr.write("ERROR: UXLC loader returned a non-dict tier-1 payload\n")
         return 2
 
+    # A2a — consensus-gold chunks for the human-vs-reference CER decomposition.
+    # The gold projection's per-verse chunk IS the reference text; tier 1/2/3
+    # CER of each annotator's round-0 chunk against it (gold as reference) lands
+    # in headline.tier{1,2,3}.cer_vs_gold.{a,b}.
+    gold_proj = load_projection(GOLD_PROJ)
+    gold_chunks_by_verse = {v.verse_ref: v.chunk for v in gold_proj.verses}
+
     headline = compute_iaa_uxlc_anchored_from_positional(
         A_PROJ,
         B_PROJ,
         uxlc_strings,
         bootstrap_b=DEFAULT_B,
         bootstrap_seed=DEFAULT_SEED,
+        gold_chunks_by_verse=gold_chunks_by_verse,
     )
     per_anno = compute_iaa_from_positional(
         A_PROJ,
@@ -136,13 +145,17 @@ def main() -> int:
             "inputs": {
                 "a_projection": str(A_PROJ.relative_to(_REPO_ROOT)),
                 "b_projection": str(B_PROJ.relative_to(_REPO_ROOT)),
+                "gold_projection": str(GOLD_PROJ.relative_to(_REPO_ROOT)),
                 "uxlc_xml": str(UXLC_XML.relative_to(_REPO_ROOT)),
             },
             "notes": (
                 "headline = UXLC-anchored tier-4 ordinals (FINDING 3 removed). "
                 "sensitivity.per_annotator = legacy per-annotator-ordinal anchoring. "
                 "Bootstrap CIs use the FINDING 1 multiplicity-safe aggregator "
-                "(commit-or-later than the matcher-multiplicity-fix in this branch)."
+                "(commit-or-later than the matcher-multiplicity-fix in this branch). "
+                "headline.tier{1,2,3}.cer_vs_gold.{a,b} (A2a) = each annotator's "
+                "round-0 CER against the consensus gold (gold as CER reference), "
+                "structurally comparable to the Nakdimon-vs-UXLC tier-2 baseline."
             ),
         },
     }
@@ -163,6 +176,18 @@ def main() -> int:
     sys.stdout.write(
         f"UXLC reprojection drops: a_side={dropped.get('a_side')}, b_side={dropped.get('b_side')}\n"
     )
+    # A2a — human-vs-gold tier-2 CER (the new Nakdimon comparison baseline).
+    for tier in (1, 2, 3):
+        tcr = getattr(headline, f"tier{tier}")
+        if tcr.cer_vs_gold is None:
+            continue
+        a = tcr.cer_vs_gold["a"].cer_overall
+        b = tcr.cer_vs_gold["b"].cer_overall
+        sys.stdout.write(
+            f"A2a tier{tier} cer_vs_gold: "
+            f"A={a.point:.4f} [{a.ci_lower:.4f}, {a.ci_upper:.4f}]  "
+            f"B={b.point:.4f} [{b.ci_lower:.4f}, {b.ci_upper:.4f}]\n"
+        )
     return 0
 
 

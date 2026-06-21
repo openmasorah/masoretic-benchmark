@@ -191,6 +191,33 @@ def _macro_cer(per_verse: list[float]) -> float:
     return sum(per_verse) / len(per_verse)
 
 
+def _tier_cer_result(
+    per_verse_cers: dict[str, float],
+    verse_folio_map: Sequence[tuple[str, str]],
+    verses_by_folio: dict[str, list[str]],
+    *,
+    bootstrap_b: int,
+    bootstrap_seed: int,
+    cer_vs_gold: dict[str, TierCERResult] | None = None,
+) -> TierCERResult:
+    """Build a per-folio + overall ``TierCERResult`` from per-verse CERs.
+
+    Per-folio CIs resample verses within that folio; the overall CI resamples
+    over the full verse pool (verse-bootstrap percentile, matching the headline
+    convention). Shared by the pair-CER path and the A2a human-vs-gold path so
+    the two cannot drift in aggregation or CI method.
+    """
+    per_folio: dict[str, MetricWithCI] = {}
+    for folio, verse_list in verses_by_folio.items():
+        folio_payloads = [per_verse_cers[v] for v in verse_list]
+        per_folio[folio] = bootstrap_metric(
+            folio_payloads, _macro_cer, b=bootstrap_b, seed=bootstrap_seed
+        )
+    overall_payloads = [per_verse_cers[v] for v, _ in verse_folio_map]
+    overall = bootstrap_metric(overall_payloads, _macro_cer, b=bootstrap_b, seed=bootstrap_seed)
+    return TierCERResult(cer_per_folio=per_folio, cer_overall=overall, cer_vs_gold=cer_vs_gold)
+
+
 def compute_iaa(
     a_side_path: Path,
     b_side_path: Path,
@@ -292,6 +319,7 @@ def _compute_from_verse_data(
     bootstrap_b: int,
     bootstrap_seed: int,
     metadata_extra: dict[str, object],
+    gold_chunks_by_verse: dict[str, str] | None = None,
 ) -> IaaResult:
     """Shared post-parse kernel for raw-.txt and positional-projection paths.
 
@@ -501,27 +529,46 @@ def _compute_from_verse_data(
             v: per_verse_cer(chunks_by_verse[v][1], chunks_by_verse[v][2], tier=tier)
             for v, _ in verse_folio_map
         }
-        # Per-folio bootstrap CI: resample verses within that folio.
-        per_folio: dict[str, MetricWithCI] = {}
-        for folio, verse_list in verses_by_folio.items():
-            folio_payloads = [per_verse_cers[v] for v in verse_list]
-            per_folio[folio] = bootstrap_metric(
-                folio_payloads,
-                _macro_cer,
-                b=bootstrap_b,
-                seed=bootstrap_seed,
-            )
-        # Overall bootstrap CI: resample folios with replacement, then verses
-        # within each drawn folio with replacement. Cluster-by-folio matches
-        # the headline tier-4 CIs.
-        overall_payloads = [per_verse_cers[v] for v, _ in verse_folio_map]
-        overall = bootstrap_metric(
-            overall_payloads,
-            _macro_cer,
-            b=bootstrap_b,
-            seed=bootstrap_seed,
+        # A2a — human-vs-consensus-gold CER decomposition. When a gold
+        # reference is supplied, each annotator's round-0 chunk is scored
+        # against the gold chunk with GOLD AS THE CER REFERENCE (first arg →
+        # denominator = gold length). This matches the Nakdimon-vs-UXLC tier-2
+        # orientation, so cer_vs_gold.{a,b} are directly comparable to the
+        # Nakdimon baseline. chunks_by_verse[v] = (folio, a_chunk, b_chunk).
+        cer_vs_gold: dict[str, TierCERResult] | None = None
+        if gold_chunks_by_verse is not None:
+            a_vs_gold_cers = {
+                v: per_verse_cer(gold_chunks_by_verse[v], chunks_by_verse[v][1], tier=tier)
+                for v, _ in verse_folio_map
+            }
+            b_vs_gold_cers = {
+                v: per_verse_cer(gold_chunks_by_verse[v], chunks_by_verse[v][2], tier=tier)
+                for v, _ in verse_folio_map
+            }
+            cer_vs_gold = {
+                "a": _tier_cer_result(
+                    a_vs_gold_cers,
+                    verse_folio_map,
+                    verses_by_folio,
+                    bootstrap_b=bootstrap_b,
+                    bootstrap_seed=bootstrap_seed,
+                ),
+                "b": _tier_cer_result(
+                    b_vs_gold_cers,
+                    verse_folio_map,
+                    verses_by_folio,
+                    bootstrap_b=bootstrap_b,
+                    bootstrap_seed=bootstrap_seed,
+                ),
+            }
+        tier_results[tier] = _tier_cer_result(
+            per_verse_cers,
+            verse_folio_map,
+            verses_by_folio,
+            bootstrap_b=bootstrap_b,
+            bootstrap_seed=bootstrap_seed,
+            cer_vs_gold=cer_vs_gold,
         )
-        tier_results[tier] = TierCERResult(cer_per_folio=per_folio, cer_overall=overall)
 
     metadata: dict[str, object] = {
         **metadata_extra,

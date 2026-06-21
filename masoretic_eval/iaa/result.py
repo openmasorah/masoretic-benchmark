@@ -96,10 +96,21 @@ class TierCERResult:
     Per-folio CIs resample verses within that folio; overall CI resamples
     over the full verse pool. This is symmetric with how the F1/α CIs are
     constructed in tier-4 — the bootstrap unit is always the verse.
+
+    ``cer_vs_gold`` is the human-vs-reference CER decomposition (A2a). When
+    populated it is ``{"a": TierCERResult, "b": TierCERResult}`` where each
+    sub-result is that annotator's round-0 transcription scored against the
+    *consensus gold* (gold as the CER reference, i.e. denominator = gold
+    length — the same orientation as the Nakdimon-vs-UXLC tier-2 baseline, so
+    the two are structurally comparable). It is ``None`` on the headline
+    pair-CER result (A round-0 vs B round-0) unless a gold reference was
+    supplied, and always ``None`` on the nested per-annotator sub-results
+    (no recursion in practice). Serializes to ``null`` when absent.
     """
 
     cer_per_folio: dict[str, MetricWithCI]
     cer_overall: MetricWithCI
+    cer_vs_gold: dict[str, TierCERResult] | None = None
 
 
 @dataclass(frozen=True)

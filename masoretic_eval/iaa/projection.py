@@ -343,6 +343,7 @@ def compute_iaa_uxlc_anchored_from_positional(
     expected_b_sha256: str | None = None,
     gt_hash: str | None = None,
     force: bool = False,
+    gold_chunks_by_verse: dict[str, str] | None = None,
 ) -> IaaResult:
     """Headline IAA with FINDING 3 contamination removed.
 
@@ -446,4 +447,5 @@ def compute_iaa_uxlc_anchored_from_positional(
             "uxlc_anchored": True,
             "dropped_record_counts": {"a_side": dropped_a, "b_side": dropped_b},
         },
+        gold_chunks_by_verse=gold_chunks_by_verse,
     )

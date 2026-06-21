@@ -14,7 +14,12 @@ deterministic guarantee — same input bytes → byte-identical projection JSON
 Environment:
 
 * ``MASORETIC_IAA_DATA_DIR`` (required): directory containing
-  ``a_side.txt``, ``b_side.txt``, and ``verse_folio_map.json``.
+  ``a_side.txt``, ``b_side.txt``, and ``verse_folio_map.json``. May
+  optionally contain ``gold_side.txt`` (the operator's copy of the Yosef
+  FINAL consensus-gold .txt); when present it is projected to the CC-BY
+  ``consensus_gold_positional.json`` surface used by the human-vs-gold CER
+  decomposition (A2a). When absent, the committed gold projection is left
+  untouched.
 
 The output directory ``iaa_data/devarim_4folio/`` is expected to exist
 relative to the repo root.
@@ -77,13 +82,33 @@ def main() -> int:
 
     verse_folio_map = _load_verse_folio_map(vfm_path)
 
-    pairs = (
-        ("ginsberg", a_path, out_dir / "ginsberg_round0_positional.json"),
-        ("moster", b_path, out_dir / "moster_round0_positional.json"),
+    _DEFAULT_SOURCE = "Round-0 raw transcription, layout-free projection"
+    _GOLD_SOURCE = (
+        "Round-1 revised consensus gold (Yosef/Ginsberg FINAL 2026-06-19); "
+        "byte-identical to Annotator B (Moster) round-2 endorsement. "
+        "Single-source consensus reference for human-vs-gold CER (A2a)."
     )
-    for label, src, dest in pairs:
+    pairs: list[tuple[str, Path, Path, str]] = [
+        ("ginsberg", a_path, out_dir / "ginsberg_round0_positional.json", _DEFAULT_SOURCE),
+        ("moster", b_path, out_dir / "moster_round0_positional.json", _DEFAULT_SOURCE),
+    ]
+    # Consensus gold (A2a) — optional input. When `gold_side.txt` is present
+    # (the operator's copy of the Yosef FINAL .txt) project it to the CC-BY
+    # `consensus_gold_positional.json` reproducibility surface; when absent,
+    # the committed gold projection is left untouched and only a notice prints.
+    gold_path = data_dir / "gold_side.txt"
+    if gold_path.exists():
+        pairs.append(
+            ("consensus_gold", gold_path, out_dir / "consensus_gold_positional.json", _GOLD_SOURCE)
+        )
+    else:
+        sys.stdout.write(
+            f"NOTE: {gold_path} absent — consensus_gold_positional.json left as committed.\n"
+        )
+
+    for label, src, dest, source in pairs:
         text = src.read_text(encoding="utf-8")
-        projection = project_side(text, verse_folio_map, side_label=label)
+        projection = project_side(text, verse_folio_map, side_label=label, source=source)
         dest.write_text(serialize_projection(projection) + "\n", encoding="utf-8")
         # Round-trip: validate the file we just wrote loads + passes
         # source-of-truth invariants. Catches local FS/encoding surprises.

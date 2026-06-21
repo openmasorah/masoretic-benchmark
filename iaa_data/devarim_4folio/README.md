@@ -9,14 +9,25 @@ cells.
 
 ## Files
 
-| File                              | Side                     | Source                                                 |
-| --------------------------------- | ------------------------ | ------------------------------------------------------ |
-| `ginsberg_round0_positional.json` | A (Ginsberg / operator)  | `MASORETIC_IAA_DATA_DIR/a_side.txt` projection         |
-| `moster_round0_positional.json`   | B (Moster)               | `MASORETIC_IAA_DATA_DIR/b_side.txt` projection         |
+| File                               | Side                     | Source                                                 |
+| ---------------------------------- | ------------------------ | ------------------------------------------------------ |
+| `ginsberg_round0_positional.json`  | A (Ginsberg / operator)  | `MASORETIC_IAA_DATA_DIR/a_side.txt` projection         |
+| `moster_round0_positional.json`    | B (Moster)               | `MASORETIC_IAA_DATA_DIR/b_side.txt` projection         |
+| `consensus_gold_positional.json`   | Consensus gold           | `MASORETIC_IAA_DATA_DIR/gold_side.txt` projection      |
 
-Both files are produced by the regeneration script below from the gitignored
-round-0 .txt files. The script is deterministic — same input bytes →
+The two round-0 files are produced by the regeneration script below from the
+gitignored round-0 .txt files. The script is deterministic — same input bytes →
 byte-identical projection JSON.
+
+`consensus_gold_positional.json` is the **consensus gold standard**: Annotator
+A's round-1 revised transcription (Yosef/Ginsberg FINAL 2026-06-19), which is
+byte-identical to Annotator B's (Moster) round-2 endorsement — a single-source
+reference, not a third independent annotation. It exists so the human-vs-gold
+CER decomposition (`headline.tier{1,2,3}.cer_vs_gold.{a,b}` in
+`paper_iaa_results.json`) reproduces from this public surface alone: each
+annotator's round-0 chunk scored against the gold chunk, with **gold as the CER
+reference** (denominator = gold length) — the same orientation as the
+Nakdimon-vs-UXLC tier-2 baseline, so the two are directly comparable.
 
 ## Schema (per-side projection)
 
