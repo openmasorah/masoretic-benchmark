@@ -147,7 +147,7 @@ If you use this benchmark or scoring suite, please cite. GitHub renders a "Cite 
 ```bibtex
 @dataset{lamm2026masoretic,
   title        = {Open Mesorah Masoretic Benchmark: a 4-tier CER evaluation suite for medieval Tiberian Hebrew},
-  author       = {Lamm, Ben and Ginsburg, Yosef and Finkelstein, Ari},
+  author       = {Lamm, Ben and Ginsberg, Yosef and Finkelstein, Ari},
   year         = {2026},
   version      = {0.2.0},
   howpublished = {Hugging Face dataset, \url{https://huggingface.co/datasets/openmasorah/masoretic-benchmark-v0.1}},
