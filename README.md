@@ -156,3 +156,14 @@ If you use this benchmark or scoring suite, please cite. GitHub renders a "Cite 
 ```
 
 A peer-reviewed paper citation will be added when the JCDL 2027 submission lands.
+
+## Acknowledgements
+
+This benchmark builds on openly available sources, gratefully acknowledged (full machine-readable entries are in `CITATION.cff` under `references:`):
+
+- **Leningrad Codex** (Samuel ben Jacob, c. 1008 CE; Firkovich MS Evr. I B19a, National Library of Russia) — the base manuscript, via West Semitic Research Project photographs on the [Internet Archive](https://archive.org/details/Leningrad_Codex_Color_Images) (Public Domain Mark 1.0). Images are referenced by IIIF only, never redistributed.
+- **UXLC / Tanach.us** — the Unicode/XML Leningrad Codex 2.5 (Tanach.us Inc.), source of the tier-1 ground truth (F119A/F119B/F120A) and the tier-2 UXLC backbone. Tanach.us asks that citation of the site as the source of the text be made, and we gladly do so — see [tanach.us](https://tanach.us/).
+- **Kraken** (B. Kiessling, DH 2019) and the **BiblIA** medieval-Hebrew model + dataset (D. Stökl Ben Ezra et al., HIP '21) — OCR/HTR baselines BL-02 / BL-03.
+- **Nakdimon** (E. Gershuni & Y. Pinter, NAACL Findings 2022) — diacritization for baseline BL-03 and the primary oracle.
+- **DICTA Nakdan** (A. Shmidman et al., ACL 2020) and **DictaBERT** (S. Shmidman et al., 2023) — the secondary diacritization oracle and the off-label negative-result baseline BL-04.
+- **Unicode Standard Annex #29** (The Unicode Consortium) — grapheme-cluster segmentation underlying the scorer's cluster-aligned alignment.

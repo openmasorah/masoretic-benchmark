@@ -31,3 +31,160 @@ keywords:
   - nikkud
   - trop
   - digital-humanities
+references:
+  # --- Data sources ---
+  - type: data
+    title: "Unicode/XML Leningrad Codex: UXLC 2.5 (27.6)"
+    authors:
+      - name: "Tanach.us Inc."
+    year: 2026
+    url: "https://tanach.us/"
+    notes: >-
+      Tier-1 ground truth (folios F119A/F119B/F120A) and the UXLC backbone for
+      tier-2 scoring are derived from UXLC. The biblical Hebrew text is free to
+      view or copy without restriction; citation to Tanach.us is appreciated.
+      License: https://tanach.us/License.html
+  - type: historical-work
+    title: "Leningrad Codex (Codex Leningradensis), Firkovich MS Evr. I B19a"
+    authors:
+      - name: "Samuel ben Jacob (scribe)"
+    year: 1008
+    url: "https://archive.org/details/Leningrad_Codex_Color_Images"
+    notes: >-
+      Base manuscript. National Library of Russia, St. Petersburg. Digitized by
+      the West Semitic Research Project (photographs by Bruce E. Zuckerman);
+      Internet Archive item Leningrad_Codex_Color_Images, Public Domain Mark 1.0.
+      Manuscript images are referenced via IIIF only and never redistributed.
+  # --- Diacritization tools ---
+  - type: conference-paper
+    title: "Restoring Hebrew Diacritics Without a Dictionary"
+    authors:
+      - family-names: Gershuni
+        given-names: Elazar
+      - family-names: Pinter
+        given-names: Yuval
+    year: 2022
+    collection-title: "Findings of the Association for Computational Linguistics: NAACL 2022"
+    start: 1010
+    end: 1018
+    publisher:
+      name: "Association for Computational Linguistics"
+    url: "https://aclanthology.org/2022.findings-naacl.75/"
+    notes: >-
+      Nakdimon — diacritization tool for baseline BL-03 and the primary oracle
+      (PyPI nakdimon==0.1.2, MIT License, https://github.com/elazarg/nakdimon).
+  - type: conference-paper
+    title: "Nakdan: Professional Hebrew Diacritizer"
+    authors:
+      - family-names: Shmidman
+        given-names: Avi
+      - family-names: Shmidman
+        given-names: Shaltiel
+      - family-names: Koppel
+        given-names: Moshe
+      - family-names: Goldberg
+        given-names: Yoav
+    year: 2020
+    collection-title: "Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics: System Demonstrations"
+    start: 197
+    end: 203
+    publisher:
+      name: "Association for Computational Linguistics"
+    url: "https://aclanthology.org/2020.acl-demos.23/"
+    notes: "DICTA hybrid Nakdan API (nakdan.dicta.org.il) — secondary diacritization oracle."
+  - type: article
+    title: "DictaBERT: A State-of-the-Art BERT Suite for Modern Hebrew"
+    authors:
+      - family-names: Shmidman
+        given-names: Shaltiel
+      - family-names: Shmidman
+        given-names: Avi
+      - family-names: Koppel
+        given-names: Moshe
+    year: 2023
+    url: "https://arxiv.org/abs/2308.16687"
+    identifiers:
+      - type: other
+        value: "arXiv:2308.16687"
+        description: "arXiv preprint"
+    notes: >-
+      Model dicta-il/dictabert-large-char-menaked (CC-BY-4.0) is used as the
+      off-label negative-result baseline BL-04. The char-menaked variant has no
+      dedicated paper; the DictaBERT suite paper is cited as the closest reference.
+  # --- OCR/HTR engine + medieval-Hebrew model/dataset ---
+  - type: conference-paper
+    title: "Kraken - an Universal Text Recognizer for the Humanities"
+    authors:
+      - family-names: Kiessling
+        given-names: Benjamin
+    year: 2019
+    conference:
+      name: "Digital Humanities 2019 (ADHO), Utrecht"
+    url: "https://dh-abstracts.library.virginia.edu/works/9912"
+  - type: software
+    title: "kraken"
+    authors:
+      - family-names: Kiessling
+        given-names: Benjamin
+    version: "7.0.1"
+    license: Apache-2.0
+    url: "https://kraken.re"
+    repository-code: "https://github.com/mittagessen/kraken"
+    notes: "OCR/HTR engine for baselines BL-02 and BL-03."
+  - type: conference-paper
+    title: "BiblIA - a General Model for Medieval Hebrew Manuscripts and an Open Annotated Dataset"
+    authors:
+      - family-names: "Stökl Ben Ezra"
+        given-names: Daniel
+      - family-names: Brown-DeVost
+        given-names: Bronson
+      - family-names: Jablonski
+        given-names: Pawel
+      - family-names: Kiessling
+        given-names: Benjamin
+      - family-names: Lolli
+        given-names: Elena
+      - family-names: Lapin
+        given-names: Hayim
+    year: 2021
+    conference:
+      name: "6th International Workshop on Historical Document Imaging and Processing (HIP '21), Lausanne"
+    url: "https://doi.org/10.5281/zenodo.5167263"
+  - type: software
+    title: "Medieval Hebrew manuscripts (BiblIA Kraken recognition model)"
+    authors:
+      - family-names: "Stökl Ben Ezra"
+        given-names: Daniel
+    year: 2021
+    version: "1.0"
+    license: CC-BY-SA-4.0
+    doi: "10.5281/zenodo.5468286"
+    notes: "Pinned BiblIA_01.mlmodel recognition model for baselines BL-02 and BL-03."
+  - type: data
+    title: "BiblIA - an Open Annotated Dataset"
+    authors:
+      - family-names: "Stökl Ben Ezra"
+        given-names: Daniel
+      - family-names: Brown-DeVost
+        given-names: Bronson
+      - family-names: Jablonski
+        given-names: Pawel
+      - family-names: Kiessling
+        given-names: Benjamin
+      - family-names: Lolli
+        given-names: Elena
+      - family-names: Lapin
+        given-names: Hayim
+    year: 2021
+    version: "1.0"
+    license: CC-BY-NC-SA-4.0
+    doi: "10.5281/zenodo.5167263"
+  # --- Methodology standard ---
+  - type: standard
+    title: "Unicode Standard Annex #29: Unicode Text Segmentation"
+    authors:
+      - name: "The Unicode Consortium"
+    year: 2025
+    version: "Revision 47 (Unicode 17.0.0)"
+    url: "https://www.unicode.org/reports/tr29/"
+    notes: "Grapheme-cluster alignment unit for the cluster-aligned CER."
