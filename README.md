@@ -78,7 +78,7 @@ masoretic-eval score \
 Tier-1 ground truth for the 4-folio IAA set (Leningrad Devarim F118B, F119A, F119B, F120A) lives at `baselines/tests/fixtures/iaa_folio_leningrad_devarim_*_fixture.gt_adapter_golden.json`. Provenance and licensing differ per folio (see each fixture's `_provenance` block):
 
 - **F118B** — hand-transcribed from PDM 1.0 archive.org photographs of the Leningrad Codex. CC-BY-4.0 (attribution: Open Mesorah).
-- **F119A, F119B, F120A** — UXLC-derived (UXLC v4.20, [tanach.us](https://tanach.us/)) via `gt_infra.uxlc_import`. UXLC distributes its text as public domain; CC0-1.0 (attribution requested: UXLC / tanach.us).
+- **F119A, F119B, F120A** — UXLC-derived (UXLC 2.5, [tanach.us](https://tanach.us/)) via `gt_infra.uxlc_import`. The UXLC biblical Hebrew text is distributed by Tanach.us Inc. free to view or copy without restriction (citation to Tanach.us appreciated) — see [tanach.us/License.html](https://tanach.us/License.html). This is a custom permissive grant, **not** a formal CC0-1.0 dedication.
 
 Only IIIF/archive.org references are stored — no manuscript images are redistributed. Per-baseline headline scores for F118B are in `results/scores/leningrad_devarim_F118B_fixture.json`.
 
@@ -123,7 +123,7 @@ Scored against qere by default (UXLC `<q>` element when present). Ketiv-only wor
 |---|---|
 | Scorer code (`masoretic_eval/`) | Apache 2.0 |
 | Benchmark text GT — F118B (hand-transcribed) | CC-BY-4.0 (Open Mesorah) |
-| Benchmark text GT — F119A/F119B/F120A (UXLC-derived) | CC0-1.0 (UXLC v4.20, tanach.us) |
+| Benchmark text GT — F119A/F119B/F120A (UXLC-derived) | UXLC 2.5 (tanach.us) — free to copy without restriction, citation appreciated; not CC0 ([license](https://tanach.us/License.html)) |
 | Manuscript images | Fetched via IIIF from archive.org (PDM 1.0); never redistributed |
 
 See [LICENSE](LICENSE) for the full Apache 2.0 text.

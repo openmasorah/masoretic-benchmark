@@ -17,8 +17,9 @@ Inputs:
 
 * ``iaa_data/devarim_4folio/{ginsberg,moster}_round0_positional.json``
   (committed; CC-BY-4.0).
-* ``baselines/tests/fixtures/_uxlc_cache/Deuteronomy.xml`` (CC0; UXLC
-  2.5 cache, used for the UXLC backbone tier-1 strings). The cache is
+* ``baselines/tests/fixtures/_uxlc_cache/Deuteronomy.xml`` (UXLC 2.5
+  cache, tanach.us — free to copy without restriction, not CC0; used for the
+  UXLC backbone tier-1 strings). The cache is
   gitignored — fetch the file from tanach.us (UXLC 2.5) into that path
   before running this script. The paper repo's published-numbers
   reproduction instructions handle this prerequisite.

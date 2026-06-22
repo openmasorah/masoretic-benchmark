@@ -361,7 +361,8 @@ def compute_iaa_uxlc_anchored_from_positional(
 
     Schema impact: NONE. The published positional projection JSONs keep
     per-annotator ordinals (no v0.3 schema bump, no manifest fuse). UXLC is
-    a separate runtime input — publicly available CC0 from UXLC 2.5 — that
+    a separate runtime input — publicly available from UXLC 2.5 (tanach.us;
+    free to copy without restriction, not CC0) — that
     the scorer fetches alongside the projection JSONs. Without UXLC the
     scorer reproduces the per-annotator sensitivity number; with UXLC it
     reproduces the headline number.

@@ -216,8 +216,9 @@ Frozen baseline predictions and the headline scores per folio live in
   scores for F118B across all four baselines.
 
 Benchmark text licensing differs per folio: F118B tier-1 GT is hand-transcribed
-(CC-BY-4.0); F119A/F119B/F120A tier-1 GT is UXLC-derived (CC0-1.0, UXLC v4.20 /
-tanach.us). See the README "IAA benchmark fixtures" section and each fixture's
+(CC-BY-4.0); F119A/F119B/F120A tier-1 GT is UXLC-derived (UXLC 2.5, tanach.us —
+free to copy without restriction, citation appreciated; not CC0). See the
+README "IAA benchmark fixtures" section and each fixture's
 `_provenance` block. Only IIIF/archive.org references are stored for the
 manuscript images; no manuscript images are redistributed in this repository.
 
