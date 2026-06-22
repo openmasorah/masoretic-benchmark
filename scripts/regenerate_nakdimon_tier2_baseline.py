@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 """Nakdimon tier-2 baseline for the v0.2.0 Devarim 4-folio benchmark.
 
-The grant-strategy case for the JCDL 2027 paper rests on three findings:
-(a) a publicly-licensed benchmark exists, (b) the human-human IAA ceiling
-on this data is high, and (c) current OCR/HTR systems fall short of that
-ceiling. This script delivers (c) for tier 2 (consonants + nikkud) — the
-diacritization task that Nakdimon (elazarg/nakdimon, MIT, PyPI 0.1.2,
-MODEL_HASH 8fd7722b8002a690) was actually trained for.
+This script measures Nakdimon's tier-2 (consonants + nikkud) Character Error
+Rate against the UXLC tier-2 reference on the frozen 96-verse Devarim subset.
+Nakdimon (elazarg/nakdimon, MIT, PyPI 0.1.2, MODEL_HASH 8fd7722b8002a690) is a
+diacritization model; tier 2 is the diacritization task it was trained for.
 
 Pipeline per verse:
 1. Read UXLC tier-1 (consonants only) — the publicly-available standardized
@@ -23,11 +21,13 @@ Pipeline per verse:
 Output:
     nakdimon_tier2_baseline.json  (gitignored — regen artifact)
 
-Comparison surface (already in paper_iaa_results.json from the sibling
-regen):
-    Human-vs-human tier 2 CER (annotator A vs annotator B, round-0): 0.0181
-    This is the "human ceiling" for tier-2 reliability on this subset.
-    Nakdimon CER vs UXLC measures the OCR gap relative to that ceiling.
+Comparable surface (in paper_iaa_results.json from the sibling regen): the
+human-vs-UXLC tier-2 CER (``headline.tier2.cer_vs_uxlc``) is scored against
+the SAME UXLC tier-2 reference and is the quantity directly comparable to this
+Nakdimon number. Annotator-vs-annotator (human-pair) CER is a different,
+non-comparable quantity and is deliberately not used here. Nakdimon is a
+diacritization system, not OCR/HTR; this script makes no OCR-gap or
+human-ceiling claim.
 
 Environment: this script MUST run in a Python 3.11 venv with
 ``tensorflow==2.15.0`` and ``nakdimon==0.1.2`` installed — Nakdimon's
@@ -144,7 +144,8 @@ def main() -> int:
         "n_verses": len(overall_payloads),
     }
 
-    # Sanity context — human ceiling lives in paper_iaa_results.json.
+    # Comparable human-vs-UXLC numbers live in paper_iaa_results.json
+    # (headline.tier2.cer_vs_uxlc) — scored against the same UXLC reference.
     out = {
         "baseline": "nakdimon_oss",
         "model_hash": MODEL_HASH,
@@ -159,9 +160,11 @@ def main() -> int:
         "per_folio_cer": per_folio,
         "per_verse_cer": per_verse_cer,
         "comparison_note": (
-            "Human-vs-human tier-2 CER on the same 96-verse set is 0.0181 "
-            "[0.0113, 0.0257] (paper_iaa_results.json tier2.cer_overall). "
-            "Nakdimon's CER relative to UXLC tier-2 quantifies the OCR gap."
+            "Comparable surface: the human-vs-UXLC tier-2 CER "
+            "(paper_iaa_results.json headline.tier2.cer_vs_uxlc) is scored "
+            "against the same UXLC tier-2 reference. Annotator-vs-annotator "
+            "(human-pair) CER is a different, non-comparable quantity. "
+            "Nakdimon is a diacritization model, not OCR/HTR."
         ),
     }
     OUTPUT.write_text(json.dumps(out, indent=2, sort_keys=True, ensure_ascii=False) + "\n")
@@ -172,8 +175,8 @@ def main() -> int:
         f"{overall['point']:.4f} [{overall['ci_lower']:.4f}, {overall['ci_upper']:.4f}]\n"
     )
     sys.stdout.write(
-        "Human-pair tier-2 CER (the ceiling): 0.0181 [0.0113, 0.0257]\n"
-        f"OCR gap (Nakdimon - human): {overall['point'] - 0.0181:+.4f}\n"
+        "Comparable human-vs-UXLC tier-2 CER: see "
+        "paper_iaa_results.json headline.tier2.cer_vs_uxlc.\n"
     )
     return 0
 
