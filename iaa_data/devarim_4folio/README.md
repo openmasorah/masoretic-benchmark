@@ -22,12 +22,28 @@ byte-identical projection JSON.
 `consensus_gold_positional.json` is the **consensus gold standard**: Annotator
 A's round-1 revised transcription (Yosef/Ginsberg FINAL 2026-06-19), which is
 byte-identical to Annotator B's (Moster) round-2 endorsement — a single-source
-reference, not a third independent annotation. It exists so the human-vs-gold
-CER decomposition (`headline.tier{1,2,3}.cer_vs_gold.{a,b}` in
-`paper_iaa_results.json`) reproduces from this public surface alone: each
-annotator's round-0 chunk scored against the gold chunk, with **gold as the CER
-reference** (denominator = gold length) — the same orientation as the
-Nakdimon-vs-UXLC tier-2 baseline, so the two are directly comparable.
+reference, not a third independent annotation.
+
+**Reproducibility boundary** — exactly what each number needs, no more:
+
+* `headline.tier{1,2,3}.cer_vs_gold.{a,b}` (human-vs-gold CER) reproduces from
+  **these three committed CC-BY projection JSONs alone**: each annotator's
+  round-0 `chunk` is scored against the gold `chunk` (gold as the CER
+  reference, denominator = gold length) via the cluster-aligned CER. No UXLC
+  distribution and no private raw `.txt` are required.
+* `headline.tier2.cer_vs_uxlc.{a,b}` and the UXLC-anchored tier-4 metrics
+  **additionally** require the UXLC 2.5 distribution (publicly available from
+  tanach.us). Still no raw `.txt`.
+* Only re-*deriving* the projection JSONs from source requires the private
+  round-0 `.txt` (gitignored). The published numbers above do not.
+
+`cer_vs_uxlc` shares a *scoring surface* with the Nakdimon-vs-UXLC tier-2
+baseline (same UXLC reference, same tier-2 strip, same `cluster_aligned_cer`
+path), which is why they can sit in one table. They are **not directly
+comparable as systems**, though: Nakdimon diacritizes given UXLC's exact
+consonants, whereas the human CER also absorbs consonant-transcription
+divergence from UXLC. The shared surface is the comparison; the systems'
+input tasks differ.
 
 ## Schema (per-side projection)
 
