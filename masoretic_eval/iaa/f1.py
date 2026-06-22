@@ -13,11 +13,22 @@ with two phases:
 2. **Tolerance phase:** remaining pairs match if ``|ord_A - ord_B| <= tolerance``.
 
 Phase ordering enforces "prefer ord-equal first" from the SPEC. Phase 2 uses
-the greedy interval-graph algorithm (sorted scan with a single advancing
-pointer), which is optimal for tolerance windows ≤1 — the maximum matching
-on the line is achieved by greedy nearest-neighbor when edges form an interval
-graph with bounded degree. No double-counting because matched ordinals are
-removed from the pool before phase 2.
+a greedy interval-graph scan (sorted, single advancing pointer); matched
+ordinals are removed from the pool before phase 2, so there is no
+double-counting.
+
+NOTE — this is exact-first-then-greedy, NOT guaranteed maximum-cardinality.
+The forced exact phase can strand a pair that an optimal matcher would have
+joined. Minimal counterexample at tolerance 1: A = {1, 2}, B = {2, 3} — the
+exact phase consumes 2↔2, leaving 1 and 3 unmatchable (1 TP), whereas a
+maximum-cardinality matching achieves 1↔2 and 2↔3 (2 TP). On the released
+96-verse corpus this never bites: the greedy result equals true
+maximum-cardinality matching on every (verse_ref, type) tolerance-1 bucket,
+in both the per-annotator and UXLC-anchored frames. That equivalence is
+regression-guarded by ``tests/iaa/test_matcher_maxcard_equiv.py``, so a future
+folio containing the adversarial pattern is caught before it could silently
+undercount. (Exact F1, tolerance 0, is unaffected either way: ordinal-equal
+matching is unique, with no choice to make suboptimally.)
 """
 
 from __future__ import annotations
