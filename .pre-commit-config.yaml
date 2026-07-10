@@ -64,6 +64,16 @@ repos:
         additional_dependencies:
           - jsonschema>=4.21
 
+      # Each frozen folio's gt_hash must still match the bytes its gt_source
+      # names. Fires on the goldens too: editing ground truth without re-fusing
+      # would leave the manifest pinning bytes that no longer exist.
+      - id: gt-hash-verified
+        name: "Frozen folios' gt_hash must match their gt_source bytes"
+        entry: python scripts/verify_gt_hash.py --check
+        language: python
+        files: ^(phase_0_manifest\.json|iaa_data/devarim_4folio/goldens/.*\.json|scripts/verify_gt_hash\.py)$
+        pass_filenames: false
+
       - id: validate-corpus
         name: "Validate corpus/manuscripts.yaml against schemas/manuscript.schema.json"
         entry: python scripts/validate_corpus.py

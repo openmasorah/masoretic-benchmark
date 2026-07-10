@@ -243,7 +243,8 @@ constrained as follows:
   `schemas/phase_0_manifest.schema.json`.
 - The current frozen values include 4 IAA folios from the Leningrad Codex
   Devarim quire (F118B, F119A, F119B, F120A), `version: v0.2.0`, and
-  `scorer_version: 0.1.0`.
+  `scorer_version: 0.2.0`. Each frozen folio carries a `gt_hash` (sha256[:16] of
+  the consensus golden it pins) and a `gt_source` naming those bytes.
 
 ## Environment variables
 

@@ -17,45 +17,49 @@
     {
       "book": "devarim",
       "folio": "F118B",
-      "gt_hash": null,
+      "gt_hash": "4b7bc5bea20bb201",
       "iaa_folio": true,
       "id": "leningrad_devarim_F118B_fixture",
       "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F118B.jpg",
       "in_frozen_scope": true,
-      "manuscript": "leningrad"
+      "manuscript": "leningrad",
+      "gt_source": "iaa_data/devarim_4folio/goldens/leningrad_devarim_F118B_fixture.gt_adapter_golden.json@4b96e57 (projection of iaa_data/devarim_4folio/consensus_gold_positional.json@3ece579)"
     },
     {
       "book": "devarim",
       "folio": "F119A",
-      "gt_hash": null,
+      "gt_hash": "349c49877b364686",
       "iaa_folio": true,
       "id": "leningrad_devarim_F119A_fixture",
       "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F119A.jpg",
       "in_frozen_scope": true,
-      "manuscript": "leningrad"
+      "manuscript": "leningrad",
+      "gt_source": "iaa_data/devarim_4folio/goldens/leningrad_devarim_F119A_fixture.gt_adapter_golden.json@4b96e57 (projection of iaa_data/devarim_4folio/consensus_gold_positional.json@3ece579)"
     },
     {
       "book": "devarim",
       "folio": "F119B",
-      "gt_hash": null,
+      "gt_hash": "ad05144923c1d8b8",
       "iaa_folio": true,
       "id": "leningrad_devarim_F119B_fixture",
       "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F119B.jpg",
       "in_frozen_scope": true,
-      "manuscript": "leningrad"
+      "manuscript": "leningrad",
+      "gt_source": "iaa_data/devarim_4folio/goldens/leningrad_devarim_F119B_fixture.gt_adapter_golden.json@4b96e57 (projection of iaa_data/devarim_4folio/consensus_gold_positional.json@3ece579)"
     },
     {
       "book": "devarim",
       "folio": "F120A",
-      "gt_hash": null,
+      "gt_hash": "df44bf6579beefe2",
       "iaa_folio": true,
       "id": "leningrad_devarim_F120A_fixture",
       "image_url": "https://archive.org/download/leningrad-codex-color/BIB_LENCDX_F120A.jpg",
       "in_frozen_scope": true,
-      "manuscript": "leningrad"
+      "manuscript": "leningrad",
+      "gt_source": "iaa_data/devarim_4folio/goldens/leningrad_devarim_F120A_fixture.gt_adapter_golden.json@4b96e57 (projection of iaa_data/devarim_4folio/consensus_gold_positional.json@3ece579)"
     }
   ],
-  "frozen_at": "2026-06-11T19:30:00Z",
+  "frozen_at": "2026-07-10T14:23:18Z",
   "fuses_fired": [],
   "iaa_subset": [
     "leningrad_devarim_F118B_fixture",
@@ -114,9 +118,14 @@
       "new_frozen_at": "2026-06-11T19:30:00Z",
       "prev_frozen_at": "2026-05-01T06:36:29Z",
       "reason": "phase 03.3: Step 2b maqaf-convention unification — tier-1 maqaf U+05BE retained, no trailing space (DECISIONS.md 2026-06-11). GT regenerated to bare maqaf across the 4 PAGE-XML exports + the 4 gt_adapter goldens; the F118B hand golden kept its 26 physical lines with 25 within-line codex maqafs injected by UXLC alignment (4 line-break-straddling joins left as line breaks); false UXLC-derived provenance corrected. results/scores/leningrad_devarim_F118B_fixture.json re-emitted from the corrected GT (real re-run): biblia_kraken 0.9162->0.9282, llm_vision 0.6662->0.6613, biblia_nakdimon/biblia_char_menaked 0.5965->0.6106, ranking preserved (nakdimon<llm_vision<kraken); gt_chars_normalized off-by-one 1421->1420 fixed. baselines/EVALUATION_PROTOCOL.md gains a paired methodology-table row. Per-folio gt_hash stays null (GT remains pre-Yosef-review/provisional)."
+    },
+    {
+      "prev_frozen_at": "2026-06-11T19:30:00Z",
+      "new_frozen_at": "2026-07-10T14:23:18Z",
+      "reason": "phase 04: v0.1 gt_hash fuse (Option A). Per-folio gt_hash = sha256[:16] of iaa_data/devarim_4folio/goldens/<folio>.gt_adapter_golden.json@4b96e57, each a projection of consensus_gold_positional.json@3ece579 (Ginsberg A + Moster B, adjudicated 2026-06-19). gt_source records the covered file. D-28's adjudicated_gt_<folio>.json was never produced, hence the projection. scorer_version corrected 0.1.0 -> 0.2.0 (stale since 0a58c1d, 2026-04-26). This field is not inert: baselines/src/baselines/_base.py cascades it into every emitted run_meta.json, so the four promoted run_meta.json files recorded scorer_version 0.1.0 even though each pins a sibling_git_sha at which masoretic_eval.__version__ was already 0.2.0. Correcting those emitted records is a separate change; no score depends on this field."
     }
   ],
   "nakdimon_model_hash": "8fd7722b8002a690",
-  "scorer_version": "0.1.0",
+  "scorer_version": "0.2.0",
   "version": "v0.2.0"
 }
