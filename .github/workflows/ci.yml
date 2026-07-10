@@ -67,6 +67,13 @@ jobs:
       - name: Release egress audit
         run: python scripts/audit_release.py --all
 
+      # Defense in depth alongside tests/test_manifest_hash_artifacts.py: a
+      # manifest fuse must land atomically with the rebind of the 11 promoted
+      # artifacts, or their provenance silently points at a manifest that no
+      # longer exists.
+      - name: Promoted results bind to current manifest_hash
+        run: python scripts/rebind_manifest_hash.py --check
+
       - name: Detect hardcoded secrets
         uses: gacts/gitleaks@v1.3.2
         with:

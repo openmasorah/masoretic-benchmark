@@ -256,7 +256,10 @@ def check_results_manifest_hash(root: Path) -> list[str]:
     results_dir = root / "results"
     if not results_dir.exists():
         return errors
-    for path in results_dir.glob("*/*.json"):
+    # rglob, not glob("*/*.json"): the latter is one level deep and silently
+    # skipped results/<baseline>/diagnostic/*.gt_fed.json, which do carry a
+    # manifest_hash. A stale binding there passed the release gate.
+    for path in results_dir.rglob("*.json"):
         try:
             data = _read_json(path)
         except AuditInternalError as exc:
