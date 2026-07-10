@@ -133,7 +133,7 @@ Scored against qere by default (UXLC `<q>` element when present). Ketiv-only wor
 | Artifact | License |
 |---|---|
 | Scorer code (`masoretic_eval/`) | Apache 2.0 |
-| Benchmark text GT — F118B (hand-transcribed) | CC-BY-4.0 (Open Mesorah) |
+| Benchmark text GT — F118B (hand-transcribed) | CC-BY-4.0 (Open Masorah) |
 | Benchmark text GT — F119A/F119B/F120A (UXLC-derived) | UXLC 2.5 (tanach.us) — free to copy without restriction, citation appreciated; not CC0 ([license](https://tanach.us/License.html)) |
 | Manuscript images | Fetched via IIIF from archive.org (PDM 1.0); never redistributed |
 
@@ -157,7 +157,7 @@ If you use this benchmark or scoring suite, please cite. GitHub renders a "Cite 
 
 ```bibtex
 @dataset{lamm2026masoretic,
-  title        = {Open Mesorah Masoretic Benchmark: a 4-tier CER evaluation suite for medieval Tiberian Hebrew},
+  title        = {Open Masorah Masoretic Benchmark: a 4-tier CER evaluation suite for medieval Tiberian Hebrew},
   author       = {Lamm, Ben and Ginsberg, Yosef and Finkelstein, Ari},
   year         = {2026},
   version      = {0.2.0},
