@@ -10,7 +10,7 @@
       "image_url": "https://iiif.archive.org/iiif/Leningrad_Codex_Color_Images/f237b.json",
       "iaa_folio": true,
       "in_frozen_scope": true,
-      "gt_hash": "sha256:abc"
+      "gt_hash": "c8bbdbb41d01a4fe"
     },
     {
       "id": "leningrad_devarim_f238a",
@@ -20,7 +20,7 @@
       "image_url": "https://iiif.archive.org/iiif/Leningrad_Codex_Color_Images/f238a.json",
       "iaa_folio": false,
       "in_frozen_scope": true,
-      "gt_hash": "sha256:def"
+      "gt_hash": "f0beffe2ec8df84b"
     }
   ],
   "iaa_subset": ["leningrad_devarim_f237b"],
