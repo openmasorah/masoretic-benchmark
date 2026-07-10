@@ -5,12 +5,14 @@ This guide walks a researcher or ML engineer through installing `masoretic-eval`
 and scoring a Hebrew OCR/HTR prediction against the IAA Leningrad Codex Devarim
 ground-truth fixtures shipped with this repository.
 
-Two audiences are covered:
+One audience is covered in v0.1:
 
 1. **Score your own baseline.** You have a Hebrew OCR/HTR system and want a
-   reproducible CER₃ number against the same folios published baselines used.
-2. **Reproduce existing baseline scores.** You want to re-run the scorer over
-   the frozen predictions in `results/` and confirm the headline numbers.
+   reproducible CER₃ number against the 4-folio IAA set.
+
+*Reproducing published baseline scores* is deferred to v0.1.1: v0.1 ships no
+`results/` tree. See [Baselines](../README.md#baselines) for why the earlier
+scores were retracted.
 
 ## Prerequisites
 
@@ -206,14 +208,15 @@ IAA-folio fixtures are converted into scorer-input shape during the baseline
 evaluation pipeline; the methodology is documented in
 [`baselines/EVALUATION_PROTOCOL.md`](../baselines/EVALUATION_PROTOCOL.md).
 
-Frozen baseline predictions and the headline scores per folio live in
-`results/`:
+**v0.1 ships no `results/` tree.** Automated baselines — and therefore any
+headline score — are deferred to v0.1.1. The earlier F118B scores were retracted
+before publication (apparatus lines scored against main-text GT, `line_id`
+ordering, and corrupt `char_menaked` predictions); see
+[Baselines](../README.md#baselines).
 
-- `results/biblia_kraken/`, `results/biblia_nakdimon/`,
-  `results/biblia_char_menaked/`, `results/llm_vision/` — per-baseline raw
-  prediction artifacts plus `run_meta.json`.
-- `results/scores/leningrad_devarim_F118B_fixture.json` — published headline
-  scores for F118B across all four baselines.
+When a baseline is promoted in v0.1.1 it writes
+`results/<baseline_id>/<folio>.json` plus `run_meta.json`, and its scores land in
+`results/scores/<folio>.json`.
 
 Benchmark text licensing differs per folio: F118B tier-1 GT is hand-transcribed
 (CC-BY-4.0); F119A/F119B/F120A tier-1 GT is UXLC-derived (UXLC 2.5, tanach.us —
@@ -258,8 +261,8 @@ manuscript images; no manuscript images are redistributed in this repository.
 - [CONFIGURATION.md](CONFIGURATION.md) — Full CLI flag reference, baseline
   configuration files, and the `phase_0_manifest.json` schema.
 - [`baselines/EVALUATION_PROTOCOL.md`](../baselines/EVALUATION_PROTOCOL.md) —
-  How the published headline scores were computed (whole-folio CER methodology,
-  per-baseline reproducibility tier).
+  The pre-registered scoring methodology, and the 2026-07-10 row recording why
+  the earlier F118B baseline scores were retracted.
 - `CONTRIBUTING.md` (root) — How to submit a new baseline. A static
   `leaderboard.json` plus PR-based submission flow is on the v0.3 roadmap; for
   now, score locally by emitting a prediction JSON that matches

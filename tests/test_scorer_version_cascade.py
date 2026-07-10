@@ -41,9 +41,22 @@ def _load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def test_promoted_run_metas_exist():
-    """Guard the parametrization: an empty glob would make every test below vacuous."""
-    assert RUN_METAS, "no results/*/run_meta.json found; the cascade tests would be no-ops"
+def test_no_promoted_run_metas_under_v01_option_a():
+    """Guard the parametrization: an empty glob makes every run_meta test below vacuous.
+
+    Under v0.1 (Option A) baselines are deferred to v0.1.1, so no `run_meta.json` is
+    published and there is nothing to cascade into. That is the expected state -- but
+    it has to be *asserted*, or the parametrized tests would pass by finding nothing
+    and we would have no signal when v0.1.1 re-promotes an artifact carrying a stale
+    scorer_version.
+    """
+    tracked = subprocess.check_output(
+        ["git", "-C", str(REPO_ROOT), "ls-files", "--", "results"], text=True
+    ).splitlines()
+    assert not tracked, (
+        "results/ is published again. Good -- now delete this test; the parametrized "
+        "cascade checks below will start doing real work."
+    )
 
 
 def test_manifest_scorer_version_matches_the_package():

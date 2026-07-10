@@ -165,12 +165,10 @@ masoretic-benchmark/
 │   ├── run_meta.schema.json              # Per-baseline run_meta.json shape.
 │   ├── phase_0_manifest.changelog.md     # Append-only manifest changelog.
 │   └── PREDICTION_SCHEMA_CHANGELOG.md    # Append-only prediction-schema changelog.
-├── results/                # Frozen per-baseline predictions and headline scores.
-│   ├── biblia_char_menaked/{leningrad_devarim_F118B_fixture.json,run_meta.json,diagnostic/}
-│   ├── biblia_kraken/{leningrad_devarim_F118B_fixture.json,run_meta.json}
-│   ├── biblia_nakdimon/{...,diagnostic/}
-│   ├── llm_vision/{...}
-│   └── scores/             # Headline CER + F1 per fixture (operator-canonical scores).
+│                           # results/ is absent in v0.1: baselines are deferred
+│                           # to v0.1.1 (see README "Baselines"). When promoted, a
+│                           # baseline writes results/<baseline_id>/<folio>.json +
+│                           # run_meta.json, and scores land in results/scores/.
 ├── tests/                  # Scorer test suite (pytest).
 │   ├── test_tier{1..4}.py / test_cer.py / test_segment.py / test_normalize.py
 │   ├── test_external_crossval.py   # Anti-self-grading: scorer vs naive Levenshtein.
