@@ -276,6 +276,40 @@ def check_results_manifest_hash(root: Path) -> list[str]:
     return errors
 
 
+def check_run_meta_scorer_version(root: Path) -> list[str]:
+    """Every promoted run_meta must record the manifest's scorer_version.
+
+    `scorer_version` is not an inert manifest label. `baselines/_base.py` cascades
+    it into every emitted `run_meta.json`, so a stale manifest field silently
+    writes a false scorer version into each promoted artifact -- and nothing
+    noticed for two and a half months. The manifest value is itself checked
+    against `masoretic_eval.__version__` (tests/release/...), so this closes the
+    other half of the cascade.
+    """
+    errors: list[str] = []
+    manifest_path = root / "phase_0_manifest.json"
+    if not manifest_path.exists():
+        return ["audit-fail: phase_0_manifest.json is missing"]
+
+    expected = _read_json(manifest_path).get("scorer_version")
+    if not expected:
+        return ["audit-fail: phase_0_manifest.json::scorer_version is missing or empty"]
+
+    results_dir = root / "results"
+    if not results_dir.exists():
+        return errors
+
+    for path in sorted(results_dir.glob("*/run_meta.json")):
+        actual = _read_json(path).get("scorer_version")
+        if actual != expected:
+            errors.append(
+                f"audit-fail: {_rel(root, path)}::scorer_version={actual!r} "
+                f"mismatches phase_0_manifest.json::scorer_version={expected!r}; "
+                "the manifest cascades this field into run_meta at emit time"
+            )
+    return errors
+
+
 def _validate_json_schema(root: Path, payload_name: str, schema_name: str) -> list[str]:
     payload_path = root / payload_name
     schema_path = root / "schemas" / schema_name
@@ -382,6 +416,7 @@ def _base_checks(
         ("denylist", check_denylist),
         ("private_corpus_terms", check_private_corpus_terms),
         ("results_manifest_hash", check_results_manifest_hash),
+        ("run_meta_scorer_version", check_run_meta_scorer_version),
         ("leaderboard_schema", check_leaderboard_schema),
         ("iaa_report_schema", check_iaa_report_schema),
         ("dataset_card_yaml", check_dataset_card_yaml),
