@@ -1,4 +1,4 @@
-# Open Mesorah / masoretic-benchmark — manuscript catalog.
+# Open Masorah / masoretic-benchmark — manuscript catalog.
 #
 # Validated against schemas/manuscript.schema.json (JSON Schema 2020-12).
 # Run scripts/validate_corpus.py before committing changes here.
@@ -69,7 +69,7 @@ entries:
         coverage: complete
         notes: "UXLC cantillation aligned to Leningrad"
       tier_4_metamarks:
-        source: "Open Mesorah hand-transcription"
+        source: "Open Masorah hand-transcription"
         source_url: "https://openmasorah.com"
         license: "Creative Commons Attribution 4.0"
         license_spdx: "CC-BY-4.0"

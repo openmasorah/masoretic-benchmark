@@ -1,4 +1,4 @@
-# Open Mesorah corpus catalog
+# Open Masorah corpus catalog
 
 ## Purpose
 
