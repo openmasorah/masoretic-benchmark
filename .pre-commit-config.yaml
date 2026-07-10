@@ -49,6 +49,21 @@ repos:
         files: ^phase_0_manifest\.json$
         pass_filenames: false
 
+      # A manifest edit re-fingerprints the manifest and strands every promoted
+      # artifact carrying the old manifest_hash. Fires on both sides of that
+      # coupling so a fuse cannot land without its rebind (and vice versa).
+      - id: manifest-hash-rebound
+        name: "Promoted results must bind to the current manifest_hash"
+        entry: python scripts/rebind_manifest_hash.py --check
+        language: python
+        files: ^(phase_0_manifest\.json|results/.*\.json|scripts/rebind_manifest_hash\.py)$
+        pass_filenames: false
+        # The script imports masoretic_eval.manifest so the canonical-hash
+        # algorithm has exactly one definition. That pulls in jsonschema, which
+        # the isolated hook venv would otherwise lack.
+        additional_dependencies:
+          - jsonschema>=4.21
+
       - id: validate-corpus
         name: "Validate corpus/manuscripts.yaml against schemas/manuscript.schema.json"
         entry: python scripts/validate_corpus.py
