@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:openmesorah:iaa_report.schema:v0.1",
+  "$id": "urn:masoretic:iaa_report.schema:v0.1",
   "title": "iaa_report.json",
   "type": "object",
   "required": ["folios", "tier1", "tier2", "tier3", "tier4", "adjudication_summary"],
