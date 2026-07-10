@@ -1,0 +1,168 @@
+# Release-tag guard (D-16 / REL-07 / REL-09; ROADMAP Phase 4 criterion 4).
+#
+# WHY THIS EXISTS
+# ---------------
+# The planning docs asserted "CI enforces Yosef's written approve before the
+# release tag fires." That was never true. Two separate facts:
+#
+#   1. `check-yosef-review-gate` in ci.yml is the Phase 03.1 A-03 gate. It
+#      enforces a `[YOSEF-REVIEW]` *title prefix* on the first-of-kind BL-01 PR
+#      and is spent by design once main carries a results/llm_vision/*.json.
+#      It is NOT D-16's gate and never was.
+#   2. `ci.yml` has no `tags:` trigger at all, so `audit_release.py`'s
+#      release-tier checks (`_is_release_ref`, `check_iaa_report_real`) have
+#      never once executed.
+#
+# HONEST LIMITATION -- read before trusting this file
+# ---------------------------------------------------
+# A `push: tags:` workflow runs *after* the tag object exists. It therefore
+# cannot PREVENT a tag from being created. What it can do is fail loudly and
+# refuse to publish. Enforcement is layered:
+#
+#   * This workflow is the ONLY sanctioned path to a public artifact. Nothing
+#     is uploaded to HuggingFace, and no GitHub Release is created, except by a
+#     job gated on `approval` passing.
+#   * To also prevent tag *creation*, add a GitHub ruleset restricting who may
+#     push refs matching `benchmark-v*`. That is a repo setting, not code.
+#   * If this workflow fails, the tag must be deleted by hand:
+#         git push origin :refs/tags/<tag>
+#     It is deliberately NOT auto-deleted -- destroying a ref on failure is the
+#     kind of "helpful" action that loses work.
+#
+# CONFIGURATION REQUIRED
+# ----------------------
+# Repository variable `YOSEF_GH_USERNAME` must be set to the reviewing
+# scholar's GitHub login. There is no default: an unset variable FAILS the
+# gate rather than silently approving. (`ARI_GH_USERNAME` already exists; this
+# one does not yet.)
+#
+#   gh variable set YOSEF_GH_USERNAME --body '<login>' \
+#     --repo openmasorah/masoretic-benchmark
+
+name: Release tag guard
+
+on:
+  push:
+    tags:
+      - "benchmark-v*"
+  # Dry-run the whole gate against any ref without cutting a tag.
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "PR number to evaluate for the D-16 approval gate (dry run)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  # --------------------------------------------------------------------------
+  # REL-09 at release tier. Unlike the `gates` job in ci.yml, this passes
+  # --release-tier, which turns on checks that have never run in CI before:
+  # iaa_report.json must exist AND carry iaa_status == "real".
+  # --------------------------------------------------------------------------
+  release-audit:
+    name: Release-tier egress + artifact audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install audit deps
+        run: python -m pip install --quiet jsonschema>=4.21
+
+      - name: audit_release --all --release-tier
+        run: python scripts/audit_release.py --all --release-tier
+
+      - name: Promoted results bind to current manifest_hash
+        run: python scripts/rebind_manifest_hash.py --check
+
+  # --------------------------------------------------------------------------
+  # D-16: no tag, no HF upload, no announcement until Yosef leaves a WRITTEN
+  # "approve" review. A thumbs-up reaction does not count, which is precisely
+  # why this queries the reviews API and not reactions.
+  # --------------------------------------------------------------------------
+  approval:
+    name: D-16 Yosef written-approve gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require YOSEF_GH_USERNAME to be configured
+        env:
+          YOSEF: ${{ vars.YOSEF_GH_USERNAME }}
+        run: |
+          if [[ -z "${YOSEF}" ]]; then
+            echo "::error::Repository variable YOSEF_GH_USERNAME is not set."
+            echo "::error::D-16 cannot be enforced without it. Refusing to pass."
+            echo "::error::  gh variable set YOSEF_GH_USERNAME --body '<login>' --repo ${{ github.repository }}"
+            exit 1
+          fi
+          echo "Reviewer of record: ${YOSEF}"
+
+      - name: Find the PR that introduced this commit
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DISPATCH_PR: ${{ inputs.pr_number }}
+        run: |
+          set -euo pipefail
+          if [[ -n "${DISPATCH_PR:-}" ]]; then
+            echo "numbers=${DISPATCH_PR}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Merged PRs whose merge/head commit is the tagged SHA.
+          NUMBERS=$(gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/pulls" \
+            --jq '[.[] | select(.merged_at != null) | .number] | join(" ")')
+          if [[ -z "${NUMBERS}" ]]; then
+            echo "::error::Tagged commit ${{ github.sha }} is not associated with any merged PR."
+            echo "::error::D-16 requires the release to be reviewed in a PR. Refusing to pass."
+            exit 1
+          fi
+          echo "numbers=${NUMBERS}" >> "$GITHUB_OUTPUT"
+
+      - name: Require a written APPROVED review from the reviewer of record
+        env:
+          GH_TOKEN: ${{ github.token }}
+          YOSEF: ${{ vars.YOSEF_GH_USERNAME }}
+          NUMBERS: ${{ steps.pr.outputs.numbers }}
+        run: |
+          set -euo pipefail
+          found=0
+          for pr in ${NUMBERS}; do
+            echo "--- PR #${pr} reviews ---"
+            # Latest review state per user; an APPROVED that was later
+            # dismissed or changed to REQUEST_CHANGES must not count.
+            latest=$(gh api "repos/${{ github.repository }}/pulls/${pr}/reviews" --paginate \
+              --jq 'map(select(.state != "COMMENTED"))
+                    | group_by(.user.login)
+                    | map(max_by(.submitted_at))
+                    | .[] | "\(.user.login) \(.state)"')
+            echo "${latest:-<no reviews>}"
+            if echo "${latest}" | grep -qx "${YOSEF} APPROVED"; then
+              found=1
+            fi
+          done
+          if [[ "${found}" -ne 1 ]]; then
+            echo "::error::No standing APPROVED review from '${YOSEF}' on PR(s): ${NUMBERS}"
+            echo "::error::D-16: no HF upload, no tag, no announcement without a written approve."
+            exit 1
+          fi
+          echo "D-16 satisfied: '${YOSEF}' has a standing APPROVED review."
+
+  # --------------------------------------------------------------------------
+  # Publication is downstream of BOTH gates. This is the layer that makes the
+  # post-hoc tag workflow meaningful: the tag existing is not the release.
+  # --------------------------------------------------------------------------
+  publish:
+    name: Publish (blocked on both gates)
+    needs: [release-audit, approval]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Gates cleared
+        run: |
+          echo "release-audit and D-16 approval both passed for ${{ github.ref_name }}."
+          echo "HuggingFace upload + GitHub Release creation belong here (REL-01/REL-08)."
+          echo "Not yet implemented -- see gap G2 in the planning repo's 260709-v1a FINDINGS.md."

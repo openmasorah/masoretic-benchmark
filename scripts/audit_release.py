@@ -339,10 +339,21 @@ def check_brand_words(root: Path) -> list[str]:
 
 
 def check_iaa_report_real(root: Path) -> list[str]:
-    """REL-09: reject placeholder IAA reports at release-tag time."""
+    """REL-09: reject placeholder OR ABSENT IAA reports at release-tag time.
+
+    This check only runs at release tier (`--release-tier` or a
+    `refs/tags/benchmark-v*` ref), so a missing `iaa_report.json` is not a
+    "nothing to check" condition -- it means the release is shipping without
+    the artifact REL-01 requires. Returning [] on absence made the release
+    audit pass for a repo that has never had an IAA report at all, which is
+    the current state of main.
+    """
     rep = root / "iaa_report.json"
     if not rep.exists():
-        return []
+        return [
+            "audit-fail: iaa_report.json is missing; a release tag must ship "
+            "the IAA report required by REL-01/REL-06"
+        ]
     payload = _read_json(rep)
     if not isinstance(payload, dict):
         return ["audit-fail: iaa_report.json must be a JSON object"]

@@ -340,10 +340,16 @@ jobs:
   # adding files under results/llm_vision/ when main has none) MUST carry the
   # [YOSEF-REVIEW] prefix in its PR title; subsequent BL-01 PRs auto-merge.
   # The gate ONLY runs on pull_request events; no manual nor scheduled trigger.
+  #
+  # THIS IS NOT D-16. It checks a PR *title prefix*, not a written approve, and
+  # it is spent by design: main already carries results/llm_vision/*.json, so
+  # the enforcement step never fires again. D-16 (Yosef's written APPROVED
+  # review before any tag / HF upload / announcement) is enforced in
+  # .github/workflows/release-tag.yml. Do not cite this job as D-16's gate.
   # ----------------------------------------------------------------------------
 
   check-yosef-review-gate:
-    name: Yosef-review gate (folio-1 BL-01 only)
+    name: A-03 title-prefix gate (first BL-01 PR only; NOT D-16)
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
