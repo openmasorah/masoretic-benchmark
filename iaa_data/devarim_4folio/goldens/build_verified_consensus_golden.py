@@ -12,10 +12,15 @@ nikkud/trop make tier-2/tier-3 meaningful (the prior Moster B-side fixtures are
 consonant-only). `tier4_positional` is carried per verse for future tier-4 work
 (the current driver scores tier-1/2/3 only).
 
-PROVISIONAL: gt_hash null, never fused/promoted/pushed. Output lives in
-results_provisional/verified_consensus/.
+CANONICAL. These goldens are the artifact `phase_0_manifest.json` computes each
+folio's `gt_hash` over. They carry no `gt_hash` of their own -- the manifest is
+the single source of truth for that digest (CLAUDE.md scope-freeze rule), and a
+file cannot contain the hash of itself.
 
-Run: .venv/bin/python results_provisional/verified_consensus/build_verified_consensus_golden.py
+Output is byte-reproducible: re-running this script must leave the committed
+goldens unchanged (tests/test_goldens_reproducible.py).
+
+Run: .venv/bin/python iaa_data/devarim_4folio/goldens/build_verified_consensus_golden.py
 """
 
 from __future__ import annotations
@@ -25,7 +30,7 @@ from pathlib import Path
 
 from masoretic_eval.iaa.parse import count_consonants
 
-REPO = Path(__file__).resolve().parents[2]
+REPO = Path(__file__).resolve().parents[3]
 SRC = REPO / "iaa_data" / "devarim_4folio" / "consensus_gold_positional.json"
 OUT_DIR = Path(__file__).resolve().parent
 FOLIO_ORDER = ["F118B", "F119A", "F119B", "F120A"]
@@ -57,10 +62,9 @@ def main() -> int:
 
         golden = {
             "folio_id": folio_id,
-            "provisional": True,
+            "provisional": False,
             "single_annotator": False,
             "pre_adjudication": False,
-            "gt_hash": None,
             "side_label": "consensus_gold",
             "license": src.get("license", "CC-BY-4.0"),
             "_provenance": {
@@ -82,11 +86,10 @@ def main() -> int:
                 "line_count": len(lines),
                 "consonant_total": sum(stored_cons),
                 "tier4_positional_total": sum(len(r.get("tier4_positional", [])) for r in rows),
-                "provisional": True,
-                "gt_hash": None,
+                "provisional": False,
                 "iaa_status": (
-                    "post-adjudication consensus (Ginsberg A + Moster B); baseline "
-                    "cold-scoring reference only, never fused/promoted/pushed"
+                    "post-adjudication consensus (Ginsberg A + Moster B); canonical "
+                    "ground truth, hashed into phase_0_manifest.json as gt_hash"
                 ),
             },
             "lines": lines,

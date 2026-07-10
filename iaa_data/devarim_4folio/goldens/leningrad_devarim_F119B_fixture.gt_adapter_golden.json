@@ -1,9 +1,8 @@
 {
   "folio_id": "leningrad_devarim_F119B_fixture",
-  "provisional": true,
+  "provisional": false,
   "single_annotator": false,
   "pre_adjudication": false,
-  "gt_hash": null,
   "side_label": "consensus_gold",
   "license": "CC-BY-4.0",
   "_provenance": {
@@ -15,9 +14,8 @@
     "line_count": 30,
     "consonant_total": 1393,
     "tier4_positional_total": 144,
-    "provisional": true,
-    "gt_hash": null,
-    "iaa_status": "post-adjudication consensus (Ginsberg A + Moster B); baseline cold-scoring reference only, never fused/promoted/pushed"
+    "provisional": false,
+    "iaa_status": "post-adjudication consensus (Ginsberg A + Moster B); canonical ground truth, hashed into phase_0_manifest.json as gt_hash"
   },
   "lines": [
     "כִּ֥י מִנֶּ֖גֶ<DR>ד תִּרְאֶ֣ה אֶת־הָאָ֑רֶץ     וְשָׁ֙מָּה֙ לֹ֣א תָֿב֔וֹא אֶל־הָאָ֕רֶץ  אֲשֶׁר־אֲנִ֥י נֹתֵ֖ן לִבְֿנֵ֥י יִשְׂרָאֵֽל",
