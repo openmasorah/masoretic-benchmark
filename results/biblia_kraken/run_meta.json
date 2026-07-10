@@ -29,7 +29,7 @@
   },
   "replay_mode": false,
   "schema_version": "0.1.0",
-  "scorer_version": "0.1.0",
+  "scorer_version": "0.2.0",
   "sibling_git_sha": "6ed2ecf690c4",
   "started_at_iso": "2026-04-30T19:58:03+00:00"
 }
