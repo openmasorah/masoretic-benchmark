@@ -1,0 +1,49 @@
+{
+  "iaa_status": "real",
+  "folios": [
+    "leningrad_devarim_F118B_fixture",
+    "leningrad_devarim_F119A_fixture",
+    "leningrad_devarim_F119B_fixture",
+    "leningrad_devarim_F120A_fixture"
+  ],
+  "tier1": {
+    "cer_vs_consensus_b": 0.0029,
+    "ci95": [
+      0.0006,
+      0.0059
+    ]
+  },
+  "tier2": {
+    "cer_vs_consensus_b": 0.0172,
+    "ci95": [
+      0.0105,
+      0.0248
+    ]
+  },
+  "tier3": {
+    "cer_vs_consensus_b": 0.0234,
+    "ci95": [
+      0.0166,
+      0.0309
+    ]
+  },
+  "tier4": {
+    "f1_mean": 0.9187,
+    "ci95": [
+      0.8969,
+      0.9397
+    ]
+  },
+  "adjudication_summary": {
+    "tier1_disagreements_reconciled": 18,
+    "tier2_disagreements_reconciled": 165,
+    "tier3_disagreements_reconciled": 280,
+    "tier4_disagreements_reconciled": 80
+  },
+  "_note": {
+    "cer_vs_consensus_b": "Annotator B's (Moster) round-0 transcription vs the adjudicated consensus reference, tiers 1-3, code-point Levenshtein CER on NFC-normalised projection strings (DRAFT_v4 §5.2). The consensus is A's round-1 revision, byte-identical to B's round-2 endorsement -- NOT independent of either annotator, and NOT a bidirectional A-vs-B figure.",
+    "tier4_f1_mean": "Pair-level tier-4 F1 EXACT point estimate (DRAFT_v4 §5.1 / App. A.3; tp=452, fp=39, fn=41). This is the exact-match figure, NOT the paper's F1 with +/-1-consonant tolerance (0.9472).",
+    "adjudication_summary": "DESCRIPTIVE WORKFLOW STATISTIC -- the paper reports no such counts, and these are NOT a post-adjudication agreement measurement. Each integer is the number of round-0 disagreements between annotator A (Ginsberg) and annotator B (Moster) that the two-round diff-and-revise protocol reconciled into the consensus (the protocol ended in a byte-identical SHA-256 endorsement, so every round-0 divergence was resolved). Units differ by tier and the tier 1-3 counts are NESTED, NOT disjoint -- DO NOT SUM. tier1/2/3 = cluster-aligned code-point edit operations between the two round-0 projections at that tier (tier2 includes tier1's consonantal edits; tier3 includes both); an edit op is not a discrete adjudication case. tier4 = unmatched tier-4 detections (FP+FN) under the §5.1 headline exact-match config (UXLC-anchored, canonicalised {rafe,double_rafe}->rafe; 4 records -- 1 A-side, 3 B-side -- unalignable to the UXLC backbone are dropped per App. A.4), the frame that also produces f1_mean above.",
+    "reproduction": "tier1/2/3 adjudication counts recompute from the two committed CC-BY projections alone via scripts/generate_iaa_report.py --check. The CER/F1 headline values and the tier-4 count are UXLC-frame and reproduce via scripts/regenerate_paper_iaa_results.py with the pinned UXLC 2.5 cache and seed 0xBEEF."
+  }
+}
