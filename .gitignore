@@ -35,6 +35,14 @@ baselines/tests/fixtures/_uxlc_cache/
 paper_iaa_results.json
 nakdimon_tier2_baseline.json
 
+# Baseline output trees. Withdrawn from v0.1 (Option A defers baselines to
+# v0.1.1); a local `python -m baselines.run` recreates them, along with the
+# line-crop JPEGs and .in_progress/ sandbox. Nothing here is published until
+# v0.1.1 re-opens promotion, at which point the promoted artifacts are added
+# explicitly. tests/test_manifest_hash_artifacts.py asserts this stays empty.
+results/
+results_provisional/
+
 # Local agent / editor / OS metadata — never commit
 .claude/
 .mcp.json

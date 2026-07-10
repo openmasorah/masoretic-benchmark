@@ -67,7 +67,7 @@ masoretic-eval score \
 | `baselines/` | Four independent baselines: BL-01 LLM-vision, BL-02 BiblIA Kraken, BL-03 Kraken→Nakdimon, BL-04 Kraken→DictaBERT char-menaked. |
 | `oracles/` | Hebrew diacritization oracle modules consumed externally to populate the scorer's pass-through tier-2 fields. |
 | `schemas/` | JSON Schemas + changelogs for `baseline_prediction.schema.json`, `phase_0_manifest.schema.json`, and `run_meta.schema.json`. |
-| `results/` | Frozen per-baseline predictions plus `results/scores/` headline CER reports for the IAA folios. |
+| `results/` | *(Not in v0.1.)* Automated baselines are deferred to v0.1.1 — see [Baselines](#baselines). |
 | `scripts/` | Release and gate scripts (manifest immutability, version-cascade, private-path rejection). |
 | `tests/` | Scorer test suite. |
 | `docs/` | Architecture, getting-started, development, testing, and configuration guides. |
@@ -77,10 +77,21 @@ masoretic-eval score \
 
 Tier-1 ground truth for the 4-folio IAA set (Leningrad Devarim F118B, F119A, F119B, F120A) lives at `baselines/tests/fixtures/iaa_folio_leningrad_devarim_*_fixture.gt_adapter_golden.json`. Provenance and licensing differ per folio (see each fixture's `_provenance` block):
 
-- **F118B** — hand-transcribed from PDM 1.0 archive.org photographs of the Leningrad Codex. CC-BY-4.0 (attribution: Open Mesorah).
+- **F118B** — hand-transcribed from PDM 1.0 archive.org photographs of the Leningrad Codex. CC-BY-4.0 (attribution: Open Masorah).
 - **F119A, F119B, F120A** — UXLC-derived (UXLC 2.5, [tanach.us](https://tanach.us/)) via `gt_infra.uxlc_import`. The UXLC biblical Hebrew text is distributed by Tanach.us Inc. free to view or copy without restriction (citation to Tanach.us appreciated) — see [tanach.us/License.html](https://tanach.us/License.html). This is a custom permissive grant, **not** a formal CC0-1.0 dedication.
 
-Only IIIF/archive.org references are stored — no manuscript images are redistributed. Per-baseline headline scores for F118B are in `results/scores/leningrad_devarim_F118B_fixture.json`.
+Only IIIF/archive.org references are stored — no manuscript images are redistributed.
+
+### Baselines
+
+**v0.1 publishes no baseline scores.** This release is the benchmark itself: the adjudicated ground truth, the inter-annotator agreement measurement, and the scorer. Automated baselines are deferred to **v0.1.1**.
+
+An earlier draft of this repository carried F118B scores for four baselines. They were **retracted before publication**, for two independent reasons:
+
+- The whole-folio CER was computed over Kraken's 109 segmented lines — which include the masorah magna and parva apparatus — against 26 physical lines of main-text ground truth, with every bounding box `[0,0,0,0]` so reading order fell back to `line_id`. The resulting ranking is *inverted*: it reports `biblia_kraken` as the weakest system when ROI-restricted main-text scoring puts it strongest on consonants.
+- The `biblia_char_menaked` tier-2/3 predictions were corrupt — an unpinned `transformers` release produced cumulative prefix repetition (tier-2 output 3.3× the length of tier-1, with nikkud on 7 of 109 lines). Those bytes are not model output and cannot be published with a caveat.
+
+v0.1.1 will re-emit both from real runs, under a pinned `transformers` and an ROI/main-text methodology.
 
 ## Methodology
 

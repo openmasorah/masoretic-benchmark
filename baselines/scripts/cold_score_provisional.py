@@ -26,8 +26,16 @@ from pathlib import Path
 
 from masoretic_eval.composite import Scorer
 
-# Published F118B tier-1 CERs (results/scores/leningrad_devarim_F118B_fixture.json,
-# Ben's-hand golden, re-emitted 2026-06-11). Driver self-test target.
+# RETRACTED 2026-07-10, kept only as a regression pin for the historical method.
+#
+# These were the F118B tier-1 CERs published in results/scores/ before that tree was
+# withdrawn from v0.1. They are NOT the benchmark's numbers and must not be cited.
+# They score Kraken's 109 segmented lines -- which include the masorah magna/parva
+# apparatus -- against 26 physical lines of main-text GT, ordered by line_id because
+# every bbox is [0,0,0,0]. The ranking they produce is inverted: biblia_kraken appears
+# weakest here, while ROI-restricted main-text scoring puts it strongest on consonants.
+#
+# They remain here so that a change to the whole-folio code path still trips a diff.
 F118B_EXPECTED_TIER1_CER = {
     "biblia_kraken": 0.9282,
     "llm_vision": 0.6613,

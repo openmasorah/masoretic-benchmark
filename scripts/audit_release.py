@@ -276,6 +276,35 @@ def check_results_manifest_hash(root: Path) -> list[str]:
     return errors
 
 
+def check_expected_reports_match_promoted(root: Path) -> list[str]:
+    """The manifest must not promise reports the tree does not ship, or vice versa.
+
+    Under v0.1 (Option A) baselines are deferred to v0.1.1 and `results/` is absent,
+    so every `expected_reports_per_baseline` count must be 0. This closes a failure
+    that was silent in both directions: an absent `results/` turned the REL-09 hash
+    check into a no-op, and nothing ever compared the manifest's promised counts
+    against the tree actually published.
+    """
+    errors: list[str] = []
+    expected = _manifest(root).get("expected_reports_per_baseline", {})
+    if not isinstance(expected, dict):
+        return ["audit-fail: phase_0_manifest.json::expected_reports_per_baseline is not an object"]
+
+    results_dir = root / "results"
+    for baseline, promised in sorted(expected.items()):
+        baseline_dir = results_dir / baseline
+        actual = 0
+        if baseline_dir.exists():
+            actual = len([p for p in baseline_dir.glob("*.json") if p.name != "run_meta.json"])
+        if promised != actual:
+            errors.append(
+                "audit-fail: phase_0_manifest.json::expected_reports_per_baseline"
+                f"[{baseline!r}]={promised} but results/{baseline}/ ships {actual} "
+                "report(s); the manifest must describe the tree it publishes"
+            )
+    return errors
+
+
 def check_run_meta_scorer_version(root: Path) -> list[str]:
     """Every promoted run_meta must record the manifest's scorer_version.
 
@@ -417,6 +446,7 @@ def _base_checks(
         ("private_corpus_terms", check_private_corpus_terms),
         ("results_manifest_hash", check_results_manifest_hash),
         ("run_meta_scorer_version", check_run_meta_scorer_version),
+        ("expected_reports_match_promoted", check_expected_reports_match_promoted),
         ("leaderboard_schema", check_leaderboard_schema),
         ("iaa_report_schema", check_iaa_report_schema),
         ("dataset_card_yaml", check_dataset_card_yaml),
