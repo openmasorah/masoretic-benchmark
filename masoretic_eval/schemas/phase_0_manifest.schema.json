@@ -123,6 +123,10 @@
           "gt_hash": {
             "type": ["string", "null"]
           },
+          "gt_source": {
+            "type": ["string", "null"],
+            "description": "Provenance pointer for gt_hash: the consensus artifact this folio's ground truth derives from, as '<repo-relative path>@<git-rev>'. Null until the gt_hash fuse. Recorded explicitly because D-28's named canonical GT file (adjudicated_gt_<folio>.json) was never produced, so gt_hash is computed over a derived projection rather than over the artifact the paper pins."
+          },
           "in_frozen_scope": {
             "type": "boolean"
           }

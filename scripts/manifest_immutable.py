@@ -50,6 +50,12 @@ IMMUTABLE_FIELDS: tuple[str, ...] = (
     "image_url",
     "iaa_folio",
     "gt_hash",
+    # Provenance for gt_hash. Once a folio's GT is fused, the artifact it was
+    # derived from must not be silently re-pointed: a rewritable provenance
+    # pointer is not provenance. Same semantics as gt_hash -- the immutability
+    # check skips a null `prev`, so the null -> value fuse transition is allowed
+    # and every later change is rejected.
+    "gt_source",
 )
 
 TOP_LEVEL_TRACKED_FIELDS: tuple[str, ...] = (
