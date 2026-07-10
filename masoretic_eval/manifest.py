@@ -51,6 +51,10 @@ class Folio:
     iaa_folio: bool = False
     in_frozen_scope: bool = True
     gt_hash: str | None = None
+    # Provenance for gt_hash. D-28 named adjudicated_gt_<folio>.json as canonical
+    # GT; it was never produced, so gt_hash is computed over a derived projection
+    # and the source it derives from must travel with it.
+    gt_source: str | None = None
 
 
 def _coerce_v01_to_v02_in_memory(doc: dict[str, Any]) -> dict[str, Any]:
@@ -125,6 +129,7 @@ class Manifest:
                 iaa_folio=f.get("iaa_folio", False),
                 in_frozen_scope=f["in_frozen_scope"],
                 gt_hash=f.get("gt_hash"),
+                gt_source=f.get("gt_source"),
             )
             for f in doc["folios"]
         ]
@@ -157,9 +162,7 @@ class Manifest:
         Phase 3 BL-08 preflight calls this: ScopeViolation is raised when
         a baseline run touches a folio outside the frozen Leningrad set.
         """
-        return [
-            f for f in self.folios if f.manuscript == "leningrad" and f.in_frozen_scope
-        ]
+        return [f for f in self.folios if f.manuscript == "leningrad" and f.in_frozen_scope]
 
     def iaa_folios(self) -> Iterator[Folio]:
         ids = set(self.iaa_subset)
@@ -210,9 +213,7 @@ class Manifest:
         missing = frozen_ids - predicted_ids
         extra = predicted_ids - frozen_ids
         if missing:
-            raise ManifestValidationError(
-                f"missing predictions for folios: {sorted(missing)}"
-            )
+            raise ManifestValidationError(f"missing predictions for folios: {sorted(missing)}")
         if extra:
             raise ManifestValidationError(
                 f"prediction set contains unknown folios: {sorted(extra)}"
