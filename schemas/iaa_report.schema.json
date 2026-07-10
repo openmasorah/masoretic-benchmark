@@ -13,12 +13,13 @@
     "tier4": {"$ref": "#/$defs/f1_tier"},
     "adjudication_summary": {
       "type": "object",
+      "description": "Descriptive workflow statistic; NOT reported in the paper and NOT a post-adjudication agreement measurement. Each field counts round-0 disagreements between annotator A (Ginsberg) and annotator B (Moster) reconciled into the consensus by the two-round diff-and-revise protocol (which ended in a byte-identical SHA-256 endorsement). Units differ by tier and tier 1-3 are NESTED (tier N includes tier <N) -- DO NOT SUM. See iaa_report.json::_note.",
       "required": ["tier1_disagreements_reconciled", "tier2_disagreements_reconciled", "tier3_disagreements_reconciled", "tier4_disagreements_reconciled"],
       "properties": {
-        "tier1_disagreements_reconciled": {"type": "integer", "minimum": 0},
-        "tier2_disagreements_reconciled": {"type": "integer", "minimum": 0},
-        "tier3_disagreements_reconciled": {"type": "integer", "minimum": 0},
-        "tier4_disagreements_reconciled": {"type": "integer", "minimum": 0}
+        "tier1_disagreements_reconciled": {"type": "integer", "minimum": 0, "description": "Cluster-aligned code-point edit ops between the two round-0 tier-1 (consonantal) projections, over all verses. Reproducible from the two committed projections alone."},
+        "tier2_disagreements_reconciled": {"type": "integer", "minimum": 0, "description": "Same at tier 2 (+nikkud); INCLUDES the tier-1 consonantal edits -- not disjoint from tier1."},
+        "tier3_disagreements_reconciled": {"type": "integer", "minimum": 0, "description": "Same at tier 3 (full text); INCLUDES the tier-1 and tier-2 edits -- not disjoint."},
+        "tier4_disagreements_reconciled": {"type": "integer", "minimum": 0, "description": "Unmatched tier-4 detections (FP+FN) under the paper's §5.1 headline exact-match config (UXLC-anchored, canonicalised; 4 unalignable records dropped). Same frame as tier4.f1_mean."}
       }
     }
   },

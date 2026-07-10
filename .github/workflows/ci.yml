@@ -79,6 +79,11 @@ jobs:
       - name: Frozen folios' gt_hash matches their gt_source bytes
         run: python scripts/verify_gt_hash.py --check
 
+      # iaa_report.json is the artifact the release-tag gate requires; verify it
+      # validates and its projections-only adjudication counts recompute.
+      - name: iaa_report.json matches schema + committed projections
+        run: python scripts/generate_iaa_report.py --check
+
       - name: Detect hardcoded secrets
         uses: gacts/gitleaks@v1.3.2
         with:

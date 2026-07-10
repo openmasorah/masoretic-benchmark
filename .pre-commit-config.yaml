@@ -74,6 +74,21 @@ repos:
         files: ^(phase_0_manifest\.json|iaa_data/devarim_4folio/goldens/.*\.json|scripts/verify_gt_hash\.py)$
         pass_filenames: false
 
+      # iaa_report.json must validate, stay iaa_status:real, and its projections-only
+      # adjudication tier1-3 must recompute from the committed round-0 projections.
+      - id: iaa-report-verified
+        name: "iaa_report.json validates + pinned §5.2/§5.1 values intact"
+        # --check-schema is jsonschema-only (no scorer import). The full --check,
+        # which recomputes the tier1-3 adjudication counts via the scorer path
+        # (rapidfuzz + grapheme), runs in CI and in the test suite instead — the
+        # scorer runtime does not belong in an isolated pre-commit venv.
+        entry: python scripts/generate_iaa_report.py --check-schema
+        language: python
+        files: ^(iaa_report\.json|schemas/iaa_report\.schema\.json|scripts/generate_iaa_report\.py)$
+        pass_filenames: false
+        additional_dependencies:
+          - jsonschema>=4.21
+
       - id: validate-corpus
         name: "Validate corpus/manuscripts.yaml against schemas/manuscript.schema.json"
         entry: python scripts/validate_corpus.py
