@@ -25,9 +25,13 @@
   "$defs": {
     "cer_tier": {
       "type": "object",
-      "required": ["bidirectional_cer_mean", "ci95"],
+      "required": ["cer_vs_consensus_b", "ci95"],
       "properties": {
-        "bidirectional_cer_mean": {"type": "number", "minimum": 0},
+        "cer_vs_consensus_b": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Annotator B's round-0 transcription vs the adjudicated consensus reference, per DRAFT_v4 §5.2. NOT a bidirectional A-vs-B agreement figure and NOT an independent human-vs-reference baseline: the consensus is A's round-1 revision, byte-identical to B's round-2 endorsement, so it is not independent of either annotator. The paper reports no bidirectional tier-1/2/3 CER; the word does not appear in it. Renamed from bidirectional_cer_mean 2026-07-10 (B3)."
+        },
         "ci95": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2}
       }
     },
