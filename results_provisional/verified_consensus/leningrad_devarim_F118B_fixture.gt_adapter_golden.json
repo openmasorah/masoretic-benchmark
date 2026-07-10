@@ -1,0 +1,842 @@
+{
+  "folio_id": "leningrad_devarim_F118B_fixture",
+  "provisional": true,
+  "single_annotator": false,
+  "pre_adjudication": false,
+  "gt_hash": null,
+  "side_label": "consensus_gold",
+  "license": "CC-BY-4.0",
+  "_provenance": {
+    "method": "OD-1 Option A: verified-consensus per-verse chunks grouped by folio in document order, emitted as lines[] (one verse chunk per line). GT scorer input space-joins lines[]; tier-1 CER is segmentation-invariant so chunk-per-line is lossless for tier-1, while retained nikkud/trop make tier-2/tier-3 meaningful.",
+    "annotators": "Ginsberg (A) + Moster (B), post-adjudication consensus",
+    "source": "iaa_data/devarim_4folio/consensus_gold_positional.json (CC-BY-4.0 verified consensus gold; Round-1 revised consensus, FINAL 2026-06-19, byte-identical to Annotator B round-2 endorsement)",
+    "verse_range_first": "Deut.31.28",
+    "verse_range_last": "Deut.32.22",
+    "line_count": 25,
+    "consonant_total": 1127,
+    "tier4_positional_total": 153,
+    "provisional": true,
+    "gt_hash": null,
+    "iaa_status": "post-adjudication consensus (Ginsberg A + Moster B); baseline cold-scoring reference only, never fused/promoted/pushed"
+  },
+  "lines": [
+    "וְאָ֯עִ֣ידָֿה בָּ֔ם אֶת־֯ הַשָּׁמַ֖יִם   וְאֶת־ הָאָֽרֶץ",
+    "כִּ֣י יָדַ֗עְתִּי     אַחֲרֵ֤י מוֹתִֿי֙ כִּֽי־הַשְׁחֵ֣ת תַּ֯שְׁחִת֔וּן      וְסַרְתֶּ֣ם מִן־          הַדֶּ֔רֶךְֿ אֲשֶׁ֥ר ֯צִוִּ֖יתִֿי אֶתְ<DR>כֶ֑ם וְקָרָ֨אֿ֯ת   אֶתְכֶֿ֤ם      הָֽרָעָה֙      בְּאַחֲרִ֣ית הַיָּמִ֔ים כִּֽי־תַֿעֲשׂ֤וּ  אֶת־הָרַע֙     בְּעֵ֯ינֵ֣י יְהוָ֔ה     לְהַכְֿעִיס֖וֹ  בְּמַעֲשֵׂ֥ה   יְדֵֿי֯כֶֽם",
+    "וַיְדַֿבֵּ֣ר מֹשֶׁ֗ה בְּאָזְנֵי֙    כָּל־     קְהַ֣ל יִשְׂרָאֵ֔ל  אֶת־דִּבְרֵ֥י הַשִּׁירָ֖ה הַזֹּ֑את        עַ֖ד תֻּמָּֽם",
+    "הַאֲזִ֥֯ינוּ הַשָּׁמַ֖יִם וַאֲדַ֯בֵּ֑רָה וְתִֿשְׁמַ֥֯ע הָאָ֖רֶץ אִמְרֵי־פִֽֿי",
+    "יַעֲרֹ֤֯ףֿ כַּמָּטָר֙ לִקְ֯חִ֔י תִּ֯זַּ֥ל  כַּטַּ֖ל֯ אִמְרָתִֿ֑י כִּשְׂ֯עִירִ֣ם עֲלֵי־דֶ֔שֶׁא וְכִֿרְ֯בִֿיבִֿ֖ים עֲלֵי־עֵֽשֶׂבֿ",
+    "כִּ֛י שֵׁ֥ם יְהוָ֖ה אֶקְרָ֑א  הָב֥ו גֹֿ֖דֶל לֵאלֹהֵֽינוּ",
+    "הַצּ֯וּר֙ תָּמִ֣ים פָּעֳל֔וֹ כִּ֥י כָֿל־דְּרָכָ֖יו מִשְׁפָּ֑ט אֵ֤ל ֯אֱמוּנָה֙ וְאֵ֣ין  עָ֔וֶל צַדִּ֥יק וְיָשָׁ֖ר הֽוּא",
+    "שִׁחֵ֥ת ל֛וֹ ֯לֹ֖א בָּנָ֣יו מוּמָ֑ם֯ דּ֥וֹר עִקֵּ֖שׁ וּפְֿתַ֯לְתֹּֽל",
+    "הֲ־לַיְהוָה֙ תִּגְמְלוּ־זֹ֔אֿת עַ֥ם נָבָֿ֖ל וְלֹ֣א חָכָ֑ם הֲ֯לוֹא־הוּא֙ אָבִ֣יךָ קָּנֶ֔ךָ ה֥וּא עָֽשְׂךָ֖  וַֽיְכֹֿנְנֶֽךָֿ",
+    "זְכֹר֙ יְמ֣וֹת עוֹלָ֔ם בִּ֖ינוּ שְׁנ֣וֹת דּוֹר־וָדֿ֑וֹר שְׁאַ֤ל אָבִ֙יךָ֙ וְיַגֵּ֔דְךָ זְקֵנֶ֖יךָֿ   וְיֹ֥אֿמְר֯וּ לָֽךְ",
+    "בְּהַ֯נְחֵ֤ל עֶלְיוֹן֙ גּוֹיִ֔ם בְּהַפְרִ֯ידֿ֖וֹ בְּנֵ֣י ֯אָדָ֑ם יַצֵּב֙ גְּבֻלֹ֣ת עַמִּ֔ים לְמִסְפַּ֖ר  בְּנֵ֥י יִשְׂרָאֵֽל",
+    "כִּ֛י חֵ֥לֶק יְהֹוָ֖ה עַמּ֑וֹ יַעֲקֹ֖ב חֶ֥בֶֿל נַחֲלָתֽֿוֹ",
+    "יִמְצָ֯אֵ֙הוּ֙ בְּאֶ֣רֶץ מִדְבָּ֔ר  וּבְֿתֹ֖֯הוּ יְלֵ֣֯ל יְשִׁ֯מֹ֑ן יְסֹֽבְֿבֶ֙֯נְהוּ֙ יְבֿ֣וֹנְ֯נֵ֔הוּ יִצְּרֶ֖֯נְהוּ כְּאִ֯ישׁ֥וֹן עֵי֯נֽוֹ",
+    "כְּנֶ֙שֶׁר֙֯ יָעִ֣֯יר קִ֯נּ֔וֹ עַל־  גּוֹזָלָ֖֯יו יְרַחֵ֑ףֿ יִפְרֹ֤שׂ כְּנָפָיו֙ יִקָּ֯חֵ֔הוּ יִשָּׂ֯אֵ֖הוּ עַל־אֶבְֿ֯רָתֽֿוֹ",
+    "יְהוָ֖ה בָּדָ֣<DR>ד֯ יַנְחֶ֑נּ֯וּ וְאֵ֥ין ֯עִמּ֖וֹ  אֵ֥ל נֵכָֽֿר",
+    "יַרְכִּ֯בֵ֙הוּ֙ עַל־בָּ֣מֳו֯תֵי אָ֔רֶץ֯ וַיֹּאֿכַ֖ל תְּנוּ֯בֹֿ֣ת שָׂדָֿ֑י וַיֵּנִקֵ֤הֽ֯וּ דְֿבַשׁ֙ מִסֶּ֔לַע  וְשֶׁ֖מֶן מֵחַלְ֯מִ֥ישׁ צֽוּר",
+    "חֶמְאַ֨ת בָּקָ֜ר וַחֲ֯לֵ֣בֿ צֹ֗אֿן עִם־חֵ֨לֶבֿ כָּרִ֜ים וְאֵילִ֤ים בְּנֵֽי־בָֿשָׁן֙   וְעַתּ֯וּדִ֔ים עִם־חֵ֖לֶבֿ כִּלְי֣וֹ<DR>ת֯ חִטָּ֑ה וְדַֿם־֯עֵנָ֖בֿ תִּשְׁתֶּה־֯חָֽמֶר",
+    "וַיִּשְׁמַ֤ן יְשֻׁרוּן֙ וַיִּבְֿעָ֔ט֯   שָׁמַ֖֯נְתָּ עָ֯בִֿ֣יתָֿ כָּשִׂ֑י֯תָ וַיִּטֹּשׁ֙ אֱל֣וֹהַ עָשָׂ֔הוּ וַיְנַבֵּ֖֯ל צ֥וּר יְשֻׁעָ֯תֽֿוֹ",
+    "יַקְ֯נִאֻ֖הוּ   בְּזָרִ֑ים בְּתֿוֹעֵבֹֿ֖ת יַכְֿעִיסֻֽהוּ",
+    "יִזְבְּח֗וּ לַשֵּׁדִים֙ לֹ֣א אֱלֹ֔הַ אֱלֹהִ֖ים לֹ֣א יְדָֿע֑וּם חֲדָֿשִׁים֙  מִקָּרֹ֣֯ב בָּ֔אוּ לֹ֥א שְׂעָר֖֯וּם אֲבֹֿתֵֿיכֶֽם",
+    "צ֥וּר יְלָדְ<DR>ךָ֖ תֶּ֑֯שִׁי וַתִּשְׁכַּ֖ח אֵ֥ל מְחֹ֯לְלֶֽךָ",
+    "וַיַּ֥רְא   ֯יְהוָ֖ה וַיִּנְאָ֑ץ מִכַּ֥עַס בָּנָ֖יו וּבְֿנֹתָֽיו",
+    "וַיֹּ֗אמֶר אַסְתִּ֤֯ירָה פָֿנַי֙ מֵהֶ֔ם אֶרְאֶ֖ה מָ֣ה אַחֲרִיתָֿ֑ם  כִּ֣י דֿ֤וֹר תַּהְפֻּכֹֿת֙ הֵ֔מָּה בָּנִ֖ים לֹא־אֵמֻ֥֯ן בָּֽם",
+    "הֵ֚ם קִנְא֣וּנִ֯י בְֿלֹא־אֵ֔ל כִּעֲס֖וּנִי בְּהַ֯בְלֵיהֶ֑ם  וַאֲנִי֙ אַקְנִיאֵ֣֯ם בְּלֹא־עָ֔ם בְּגֿ֥וֹי נָבָֿ֖ל אַכְֿעִיסֵֽם",
+    "כִּי־אֵשׁ֙ קָדְֿחָ֣֯הֿ בְֿאַפִּ֔י וַתִּ֯יקַ֖ד עַד־  שְׁא֣וֹל תַּחְתִּ֑ית וַתֹּ֤אֿכַל אֶ֙רֶץ֙ וִֽיבֻלָ֔הּ וַתְּלַהֵ֖ט֯ מוֹסְדֵ֥י הָרִֽים"
+  ],
+  "verse_refs": [
+    "Deut.31.28",
+    "Deut.31.29",
+    "Deut.31.30",
+    "Deut.32.1",
+    "Deut.32.2",
+    "Deut.32.3",
+    "Deut.32.4",
+    "Deut.32.5",
+    "Deut.32.6",
+    "Deut.32.7",
+    "Deut.32.8",
+    "Deut.32.9",
+    "Deut.32.10",
+    "Deut.32.11",
+    "Deut.32.12",
+    "Deut.32.13",
+    "Deut.32.14",
+    "Deut.32.15",
+    "Deut.32.16",
+    "Deut.32.17",
+    "Deut.32.18",
+    "Deut.32.19",
+    "Deut.32.20",
+    "Deut.32.21",
+    "Deut.32.22"
+  ],
+  "consonant_counts": [
+    22,
+    111,
+    43,
+    32,
+    49,
+    25,
+    50,
+    27,
+    51,
+    51,
+    51,
+    24,
+    56,
+    49,
+    24,
+    55,
+    68,
+    52,
+    24,
+    52,
+    22,
+    27,
+    53,
+    54,
+    55
+  ],
+  "tier4_positional_by_verse": [
+    {
+      "verse_ref": "Deut.31.28",
+      "tier4_positional": [
+        {
+          "ordinal": 2,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 10,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 5,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.31.29",
+      "tier4_positional": [
+        {
+          "ordinal": 22,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 41,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 54,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 87,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 109,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 48,
+          "type": "double_rafe"
+        },
+        {
+          "ordinal": 14,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 38,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 45,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 54,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 58,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 77,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 97,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 108,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.31.30",
+      "tier4_positional": [
+        {
+          "ordinal": 3,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.1",
+      "tier4_positional": [
+        {
+          "ordinal": 3,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 14,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 21,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 19,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 31,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.2",
+      "tier4_positional": [
+        {
+          "ordinal": 3,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 10,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 13,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 18,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 25,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 38,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 4,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 22,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 37,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 39,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 41,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 49,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.3",
+      "tier4_positional": [
+        {
+          "ordinal": 16,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.4",
+      "tier4_positional": [
+        {
+          "ordinal": 2,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 27,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 15,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.5",
+      "tier4_positional": [
+        {
+          "ordinal": 5,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 15,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 24,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 23,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.6",
+      "tier4_positional": [
+        {
+          "ordinal": 26,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 13,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 18,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 48,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 51,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.7",
+      "tier4_positional": [
+        {
+          "ordinal": 48,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 24,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 43,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 46,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.8",
+      "tier4_positional": [
+        {
+          "ordinal": 2,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 18,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 24,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 20,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.9",
+      "tier4_positional": [
+        {
+          "ordinal": 18,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 23,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.10",
+      "tier4_positional": [
+        {
+          "ordinal": 3,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 17,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 21,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 24,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 30,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 37,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 43,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 48,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 54,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 16,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 29,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 35,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.11",
+      "tier4_positional": [
+        {
+          "ordinal": 4,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 6,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 9,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 17,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 34,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 39,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 46,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 23,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 46,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 48,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.12",
+      "tier4_positional": [
+        {
+          "ordinal": 7,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 11,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 16,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 6,
+          "type": "double_rafe"
+        },
+        {
+          "ordinal": 23,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.13",
+      "tier4_positional": [
+        {
+          "ordinal": 3,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 11,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 16,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 24,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 34,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 49,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 19,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 25,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 28,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 36,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.14",
+      "tier4_positional": [
+        {
+          "ordinal": 9,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 38,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 52,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 58,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 65,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 51,
+          "type": "double_rafe"
+        },
+        {
+          "ordinal": 11,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 13,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 19,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 33,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 47,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 57,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 61,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.15",
+      "tier4_positional": [
+        {
+          "ordinal": 15,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 17,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 20,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 26,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 43,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 50,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 13,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 21,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 23,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 51,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.16",
+      "tier4_positional": [
+        {
+          "ordinal": 2,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 13,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 16,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 19,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.17",
+      "tier4_positional": [
+        {
+          "ordinal": 35,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 44,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 24,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 29,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 48,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 49,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.18",
+      "tier4_positional": [
+        {
+          "ordinal": 8,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 19,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 6,
+          "type": "double_rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.19",
+      "tier4_positional": [
+        {
+          "ordinal": 4,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 23,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.20",
+      "tier4_positional": [
+        {
+          "ordinal": 8,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 50,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 12,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 28,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 32,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 38,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.21",
+      "tier4_positional": [
+        {
+          "ordinal": 7,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 21,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 35,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 9,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 43,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 47,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 50,
+          "type": "rafe"
+        }
+      ]
+    },
+    {
+      "verse_ref": "Deut.32.22",
+      "tier4_positional": [
+        {
+          "ordinal": 7,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 14,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 46,
+          "type": "circellus"
+        },
+        {
+          "ordinal": 6,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 8,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 9,
+          "type": "rafe"
+        },
+        {
+          "ordinal": 31,
+          "type": "rafe"
+        }
+      ]
+    }
+  ]
+}
