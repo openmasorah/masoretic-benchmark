@@ -121,7 +121,9 @@
             "type": "boolean"
           },
           "gt_hash": {
-            "type": ["string", "null"]
+            "type": ["string", "null"],
+            "pattern": "^[0-9a-f]{16}$",
+            "description": "sha256 of the gt_source bytes, truncated to 16 lowercase hex chars. The repo-wide pin convention, shared with manifest_hash, kraken_model_hash and nakdimon_model_hash. It is NOT a full SHA-256 and must never be labelled one: the paper had to retract exactly that overclaim. Null until the gt_hash fuse; immutable once set."
           },
           "gt_source": {
             "type": ["string", "null"],
