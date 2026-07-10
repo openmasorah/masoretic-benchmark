@@ -1,9 +1,8 @@
 {
   "folio_id": "leningrad_devarim_F120A_fixture",
-  "provisional": true,
+  "provisional": false,
   "single_annotator": false,
   "pre_adjudication": false,
-  "gt_hash": null,
   "side_label": "consensus_gold",
   "license": "CC-BY-4.0",
   "_provenance": {
@@ -15,9 +14,8 @@
     "line_count": 12,
     "consonant_total": 650,
     "tier4_positional_total": 70,
-    "provisional": true,
-    "gt_hash": null,
-    "iaa_status": "post-adjudication consensus (Ginsberg A + Moster B); baseline cold-scoring reference only, never fused/promoted/pushed"
+    "provisional": false,
+    "iaa_status": "post-adjudication consensus (Ginsberg A + Moster B); canonical ground truth, hashed into phase_0_manifest.json as gt_hash"
   },
   "lines": [
     "וַיַּ֨עַל מֹשֶׁ֜ה מֵֽעַ֯רְבֹֿ֤תֿ  מוֹאָב֙ אֶל־֯הַ֣ר נְב֔וֹ רֹ֚אֿשׁ   הַפִּסְגָּ֔ה אֲשֶׁ֖ר עַל־פְּנֵ֣י יְרֵח֑וֹ   וַיַּרְאֵ֨ה֯וּ יְהוָ֧ה אֶת־כָּל־    הָאָ֛רֶץ אֶת־הַגִּלְעָ֖דֿ עַדֿ־   דָּֽן",

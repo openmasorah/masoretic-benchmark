@@ -44,11 +44,11 @@ driver's `lines[]` form — that file, not this projection, is the source consen
 
 - `biblia_kraken/`, `biblia_nakdimon/`, `biblia_char_menaked/`, `llm_vision/` — provisional
   predictions for F118B/F119A/F119B/F120A. **All four baselines × all four folios.**
-- `verified_consensus/` — `*.gt_adapter_golden.json` for all four folios, projected
-  post-adjudication by `build_verified_consensus_golden.py` from
-  `iaa_data/devarim_4folio/consensus_gold_positional.json`. Note that `adjudicated_gt_<folio>.json`,
-  the file D-28 names as *canonical* GT, was never produced; deciding what `gt_hash` is computed
-  over is an open scope-freeze decision for Ben.
+- `verified_consensus/` — **MOVED 2026-07-10** to `iaa_data/devarim_4folio/goldens/`.
+  Canonical ground truth must not live in a tree whose README opens "NOT the frozen
+  public artifact set." The goldens are a projection of
+  `iaa_data/devarim_4folio/consensus_gold_positional.json`; `phase_0_manifest.json`
+  hashes them into each folio's `gt_hash`, and they carry no `gt_hash` of their own.
 - `scores/` — per-folio tier-1 CER (both line-orderings), prz-era, vs the Moster B-side goldens.
   The h8r ROI tier-2/3 figures exist only in that run's markdown record; there are no committed
   machine-readable score JSONs for them.
