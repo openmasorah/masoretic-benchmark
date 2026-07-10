@@ -39,6 +39,20 @@ def _manifest_doc() -> dict:
     return json.loads(MANIFEST.read_text(encoding="utf-8"))
 
 
+def _unfused_doc() -> dict:
+    """The live manifest with every `gt_source` stripped.
+
+    The W2 fuse populated `gt_source` on all four frozen folios, so the live
+    manifest can no longer stand in for the absent-field case. These tests
+    assert the field is *optional*, which is a property of the loader and the
+    schema -- not of whatever the manifest happens to hold today.
+    """
+    doc = _manifest_doc()
+    for folio in doc["folios"]:
+        folio.pop("gt_source", None)
+    return doc
+
+
 def _write(tmp_path: Path, doc: dict) -> Path:
     path = tmp_path / "phase_0_manifest.json"
     path.write_text(json.dumps(doc), encoding="utf-8")
@@ -72,7 +86,7 @@ def test_gt_source_is_declared_in_the_schema():
 
 
 def test_per_folio_gt_source_validates_and_surfaces_on_the_loaded_folio(tmp_path):
-    doc = _manifest_doc()
+    doc = _unfused_doc()
     doc["folios"][0]["gt_source"] = GT_SOURCE
 
     manifest = Manifest.load(_write(tmp_path, doc))
@@ -91,8 +105,8 @@ def test_top_level_gt_source_is_rejected(tmp_path):
 
 
 def test_gt_source_absent_is_still_valid(tmp_path):
-    """Additive change: today's manifest, with no gt_source anywhere, must load."""
-    manifest = Manifest.load(_write(tmp_path, _manifest_doc()))
+    """Additive change: a manifest with no gt_source anywhere must still load."""
+    manifest = Manifest.load(_write(tmp_path, _unfused_doc()))
     assert all(f.gt_source is None for f in manifest.folios)
 
 

@@ -74,6 +74,11 @@ jobs:
       - name: Promoted results bind to current manifest_hash
         run: python scripts/rebind_manifest_hash.py --check
 
+      # A gt_hash pins bytes. If the goldens drift, the digest silently stops
+      # verifying and the manifest pins ground truth that no longer exists.
+      - name: Frozen folios' gt_hash matches their gt_source bytes
+        run: python scripts/verify_gt_hash.py --check
+
       - name: Detect hardcoded secrets
         uses: gacts/gitleaks@v1.3.2
         with:

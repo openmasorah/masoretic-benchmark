@@ -34,7 +34,7 @@
     }
   },
   "hostname": "Mac",
-  "manifest_hash": "062a2a6c8646e831",
+  "manifest_hash": "ff926f498df81183",
   "pins": {
     "dictabert_model_revision": null,
     "kraken_model_hash": "8514a0c7cc2b5b45",
