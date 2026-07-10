@@ -80,9 +80,9 @@ def test_placeholder_iaa_report_fails_release_tier_audit(tmp_path):
             "leningrad_devarim_F119A_fixture",
             "leningrad_devarim_F120A_fixture",
         ],
-        "tier1": {"bidirectional_cer_mean": 0.0, "ci95": [0.0, 0.0]},
-        "tier2": {"bidirectional_cer_mean": 0.0, "ci95": [0.0, 0.0]},
-        "tier3": {"bidirectional_cer_mean": 0.0, "ci95": [0.0, 0.0]},
+        "tier1": {"cer_vs_consensus_b": 0.0, "ci95": [0.0, 0.0]},
+        "tier2": {"cer_vs_consensus_b": 0.0, "ci95": [0.0, 0.0]},
+        "tier3": {"cer_vs_consensus_b": 0.0, "ci95": [0.0, 0.0]},
         "tier4": {"f1_mean": 1.0, "ci95": [1.0, 1.0]},
         "adjudication_summary": {
             "tier1_disagreements_reconciled": 0,
