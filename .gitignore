@@ -34,6 +34,7 @@ baselines/tests/fixtures/_uxlc_cache/
 # locally is for operator/CI verification, not commit.
 paper_iaa_results.json
 nakdimon_tier2_baseline.json
+rafe_tier4_baseline.json
 
 # Baseline output trees. Withdrawn from v0.1 (Option A defers baselines to
 # v0.1.1); a local `python -m baselines.run` recreates them, along with the

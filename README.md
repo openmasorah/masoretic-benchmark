@@ -93,6 +93,18 @@ An earlier draft of this repository carried F118B scores for four baselines. The
 
 v0.1.1 will re-emit both from real runs, under a pinned `transformers` and an ROI/main-text methodology.
 
+#### Tier-4 detection baseline: rafe text-rule (BL-05)
+
+The first rule scored on this benchmark's tier-4 axis. A parameter-free linguistic rule — predict a *rafe* on every begadkefat consonant (ב ג ד כ ך פ ף ת) that lacks a dagesh — recovers the Leningrad scribe's actual rafe placement with **F1 0.621 (exact) [0.574, 0.665]**, precision 0.476, recall 0.892, scored against the adjudicated consensus `tier4_positional` rafe set with the same matcher the IAA panel uses.
+
+This is an **oracle-text** baseline: it reads consonants and dagesh from the consensus transcription itself (perfect tier-1/tier-2 in), so it measures only how discriminative the tier-4 rafe axis is under a deterministic rule — it is **not** an end-to-end image→tier-4 system, which remains open. Recall is definitionally the share of the scribe's rafe on begadkefat letters (272/305; the other 33 sit on א/ה/ו, which the rule structurally cannot reach), so all discriminative variation lives in precision (rafe is placed selectively, not on every eligible consonant) — that gap is the headroom a context-aware system would close. It demonstrates the tier-4 rafe axis is scoreable and discriminative.
+
+Fully reproducible from public CC-BY data — no images, no model, no network:
+
+```
+python scripts/regenerate_rafe_tier4_baseline.py   # writes rafe_tier4_baseline.json (gitignored)
+```
+
 ## Methodology
 
 ### Normalization
