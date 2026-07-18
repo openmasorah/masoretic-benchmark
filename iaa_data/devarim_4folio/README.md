@@ -79,8 +79,9 @@ silently shifting any downstream number.
 
 * **Code that produces / consumes these files**: Apache-2.0 (the
   `masoretic-eval` scorer).
-* **These JSON files**: CC-BY-4.0 (the projection content — UXLC-derived
-  Hebrew text + the operator's positional annotations).
+* **These JSON files**: CC-BY-4.0 as a compiled projection. The consonantal text
+  within is public domain and the annotation data is CC0-1.0 — see
+  [`../../LICENSE.md`](../../LICENSE.md) for the complete rights statement.
 * **The private round-0 .txt sources**: NOT in this repo. Layout-preserving
   per Yosef's private format. Even the operator does not commit them upstream.
 

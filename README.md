@@ -75,12 +75,9 @@ masoretic-eval score \
 
 ### IAA benchmark fixtures
 
-The 4-folio IAA set (Leningrad Devarim F118B, F119A, F119B, F120A) ships as the adjudicated CC-BY-4.0 consensus ground truth in `iaa_data/devarim_4folio/` (each folio's `gt_source` is pinned in `phase_0_manifest.json`). The underlying tier-1 (consonantal) text has two sources, both credited:
+The 4-folio IAA set (Leningrad Devarim F118B, F119A, F119B, F120A) ships in `iaa_data/devarim_4folio/` (each folio's `gt_source` is pinned in `phase_0_manifest.json`). It is a **multi-component artifact** with per-component rights: the consonantal text (Tier 1) is public domain, the annotation data (Tiers 2–4) is CC0-1.0, and Open Masorah's schema, adjudication, and compilation are CC-BY-4.0. See [`LICENSE.md`](LICENSE.md) for the authoritative statement, and [`ACKNOWLEDGMENTS.md`](ACKNOWLEDGMENTS.md) for text-source credits (UXLC/Tanach.us for F119A/B/120A; WSRP photographs for F118B).
 
-- **F118B** — consonantal text hand-transcribed by Open Masorah from color photographs of the Leningrad Codex (referenced via IIIF; image rights in [Acknowledgements](#acknowledgements)).
-- **F119A, F119B, F120A** — consonantal text sourced from UXLC 2.5 ([tanach.us](https://tanach.us/)) via `gt_infra.uxlc_import`, then adjudicated. Tanach.us Inc. distributes the UXLC text free to copy (citation appreciated; see [tanach.us/License.html](https://tanach.us/License.html)) — a custom permissive grant, **not** CC0-1.0. We credit Tanach.us accordingly.
-
-The released ground-truth files (Open Masorah's adjudicated consensus) are CC-BY-4.0; the UXLC-sourced text retains Tanach.us's terms as noted. Only IIIF/archive.org references are stored — no manuscript images are redistributed.
+Note: each ground-truth JSON carries an embedded `"license": "CC-BY-4.0"` field that refers to the file **as a compiled projection**, not to the public-domain text or CC0 data it contains (see [`LICENSE.md`](LICENSE.md)). No manuscript images are redistributed — only IIIF references are stored.
 
 ### Baselines
 
@@ -140,16 +137,18 @@ Scored against qere by default (UXLC `<q>` element when present). Ketiv-only wor
 - The UXLC loader is exercised on Deuteronomy fixtures; coverage for other books is pending.
 - The tier 4 metamark type taxonomy is the week-1 schema-decision inventory; additions require a scorer version bump.
 
-## License
+Open Masorah v0.1 is multi-component. [`LICENSE.md`](LICENSE.md) is the authoritative per-component statement; summary:
 
-| Artifact | License |
+| Component | License / status |
 |---|---|
-| Scorer code (`masoretic_eval/`) | Apache 2.0 |
-| Benchmark GT — adjudicated consensus (all 4 folios) | CC-BY-4.0 (Open Masorah) |
-| — underlying tier-1 text for F119A/F119B/F120A | sourced from UXLC 2.5 (tanach.us) — free to copy, citation appreciated; not CC0 ([license](https://tanach.us/License.html)) |
-| Manuscript images | West Semitic Research Project photographs, referenced via IIIF only (never redistributed); rights asserted by WSRP — consult the rights holder before reuse |
+| Consonantal text (Tier 1, all folios) | **Public Domain** (Leningrad Codex, ~1008 CE; no copyright exists) |
+| Annotation data (Tiers 2–4: nikkud, cantillation, meta-marks) | **CC0-1.0** (factual observations) |
+| Scholarly framework (JSON schema, adjudication protocol, error taxonomy) | **CC-BY-4.0** (Open Masorah — attribution required) |
+| Four-folio benchmark compilation (selection + structure) | **CC-BY-4.0** (Open Masorah — attribution required) |
+| Scorer code (`masoretic_eval/`) | **Apache-2.0** |
+| Manuscript images | Not licensed by Open Masorah — WSRP photographs, IIIF-reference-only, never redistributed |
 
-See [LICENSE](LICENSE) for the full Apache 2.0 text.
+Text-source credits (UXLC/Tanach.us, WSRP) are in [`ACKNOWLEDGMENTS.md`](ACKNOWLEDGMENTS.md). The [`LICENSE`](LICENSE) file holds the Apache-2.0 text for the scorer code.
 
 ## Documentation
 

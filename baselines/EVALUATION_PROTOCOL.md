@@ -23,8 +23,8 @@ computed over the concatenated strings. This is segmentation-invariant — the
 reported number does not depend on whether the OCR system produces line-level
 or word-level segmentation.
 
-Tier-1 GT for each folio is hand-transcribed by the operator (Ben) from the
-public-domain photograph (archive.org PDM 1.0). Hand transcription is committed
+F118B tier-1 is hand-transcribed by the operator (Ben) from WSRP photographs
+(no images redistributed); F119A/B/120A tier-1 is sourced from UXLC 2.5. Hand transcription is committed
 to `baselines/tests/fixtures/iaa_folio_<fixture_id>.gt_adapter_golden.json`
 and frozen in `phase_0_manifest.json`. Yosef (the scholar) provides a
 ~5 min tier-1 spot-check; deeper review (tiers 2, 3, 4) lands in subsequent

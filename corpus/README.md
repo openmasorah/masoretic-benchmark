@@ -36,15 +36,19 @@ manifest manuscript ids must exist here before they can land in
   (`CC0-1.0`, `CC-BY-4.0`, `CC-BY-SA-4.0`, `MIT`, etc.) when possible. Use
   `NOASSERTION` only when the upstream source's license is genuinely unclear,
   and document the ambiguity in `notes`.
-- Tier-4 metamarks GT created in-house defaults to **CC-BY-4.0** (Open
-  Mesorah hand-transcription). Third-party tier-4 GT must carry the upstream
-  SPDX id.
+- Tier-4 metamark GT **data** (mark positions and labels) created in-house is
+  **CC0-1.0** — factual annotation observations. The annotation schema and
+  taxonomy are CC-BY-4.0 (see `LICENSE.md`). Third-party tier-4 GT must carry the
+  upstream SPDX id.
 - `image_sources[].rights` should be a URL when the upstream provider
   publishes a machine-readable rights statement (PDM, CC, RightsStatements.org).
   Otherwise use a short human-readable phrase.
 - `pipeline.public_distributable: true` requires that EVERY tier and every
-  image source carries a redistribution-permitting license. If any source is
-  `all_rights_reserved` or `NOASSERTION`, set `public_distributable: false`.
+  image source is redistributable. If any source is `all_rights_reserved`, set
+  `public_distributable: false`. `NOASSERTION` used to mark a **public-domain**
+  source (e.g. ancient manuscript text, no rights to assert) does NOT block
+  distribution; nor do rights-reserved images that are **reference-only** (IIIF
+  links, never redistributed). Document the rationale in `notes`.
 - Private/restricted scans must NEVER be referenced via local filesystem
   paths in this file. Use the upstream provider's URL or omit the
   `image_sources` entry entirely.

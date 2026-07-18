@@ -261,9 +261,9 @@ Leningrad Codex book of Devarim (Deuteronomy): `F118B`, `F119A`, `F119B`,
 
 1. `phase_0_manifest.json::iaa_subset` — the canonical declaration, paired
    with per-folio `image_url` references to `archive.org/download/leningrad-codex-color/BIB_LENCDX_<folio>.jpg`
-   (Public Domain Mark 1.0; never redistributed by this repo).
+   (WSRP photographs; rights asserted by WSRP; IIIF-reference-only, never redistributed).
 2. `baselines/tests/fixtures/iaa_folio_leningrad_devarim_<F>_fixture.{page.xml,gt_adapter_golden.json}`
-   — the operator's hand-transcribed tier-1 GT plus the source PAGE-XML.
+   — the tier-1 GT (F118B hand-transcribed by Open Masorah; F119A/B/120A from UXLC 2.5) plus the source PAGE-XML.
 3. `results/<baseline_id>/leningrad_devarim_<F>_fixture.json` — the frozen
    per-baseline prediction; `results/scores/leningrad_devarim_<F>_fixture.json`
    holds the headline CER + F1.
