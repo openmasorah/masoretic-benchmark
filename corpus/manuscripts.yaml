@@ -41,38 +41,38 @@ entries:
         url: "https://archive.org/details/leningrad-codex-color"
         iiif_manifest: null
         provider: "Internet Archive"
-        rights: "https://creativecommons.org/publicdomain/mark/1.0/"
-        rights_label: "PDM 1.0"
+        rights: "WSRP — rights reserved; reference/IIIF use only"
+        rights_label: "WSRP (reference-only)"
         resolution: high
         coverage: complete
         notes: "Color scans uploaded by West Semitic Research; matches archive.org/download/leningrad-codex-color/BIB_LENCDX_<FOLIO>.jpg pattern used in phase_0_manifest.json"
     ground_truth:
       tier_1_consonants:
-        source: "UXLC v4.20"
+        source: "UXLC 2.5"
         source_url: "https://tanach.us/"
-        license: "Public domain (UXLC distributes without restriction)"
-        license_spdx: "CC0-1.0"
+        license: "Public Domain (Leningrad Codex consonantal text)"
+        license_spdx: "NOASSERTION"
         coverage: complete
         notes: "UXLC consonantal text; aligned to Leningrad as base"
       tier_2_nikkud:
-        source: "UXLC v4.20"
+        source: "UXLC 2.5"
         source_url: "https://tanach.us/"
-        license: "Public domain (UXLC distributes without restriction)"
+        license: "CC0-1.0 (Open Masorah annotation data)"
         license_spdx: "CC0-1.0"
         coverage: complete
         notes: "UXLC vocalization aligned to Leningrad"
       tier_3_trop:
-        source: "UXLC v4.20"
+        source: "UXLC 2.5"
         source_url: "https://tanach.us/"
-        license: "Public domain (UXLC distributes without restriction)"
+        license: "CC0-1.0 (Open Masorah annotation data)"
         license_spdx: "CC0-1.0"
         coverage: complete
         notes: "UXLC cantillation aligned to Leningrad"
       tier_4_metamarks:
         source: "Open Masorah hand-transcription"
         source_url: "https://openmasorah.com"
-        license: "Creative Commons Attribution 4.0"
-        license_spdx: "CC-BY-4.0"
+        license: "CC0-1.0 (Open Masorah annotation data)"
+        license_spdx: "CC0-1.0"
         coverage: partial
         verified_folios:
           - "F118B"

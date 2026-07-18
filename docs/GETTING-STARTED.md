@@ -190,8 +190,8 @@ within aligned cluster pairs. CGJ (U+034F) is stripped at scoring time. See
 
 ## Where the IAA benchmark fixtures live
 
-Hand-transcribed tier-1 ground truth for the four Leningrad Codex Devarim
-folios is stored at:
+Tier-1 ground truth for the four Leningrad Codex Devarim folios is stored at:
+(F118B is hand-transcribed; F119A/B/120A are sourced from UXLC 2.5)
 
 ```
 baselines/tests/fixtures/
@@ -218,12 +218,11 @@ When a baseline is promoted in v0.1.1 it writes
 `results/<baseline_id>/<folio>.json` plus `run_meta.json`, and its scores land in
 `results/scores/<folio>.json`.
 
-Benchmark text licensing differs per folio: F118B tier-1 GT is hand-transcribed
-(CC-BY-4.0); F119A/F119B/F120A tier-1 GT is UXLC-derived (UXLC 2.5, tanach.us —
-free to copy without restriction, citation appreciated; not CC0). See the
-README "IAA benchmark fixtures" section and each fixture's
-`_provenance` block. Only IIIF/archive.org references are stored for the
-manuscript images; no manuscript images are redistributed in this repository.
+The benchmark data is multi-component: consonantal text (Tier 1) is public
+domain; annotation data (Tiers 2–4) is CC0-1.0; the scholarly framework and
+compilation are CC-BY-4.0. See [`LICENSE.md`](../LICENSE.md) for the complete
+rights statement. No manuscript images are redistributed; the dataset references
+WSRP photographs by IIIF URL only.
 
 ## Common setup issues
 

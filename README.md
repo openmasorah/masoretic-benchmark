@@ -64,7 +64,7 @@ masoretic-eval score \
 | Path | Purpose |
 |---|---|
 | `masoretic_eval/` | Scorer Python package (Apache-2.0). |
-| `baselines/` | Four independent baselines: BL-01 LLM-vision, BL-02 BiblIA Kraken, BL-03 Kraken→Nakdimon, BL-04 Kraken→DictaBERT char-menaked. |
+| `baselines/` | Baseline code. Automated BL-01 LLM-vision, BL-02 BiblIA Kraken, BL-03 Kraken→Nakdimon, BL-04 Kraken→DictaBERT char-menaked (scores deferred to v0.1.1); BL-05 rafe text-rule is scored — see [Baselines](#baselines). |
 | `oracles/` | Hebrew diacritization oracle modules consumed externally to populate the scorer's pass-through tier-2 fields. |
 | `schemas/` | JSON Schemas + changelogs for `baseline_prediction.schema.json`, `phase_0_manifest.schema.json`, and `run_meta.schema.json`. |
 | `results/` | *(Not in v0.1.)* Automated baselines are deferred to v0.1.1 — see [Baselines](#baselines). |
@@ -75,16 +75,13 @@ masoretic-eval score \
 
 ### IAA benchmark fixtures
 
-Tier-1 ground truth for the 4-folio IAA set (Leningrad Devarim F118B, F119A, F119B, F120A) lives at `baselines/tests/fixtures/iaa_folio_leningrad_devarim_*_fixture.gt_adapter_golden.json`. Provenance and licensing differ per folio (see each fixture's `_provenance` block):
+The 4-folio IAA set (Leningrad Devarim F118B, F119A, F119B, F120A) ships in `iaa_data/devarim_4folio/` (each folio's `gt_source` is pinned in `phase_0_manifest.json`). It is a **multi-component artifact** with per-component rights: the consonantal text (Tier 1) is public domain, the annotation data (Tiers 2–4) is CC0-1.0, and Open Masorah's schema, adjudication, and compilation are CC-BY-4.0. See [`LICENSE.md`](LICENSE.md) for the authoritative statement, and [`ACKNOWLEDGMENTS.md`](ACKNOWLEDGMENTS.md) for text-source credits (UXLC/Tanach.us for F119A/B/120A; WSRP photographs for F118B).
 
-- **F118B** — hand-transcribed from PDM 1.0 archive.org photographs of the Leningrad Codex. CC-BY-4.0 (attribution: Open Masorah).
-- **F119A, F119B, F120A** — UXLC-derived (UXLC 2.5, [tanach.us](https://tanach.us/)) via `gt_infra.uxlc_import`. The UXLC biblical Hebrew text is distributed by Tanach.us Inc. free to view or copy without restriction (citation to Tanach.us appreciated) — see [tanach.us/License.html](https://tanach.us/License.html). This is a custom permissive grant, **not** a formal CC0-1.0 dedication.
-
-Only IIIF/archive.org references are stored — no manuscript images are redistributed.
+Note: each ground-truth JSON carries an embedded `"license": "CC-BY-4.0"` field that refers to the file **as a compiled projection**, not to the public-domain text or CC0 data it contains (see [`LICENSE.md`](LICENSE.md)). No manuscript images are redistributed — only IIIF references are stored.
 
 ### Baselines
 
-**v0.1 publishes no baseline scores.** This release is the benchmark itself: the adjudicated ground truth, the inter-annotator agreement measurement, and the scorer. Automated baselines are deferred to **v0.1.1**.
+**v0.1 publishes no automated OCR/HTR baseline scores.** The release is the benchmark itself — the adjudicated ground truth, the inter-annotator agreement measurement, and the scorer — plus one parameter-free text-rule baseline (BL-05, below) that needs no model, image, or network. The automated OCR/HTR baselines (BL-01–BL-04) are deferred to **v0.1.1**.
 
 An earlier draft of this repository carried F118B scores for four baselines. They were **retracted before publication**, for two independent reasons:
 
@@ -140,16 +137,18 @@ Scored against qere by default (UXLC `<q>` element when present). Ketiv-only wor
 - The UXLC loader is exercised on Deuteronomy fixtures; coverage for other books is pending.
 - The tier 4 metamark type taxonomy is the week-1 schema-decision inventory; additions require a scorer version bump.
 
-## License
+Open Masorah v0.1 is multi-component. [`LICENSE.md`](LICENSE.md) is the authoritative per-component statement; summary:
 
-| Artifact | License |
+| Component | License / status |
 |---|---|
-| Scorer code (`masoretic_eval/`) | Apache 2.0 |
-| Benchmark text GT — F118B (hand-transcribed) | CC-BY-4.0 (Open Masorah) |
-| Benchmark text GT — F119A/F119B/F120A (UXLC-derived) | UXLC 2.5 (tanach.us) — free to copy without restriction, citation appreciated; not CC0 ([license](https://tanach.us/License.html)) |
-| Manuscript images | Fetched via IIIF from archive.org (PDM 1.0); never redistributed |
+| Consonantal text (Tier 1, all folios) | **Public Domain** (Leningrad Codex, ~1008 CE; no copyright exists) |
+| Annotation data (Tiers 2–4: nikkud, cantillation, meta-marks) | **CC0-1.0** (factual observations) |
+| Scholarly framework (JSON schema, adjudication protocol, error taxonomy) | **CC-BY-4.0** (Open Masorah — attribution required) |
+| Four-folio benchmark compilation (selection + structure) | **CC-BY-4.0** (Open Masorah — attribution required) |
+| Scorer code (`masoretic_eval/`) | **Apache-2.0** |
+| Manuscript images | Not licensed by Open Masorah — WSRP photographs, IIIF-reference-only, never redistributed |
 
-See [LICENSE](LICENSE) for the full Apache 2.0 text.
+Text-source credits (UXLC/Tanach.us, WSRP) are in [`ACKNOWLEDGMENTS.md`](ACKNOWLEDGMENTS.md). The [`LICENSE`](LICENSE) file holds the Apache-2.0 text for the scorer code.
 
 ## Documentation
 
@@ -172,7 +171,7 @@ If you use this benchmark or scoring suite, please cite. GitHub renders a "Cite 
   title        = {Open Masorah Masoretic Benchmark: a 4-tier CER evaluation suite for medieval Tiberian Hebrew},
   author       = {Lamm, Ben and Ginsberg, Yosef and Finkelstein, Ari},
   year         = {2026},
-  version      = {0.2.0},
+  version      = {0.1.0},
   howpublished = {Hugging Face dataset, \url{https://huggingface.co/datasets/openmasorah/masoretic-benchmark-v0.1}},
   note         = {Code: \url{https://github.com/openmasorah/masoretic-benchmark}}
 }
@@ -184,7 +183,7 @@ A peer-reviewed paper citation will be added when the JCDL 2027 submission lands
 
 This benchmark builds on openly available sources, gratefully acknowledged (full machine-readable entries are in `CITATION.cff` under `references:`):
 
-- **Leningrad Codex** (Samuel ben Jacob, c. 1008 CE; Firkovich MS Evr. I B19a, National Library of Russia) — the base manuscript, via West Semitic Research Project photographs on the [Internet Archive](https://archive.org/details/Leningrad_Codex_Color_Images) (Public Domain Mark 1.0). Images are referenced by IIIF only, never redistributed.
+- **Leningrad Codex** (Samuel ben Jacob, c. 1008 CE; Firkovich MS Evr. I B19a, National Library of Russia) — the base manuscript. Color photographs by the **West Semitic Research Project** (B. Zuckerman et al.), referenced via IIIF from the [Internet Archive](https://archive.org/details/Leningrad_Codex_Color_Images) and never redistributed. Rights in the photographs are asserted by WSRP; consult the rights holder before reuse. (The Internet Archive item carries an uploader-applied Public Domain Mark, which is not a WSRP dedication.)
 - **UXLC / Tanach.us** — the Unicode/XML Leningrad Codex 2.5 (Tanach.us Inc.), source of the tier-1 ground truth (F119A/F119B/F120A) and the tier-2 UXLC backbone. Tanach.us asks that citation of the site as the source of the text be made, and we gladly do so — see [tanach.us](https://tanach.us/).
 - **Kraken** (B. Kiessling, DH 2019) and the **BiblIA** medieval-Hebrew model + dataset (D. Stökl Ben Ezra et al., HIP '21) — OCR/HTR baselines BL-02 / BL-03.
 - **Nakdimon** (E. Gershuni & Y. Pinter, NAACL Findings 2022) — diacritization for baseline BL-03 and the primary oracle.

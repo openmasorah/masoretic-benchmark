@@ -2,7 +2,7 @@
   "folio_id": "leningrad_devarim_F118B_fixture",
   "provisional": true,
   "_provenance": {
-    "method": "hand-transcribed from photograph (PDM 1.0 archive.org scan of Leningrad Codex); maqaf U+05BE retained per DECISIONS.md 2026-06-11 (Step 2b)",
+    "method": "hand-transcribed from WSRP photograph of Leningrad Codex; maqaf U+05BE retained per DECISIONS.md 2026-06-11 (Step 2b)",
     "annotator": "Ben Lamm (operator)",
     "physical_line_count": 26,
     "verse_span": "Deut 31:28 (mid-verse) – Deut 32:23 (first two words; folio physically ends mid-32:23)",

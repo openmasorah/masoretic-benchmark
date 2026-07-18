@@ -1,10 +1,12 @@
 cff-version: 1.2.0
-message: "If you use this benchmark or scoring suite, please cite as follows."
+message: "If you use this benchmark or scoring suite, please cite as follows. Components carry different licenses — consonantal text: public domain; annotation data (Tiers 2-4): CC0-1.0; scholarly framework and compilation: CC-BY-4.0. See LICENSE.md for the authoritative statement."
 type: dataset
 title: "Open Masorah Masoretic Benchmark: a 4-tier CER evaluation suite for medieval Tiberian Hebrew"
-version: "0.2.0"
+version: "0.1.0"
 date-released: "2026-05-04"
-license: CC-BY-4.0
+license:
+  - CC-BY-4.0
+  - CC0-1.0
 authors:
   - family-names: Lamm
     given-names: Ben
@@ -51,10 +53,11 @@ references:
     year: 1008
     url: "https://archive.org/details/Leningrad_Codex_Color_Images"
     notes: >-
-      Base manuscript. National Library of Russia, St. Petersburg. Digitized by
-      the West Semitic Research Project (photographs by Bruce E. Zuckerman);
-      Internet Archive item Leningrad_Codex_Color_Images, Public Domain Mark 1.0.
-      Manuscript images are referenced via IIIF only and never redistributed.
+      Base manuscript. National Library of Russia, St. Petersburg. Photographs by
+      the West Semitic Research Project (Bruce E. Zuckerman et al.), which asserts
+      rights over them. Manuscript images are referenced via IIIF only and never
+      redistributed. (The Internet Archive item Leningrad_Codex_Color_Images
+      carries a Public Domain Mark applied by an uploader, not by WSRP.)
   # --- Diacritization tools ---
   - type: conference-paper
     title: "Restoring Hebrew Diacritics Without a Dictionary"
