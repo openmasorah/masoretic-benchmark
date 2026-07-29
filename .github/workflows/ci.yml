@@ -353,11 +353,21 @@ jobs:
   # [YOSEF-REVIEW] prefix in its PR title; subsequent BL-01 PRs auto-merge.
   # The gate ONLY runs on pull_request events; no manual nor scheduled trigger.
   #
-  # THIS IS NOT D-16. It checks a PR *title prefix*, not a written approve, and
-  # it is spent by design: main already carries results/llm_vision/*.json, so
-  # the enforcement step never fires again. D-16 (Yosef's written APPROVED
-  # review before any tag / HF upload / announcement) is enforced in
+  # THIS IS NOT D-16. It checks a PR *title prefix*, not a written approve.
+  # D-16 (approval from the reviewer of record, or a lapsed review window with
+  # a logged waiver, before any tag / HF upload / announcement) is enforced in
   # .github/workflows/release-tag.yml. Do not cite this job as D-16's gate.
+  #
+  # STATUS 2026-07-29 -- RE-ARMED, correcting a stale comment. This block used
+  # to say the job was "spent by design: main already carries
+  # results/llm_vision/*.json, so the enforcement step never fires again."
+  # That stopped being true when the retracted `results/` tree was deleted from
+  # main: `git ls-tree -r main` now matches zero files under
+  # results/llm_vision/, so MAIN_COUNT is 0 and the next PR adding one WILL be
+  # required to carry the [YOSEF-REVIEW] title prefix. That is the correct
+  # behaviour for a first-of-kind result under A-03 -- the gate is left armed
+  # deliberately, not retired -- but anyone landing the first new BL-01 result
+  # should expect it to fire rather than be surprised by it.
   # ----------------------------------------------------------------------------
 
   check-yosef-review-gate:

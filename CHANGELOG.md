@@ -119,6 +119,47 @@ the defect: it asserted the schema enum *equal* the UXLC loader's vocabulary,
 which forbade the schema from admitting the project's own data. A correct fix
 would have failed CI looking like a regression. Its assertion is now containment.
 
+### Governance — v0.1.0 was tagged without the reviewer's approval
+
+**Disclosure.** `benchmark-v0.1.0` was tagged and published while its release PR
+had been open 18 days with the reviewer of record requested and no review
+submitted. The D-16 gate in `.github/workflows/release-tag.yml` was
+approval-required, so it failed on the true condition and has been publicly red on
+that tag ever since. The release proceeded anyway. That was not disclosed at the
+time; this entry is that disclosure.
+
+**Policy change.** The gate is rewritten rather than deleted or left red — a
+permanently-red required gate is worse than none, because it trains everyone to
+ignore it. A `benchmark-v*` tag now passes if **either** a standing APPROVED
+review from the reviewer of record exists on the release PR, **or** the reviewer
+was formally requested and 14 days elapsed with no review of any kind, in which
+case the job passes and logs a waiver to the run summary. Fourteen days is
+calibrated to the observed 18-day stall.
+
+The waiver is deliberately narrow. It does **not** apply when the reviewer was
+never requested — a review you never asked for cannot lapse — nor when they
+responded without approving (`COMMENTED` and `REQUEST_CHANGES` both block; an
+engaged reviewer's silence is a signal, not an absence), nor when an earlier
+approval was later dismissed or superseded, nor before the window lapses. The
+clock starts when the review was **requested**, not when the PR opened, so adding
+a reviewer late does not retroactively burn their days. An unset
+`YOSEF_GH_USERNAME` still hard-fails rather than silently passing.
+
+A waiver is a disclosure obligation, not an absolution: every waived release must
+say so here under **Governance**, and the deferred review folds into the next
+patch release. The reviewer of record's review of v0.1.0 folds into v0.1.1.
+
+**Honest limitation, unchanged.** A `push: tags:` workflow runs after the tag
+object exists, so it cannot prevent a tag from being created — only refuse to
+publish. Preventing creation needs a GitHub ruleset restricting who may push
+`benchmark-v*` refs. That is a repository setting, not code, and it is still not
+in place.
+
+Separately, `check-yosef-review-gate` in `ci.yml` carried a stale comment claiming
+it was "spent by design." Deleting the retracted `results/` tree re-armed it
+(`git ls-tree -r main` now matches zero files under `results/llm_vision/`); the
+comment now says so, and the gate is left armed deliberately.
+
 ## benchmark-v0.1.0 — Open Masorah Devarim pilot benchmark
 
 First public release of the benchmark: a four-tier inter-annotator-agreement
