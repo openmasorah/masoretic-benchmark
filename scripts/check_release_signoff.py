@@ -56,6 +56,7 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+from datetime import date
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -68,6 +69,12 @@ CHANGELOG_PATH = REPO_ROOT / "CHANGELOG.md"
 REQUIRED_FIELDS = ("Version", "Signed off", "Authorized by", "Authorization")
 
 
+#: A ``### Governance`` subsection must *start* with the word. ``### Data
+#: Governance of the corpus`` is a data-provenance note, not a statement about
+#: how the release was authorized, and an unanchored search accepted it.
+GOVERNANCE_HEADING_RE = re.compile(r"^###\s+Governance\b.*$", re.MULTILINE | re.IGNORECASE)
+
+
 def _section(text: str, heading: str) -> str | None:
     """Return the body of the ``## <heading>`` section, or None if absent."""
     pattern = re.compile(
@@ -76,6 +83,35 @@ def _section(text: str, heading: str) -> str | None:
     )
     match = pattern.search(text)
     return match.group(1) if match else None
+
+
+def _version_anchored(tag: str) -> re.Pattern[str]:
+    """Match ``tag`` as a whole version, never as a prefix of a longer one.
+
+    A plain substring test reports ``benchmark-v0.1.1`` as present in a
+    ``benchmark-v0.1.10`` heading, and first-match-wins would then let a future
+    release's disclosure satisfy this one's gate.
+    """
+    return re.compile(rf"(?<![\w.]){re.escape(tag)}(?!\d)(?!\.\d)")
+
+
+def _field_line(body: str, field: str) -> str | None:
+    """The line declaring ``field``, or None. First declaration wins."""
+    for line in body.splitlines():
+        if re.match(rf"^\s*[-*]?\s*\*{{0,2}}{re.escape(field)}\*{{0,2}}\s*:", line):
+            return line
+    return None
+
+
+def _field_value(line: str) -> str:
+    """The value on a field line, judged on that line ALONE.
+
+    Emptiness must never be assessed across lines: a multi-line regex here
+    happily matched the *next* field's text and reported a blank value as
+    populated. A validator that cannot see an empty field is worse than none,
+    because it certifies it.
+    """
+    return line.split(":", 1)[1].strip().strip("*").strip()
 
 
 def check_signoff(tag: str, signoff_path: Path = SIGNOFF_PATH) -> list[str]:
@@ -95,29 +131,51 @@ def check_signoff(tag: str, signoff_path: Path = SIGNOFF_PATH) -> list[str]:
             f"An entry for a different version does not authorize this one."
         ]
 
-    errors = [
-        f"{signoff_path.name} entry for {tag!r} is missing the '{field}' field"
-        for field in REQUIRED_FIELDS
-        if not re.search(
-            rf"^\s*[-*]?\s*\*{{0,2}}{re.escape(field)}\*{{0,2}}\s*:", body, re.MULTILINE
-        )
-    ]
+    errors: list[str] = []
+    values: dict[str, str] = {}
 
-    # Emptiness must be judged on the field's OWN line. A multi-line regex here
-    # happily matched the *next* field's text and reported an empty value as
-    # populated -- a validator that cannot see a blank field is worse than none,
-    # because it certifies it.
-    for field in ("Authorized by", "Authorization"):
-        for line in body.splitlines():
-            if not re.match(rf"^\s*[-*]?\s*\*{{0,2}}{re.escape(field)}\*{{0,2}}\s*:", line):
-                continue
-            value = line.split(":", 1)[1].strip().strip("*").strip()
-            if not value:
-                errors.append(
-                    f"{signoff_path.name} entry for {tag!r} has an empty {field!r} -- "
-                    f"a sign-off that records nothing authorizes nothing"
-                )
-            break
+    # Presence and emptiness are checked for EVERY required field. An earlier
+    # version checked emptiness for only two of the four, so an entry could
+    # carry a blank `Signed off` and still authorize a release.
+    for field in REQUIRED_FIELDS:
+        line = _field_line(body, field)
+        if line is None:
+            errors.append(f"{signoff_path.name} entry for {tag!r} is missing the '{field}' field")
+            continue
+        value = _field_value(line)
+        if not value:
+            errors.append(
+                f"{signoff_path.name} entry for {tag!r} has an empty {field!r} -- "
+                f"a sign-off that records nothing authorizes nothing"
+            )
+            continue
+        values[field] = value
+
+    # The heading and the `Version` field are two independent claims about which
+    # release this entry authorizes. Only the heading was ever checked, so an
+    # entry headed `## benchmark-v0.1.1` could declare `Version: benchmark-v0.0.9`
+    # and pass -- the gate reading one claim while a human reads the other.
+    declared = values.get("Version")
+    if declared is not None and declared != tag:
+        errors.append(
+            f"{signoff_path.name} entry under '## {tag}' declares 'Version: {declared}' -- "
+            f"the heading and the Version field must name the same release, or it is "
+            f"unclear which one was actually authorized"
+        )
+
+    # `Signed off` is the date the authorization was given. Non-empty is not
+    # enough: 'yes' and 'soon' are non-empty and record nothing auditable.
+    signed_off = values.get("Signed off")
+    if signed_off is not None:
+        try:
+            date.fromisoformat(signed_off)
+        except ValueError:
+            errors.append(
+                f"{signoff_path.name} entry for {tag!r} has 'Signed off: {signed_off}', "
+                f"which is not an ISO date (YYYY-MM-DD). The field records WHEN "
+                f"authorization was given; an unparseable value records nothing."
+            )
+
     return errors
 
 
@@ -132,11 +190,12 @@ def check_disclosure(tag: str, changelog_path: Path = CHANGELOG_PATH) -> list[st
         return [f"{changelog_path.name} is missing; a release must publish a changelog"]
 
     text = changelog_path.read_text(encoding="utf-8")
+    anchored = _version_anchored(tag)
     heading = next(
         (
             line.lstrip("# ").strip()
             for line in text.splitlines()
-            if line.startswith("## ") and tag in line
+            if line.startswith("## ") and anchored.search(line)
         ),
         None,
     )
@@ -150,11 +209,24 @@ def check_disclosure(tag: str, changelog_path: Path = CHANGELOG_PATH) -> list[st
     if body is None:  # pragma: no cover - heading came from the same parse
         return [f"could not read the {changelog_path.name} section for {tag!r}"]
 
-    if not re.search(r"^###\s+.*Governance", body, re.MULTILINE | re.IGNORECASE):
+    match = GOVERNANCE_HEADING_RE.search(body)
+    if match is None:
         return [
             f"{changelog_path.name} section for {tag!r} has no '### Governance' "
             f"subsection. Every release must publicly state how it was authorized "
             f"and what review it did or did not receive."
+        ]
+
+    # A heading with nothing under it satisfies the letter of the requirement and
+    # none of its purpose. A bare heading is not a statement.
+    rest = body[match.end() :]
+    stop = re.search(r"^#{1,3}\s", rest, re.MULTILINE)
+    content = rest[: stop.start()] if stop else rest
+    if not content.strip():
+        return [
+            f"{changelog_path.name} section for {tag!r} has an EMPTY '### Governance' "
+            f"subsection. A bare heading is not a disclosure -- state how the release "
+            f"was authorized and what review it did or did not receive."
         ]
     return []
 
