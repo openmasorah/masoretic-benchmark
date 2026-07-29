@@ -369,9 +369,16 @@ jobs:
   # The gate ONLY runs on pull_request events; no manual nor scheduled trigger.
   #
   # THIS IS NOT D-16. It checks a PR *title prefix*, not a written approve.
-  # D-16 (approval from the reviewer of record, or a lapsed review window with
-  # a logged waiver, before any tag / HF upload / announcement) is enforced in
-  # .github/workflows/release-tag.yml. Do not cite this job as D-16's gate.
+  # The release gate -- a maintainer sign-off entry in RELEASE_SIGNOFF.md for
+  # the exact version, plus a published `### Governance` disclosure in
+  # CHANGELOG.md under that version's heading, before any tag / HF upload /
+  # announcement -- is enforced in .github/workflows/release-tag.yml. Scholarly
+  # review is ADVISORY there: recorded when present, never required, and its
+  # absence never blocks a tag.
+  #
+  # The old D-16 policy this comment used to describe -- approval from the
+  # reviewer of record, or a lapsed review window with a logged waiver -- was
+  # superseded at 721077b. Do not cite this job as the release gate.
   #
   # STATUS 2026-07-29 -- RE-ARMED, correcting a stale comment. This block used
   # to say the job was "spent by design: main already carries
