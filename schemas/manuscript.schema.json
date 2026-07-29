@@ -20,15 +20,20 @@
     },
     "mark_type_enum": {
       "type": "string",
+      "description": "Tier-4 mark types a manuscript's ground truth may declare coverage of. Superset of the scorer's record vocabulary (masoretic_eval/tier4_vocabulary.py::TIER4_TYPES) plus catalog-only phenomena that have no positional record type yet (CATALOG_ONLY_MARKS). Asserted by tests/test_tier4_vocabulary_consistency.py.",
       "enum": [
+        "pe",
+        "samekh",
         "large_letter",
         "small_letter",
+        "suspended_letter",
         "inverted_nun",
         "puncta_extraordinaria",
         "circellus",
+        "rafe",
+        "double_rafe",
         "line_filler",
         "stichographic_layout",
-        "suspended_letter",
         "dotted_letter",
         "rashe_tevot"
       ]

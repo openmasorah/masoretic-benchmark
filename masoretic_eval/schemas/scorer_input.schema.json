@@ -27,15 +27,18 @@
         "properties": {
           "type": {
             "type": "string",
+            "description": "Canonical tier-4 mark type. Defined once in masoretic_eval/tier4_vocabulary.py::TIER4_TYPES and asserted equal to this enum by tests/test_tier4_vocabulary_consistency.py. Retired spellings 'reversednun' (now 'inverted_nun') and 'puncta' (now 'puncta_extraordinaria') are rejected as of scorer 0.3.0.",
             "enum": [
               "pe",
               "samekh",
-              "reversednun",
-              "puncta",
               "large_letter",
               "small_letter",
               "suspended_letter",
-              "inverted_nun"
+              "inverted_nun",
+              "puncta_extraordinaria",
+              "circellus",
+              "rafe",
+              "double_rafe"
             ]
           },
           "verse_ref": {

@@ -14,7 +14,11 @@ Codex Devarim, Ha'azinu through Torah end: F118B, F119A, F119B, F120A).
 The capture conventions for **tier-4 meta-marks** in PAGE-XML ground truth
 produced via eScriptorium. Tier-4 covers body-text-internal scribal annotation:
 parashah breaks, sof pasuq, nequdot/dotted letters, large/small letters, inverted
-nun. Tier-4 ≠ marginal masorah; Mp/Mg are deferred to v0.3.
+nun, and the manuscript diacritics *rafe* and *circellus*. Tier-4 ≠ marginal
+masorah; Mp/Mg are deferred to v0.3.
+
+The authoritative type list is the **canonical tier-4 vocabulary** below; the
+per-mark sections that follow specify how each is *captured* in PAGE-XML.
 
 Consumers of this schema:
 
@@ -22,6 +26,71 @@ Consumers of this schema:
 - **`masoretic_eval/page_xml.py`** — PAGE-XML 2019-07-15 parser; per-mark extraction
 - **`masoretic_eval`** — CER scoring with tier-4 vocabulary alignment
   (`tier4_records.type` enum)
+
+---
+
+## The canonical tier-4 vocabulary
+
+**One list, defined once,** in
+[`masoretic_eval/tier4_vocabulary.py`](../masoretic_eval/tier4_vocabulary.py)
+(`TIER4_TYPES`). Both JSON Schema enums are asserted equal to it by
+`tests/test_tier4_vocabulary_consistency.py`, so they cannot drift apart.
+These are the only legal values of a tier-4 record's `type` field.
+
+Tier 4 spans two genuinely different kinds of evidence. Both use the same
+`(type, verse_ref, ordinal)` record shape and the same matcher; nothing here
+privileges one origin over the other.
+
+### Editorial marks — claims made by an edition's markup
+
+| Type | Mark | Source encoding | Capture (§ below) |
+|---|---|---|---|
+| `pe` | petuhah, open section break | UXLC `<pe/>` | §6 `@custom` `parashah:petuhah` |
+| `samekh` | setumah, closed section break | UXLC `<samekh/>` | §6 `@custom` `parashah:setumah` |
+| `large_letter` | littera majuscula | UXLC `<x>5</x>` | §4 `@custom` `letter_size:large@N` |
+| `small_letter` | littera minuscula | UXLC `<x>6</x>` | §5 `@custom` `letter_size:small@N` |
+| `suspended_letter` | littera suspensa | UXLC `<x>7</x>` | not captured in v0.1 |
+| `inverted_nun` | nun hafukha, U+05C6 | UXLC `<x>8</x>` **and** `<reversednun/>` | §3 Unicode-in-text |
+| `puncta_extraordinaria` | dotted letters, U+05C4 / U+05C5 | UXLC `<x>4</x>` | §2 Unicode-in-text |
+
+### Manuscript diacritics — observations of ink on the page
+
+These are what annotators actually read off the codex, and they are **100% of
+the tier-4 ground truth this benchmark ships** (516 records across the four
+Devarim folios). They have no UXLC encoding: no edition records them.
+
+| Type | Mark | Codepoint / token | Shipped count (consensus gold) |
+|---|---|---|---|
+| `circellus` | masorah-parva anchor ring | U+05AF | 211 |
+| `rafe` | rafe stroke | U+05BF | 278 |
+| `double_rafe` | doubled rafe | `<DR>` editor token | 27 |
+
+`double_rafe` is a **raw, pre-canonicalization** type. `masoretic_eval/iaa/
+alpha.py` folds `{rafe, double_rafe} → rafe` before computing α; the raw type
+is retained in the record vocabulary so the shipped positional JSONs stay
+round-trippable and so `masoretic-eval score` can validate them unchanged.
+
+### Retired spellings
+
+Rejected as of scorer 0.3.0. `masoretic_eval.tier4_vocabulary.canonicalize()`
+migrates them.
+
+| Retired | Canonical | Why |
+|---|---|---|
+| `reversednun` | `inverted_nun` | UXLC's XML *tag* name for the same mark `<x>8</x>` encodes; the enum listed one phenomenon twice |
+| `puncta` | `puncta_extraordinaria` | the scorer and the manuscript catalog used two names for one mark; the scholarly term wins |
+
+Neither occurs anywhere in the v0.1 corpus, so retiring them moved no
+published number — see `schemas/PREDICTION_SCHEMA_CHANGELOG.md`.
+
+### Catalog-only mark types
+
+`corpus/manuscripts.yaml` may additionally declare `line_filler`,
+`stichographic_layout`, `dotted_letter` and `rashe_tevot` under
+`mark_types_covered`. These describe phenomena a manuscript contains but that
+have **no positional record type** — they cannot be scored, only asserted as
+coverage. `manuscript.schema.json`'s `mark_type_enum` is therefore the
+canonical record vocabulary *plus* these four.
 
 ---
 
@@ -197,10 +266,18 @@ Per-line checklist:
 - [ ] **Sof pasuq** — present? (if yes, U+05C3 in text)
 - [ ] **Nequdot / dotted letters** — present? (if yes, U+05C4/U+05C5 combining on the dotted letter)
 - [ ] **Inverted nun** — present? (if yes, U+05C6 in text)
+- [ ] **Rafe** — present? (if yes, U+05BF on the consonant; `<DR>` for a doubled rafe)
+- [ ] **Circellus** — present? (if yes, U+05AF on the consonant it anchors to)
 - [ ] **Large letters** — present? (if yes, `letter_size:large@<idx>` in `@custom`)
 - [ ] **Small letters** — present? (if yes, `letter_size:small@<idx>` in `@custom`)
 - [ ] **Parashah break beginning on this line?** (if yes, `parashah:petuhah|setumah` in `@custom`)
 - [ ] **Stichographic layout** (Ha'azinu only) — applies? (if yes, `layout:stichographic_column@<n>` in `@custom`)
+
+*Rafe and circellus were absent from this checklist until 2026-07-29, despite
+being the two marks the Devarim IAA round actually scored. The omission is
+recorded rather than quietly repaired: the four-folio annotation was performed
+against the round-0 convention sheet, not against this list, so the published
+IAA figures are unaffected.*
 
 ---
 
@@ -275,5 +352,6 @@ block tier-4 scoring; track them so they don't evaporate.
 
 ## CHANGELOG
 
+- **2026-07-29** — Canonical tier-4 vocabulary table added; this document previously specified capture mechanisms without ever naming `rafe`, `circellus` or `double_rafe`, which are 100% of the shipped tier-4 ground truth. Retired `reversednun` (→ `inverted_nun`) and `puncta` (→ `puncta_extraordinaria`); scorer 0.2.0 → 0.3.0 (BREAKING). Rafe and circellus added to the annotation completeness contract. Full account in `schemas/PREDICTION_SCHEMA_CHANGELOG.md`.
 - **2026-05-10** — v0.1 follow-ups shipped (PR #20): NFC pre-comparison in scorer, `@custom` tier-4 field extraction with strict-everywhere parser policy, Pitfall 2 regression guard via non-canonical combining-mark order test. Cross-AI review (codex + cursor) deferred 5 items to v0.2 — see "Deferred to v0.2" above.
 - **2026-05-09** — v0.1 PROPOSED drafted. Pre-ratification design review by FAMP architect (AMBER, 4 adjustments applied: NFC mandate, parashah `@custom` precision, char-index fragility note, U+05C6 scope note) and FAMP matt (3 changes applied: Ha'azinu encodings front-loaded, completeness contract added, quick reference folded inline). Pending ratification.

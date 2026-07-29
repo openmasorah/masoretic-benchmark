@@ -48,12 +48,21 @@ TROP_RANGE = (0x0591, 0x05AF)  # taamim / cantillation marks
 # tier 3, not tier 2).  MUST stay in sync with strip.py::_TIER2_EXTRA_STRIP.
 _TIER2_EXTRA_STRIP = (0x05BD, 0x05BF, 0x05C0, 0x05C3, 0x05C6)
 
+#: UXLC XML tag names that encode a meta-mark as a child of ``<v>``. These are
+#: *tag* names, not scorer types: ``<reversednun/>`` is UXLC's spelling of the
+#: mark the ``<x>8</x>`` code calls ``inverted_nun``. Map through
+#: ``_TAG_TO_TYPE`` before emitting a record — the canonical vocabulary lists
+#: that phenomenon once (see ``masoretic_eval/tier4_vocabulary.py``).
 META_MARK_TAGS = {"pe", "samekh", "reversednun"}
+
+#: UXLC tag name -> canonical tier-4 type. Tags absent here are already
+#: canonical.
+_TAG_TO_TYPE = {"reversednun": "inverted_nun"}
 
 
 @dataclass(frozen=True)
 class MetaMarkRecord:
-    type: str  # e.g. "pe", "samekh", "reversednun", "large_letter", "puncta", …
+    type: str  # canonical tier-4 type; see masoretic_eval.tier4_vocabulary
     verse_ref: str  # OSIS-style, e.g. "Deut.6.4"
     ordinal: int  # 1-indexed position within the verse for this type
     codepoints: str | None = None  # optional — for large/small letter, which letter
@@ -134,7 +143,7 @@ def _join_word_parts(parts: list[str]) -> str:
 def _xcode_to_type(code: str) -> str | None:
     """Map UXLC <x> code to a tier-4 type. Codes 4–8 per spec Section 4 #9."""
     mapping = {
-        "4": "puncta",
+        "4": "puncta_extraordinaria",
         "5": "large_letter",
         "6": "small_letter",
         "7": "suspended_letter",
@@ -218,9 +227,10 @@ def load_uxlc(path: Path | str) -> UXLCDoc:
                             )
                             word_parts.append(pending_ketiv)
                             pending_ketiv = None
-                        n = ordinal_by_type.get((ref, localname), 0) + 1
-                        ordinal_by_type[(ref, localname)] = n
-                        metamarks.append(MetaMarkRecord(type=localname, verse_ref=ref, ordinal=n))
+                        mark_type = _TAG_TO_TYPE.get(localname, localname)
+                        n = ordinal_by_type.get((ref, mark_type), 0) + 1
+                        ordinal_by_type[(ref, mark_type)] = n
+                        metamarks.append(MetaMarkRecord(type=mark_type, verse_ref=ref, ordinal=n))
 
                 # Flush any ketiv left at end of verse (no more siblings).
                 if pending_ketiv is not None:

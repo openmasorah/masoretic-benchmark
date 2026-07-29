@@ -86,13 +86,15 @@ entries:
           - inverted_nun
           - puncta_extraordinaria
           - circellus
+          - rafe
+          - double_rafe
           - line_filler
           - stichographic_layout
         mark_types_excluded:
           - suspended_letter
           - dotted_letter
           - rashe_tevot
-        notes: "Ha'azinu through Torah end (Devarim F118B-F120A); IAA set per phase 03.1"
+        notes: "Ha'azinu through Torah end (Devarim F118B-F120A); IAA set per phase 03.1. rafe/double_rafe added 2026-07-29: the shipped consensus gold carries 278 rafe and 27 double_rafe records (vs 211 circellus), and the BL-05 baseline scores against the rafe set, so their prior omission understated coverage. The mark_type_enum had no term for them until scorer 0.3.0."
     pipeline:
       phase: 0
       in_frozen_scope: true
