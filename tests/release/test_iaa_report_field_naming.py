@@ -31,8 +31,8 @@ SCHEMA = REPO_ROOT / "schemas" / "iaa_report.schema.json"
 # (Pitfall 8), and regenerating needs the gitignored UXLC cache.
 PAPER_5_2 = {
     "tier1": (0.0029, [0.0006, 0.0059]),
-    "tier2": (0.0172, [0.0105, 0.0248]),
-    "tier3": (0.0234, [0.0166, 0.0309]),
+    "tier2": (0.0031, [0.0006, 0.0062]),
+    "tier3": (0.0119, [0.0085, 0.0156]),
 }
 
 
@@ -119,8 +119,8 @@ def test_a_report_using_the_old_field_name_is_rejected():
             "tier4_disagreements_reconciled": 0,
         },
         "tier1": {"bidirectional_cer_mean": 0.0029, "ci95": [0.0006, 0.0059]},
-        "tier2": {"cer_vs_consensus_b": 0.0172, "ci95": [0.0105, 0.0248]},
-        "tier3": {"cer_vs_consensus_b": 0.0234, "ci95": [0.0166, 0.0309]},
+        "tier2": {"cer_vs_consensus_b": 0.0031, "ci95": [0.0006, 0.0062]},
+        "tier3": {"cer_vs_consensus_b": 0.0119, "ci95": [0.0085, 0.0156]},
         "tier4": {"f1_mean": 0.9187, "ci95": [0.8969, 0.9397]},
     }
     with pytest.raises(jsonschema.ValidationError):

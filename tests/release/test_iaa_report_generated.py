@@ -60,9 +60,8 @@ def test_tier4_is_the_exact_f1_not_the_tolerance_headline():
 
 def test_adjudication_tier1_3_recompute_from_the_committed_projections():
     """The projections-only counts must be exactly reproducible, or they are not provenance."""
-    from masoretic_eval.iaa.cer import _STRIPPERS
+    from masoretic_eval.iaa.cer import tier_view
     from masoretic_eval.metrics.cer import cluster_aligned_cer
-    from masoretic_eval.normalize import normalize_for_scoring
 
     a = json.loads(
         (REPO_ROOT / "iaa_data/devarim_4folio/ginsberg_round0_positional.json").read_text()
@@ -72,10 +71,9 @@ def test_adjudication_tier1_3_recompute_from_the_committed_projections():
     )["verses"]
     adj = _report()["adjudication_summary"]
     for tier in (1, 2, 3):
-        strip = _STRIPPERS[tier]
         edits = sum(
             cluster_aligned_cer(
-                strip(normalize_for_scoring(av["chunk"])), strip(normalize_for_scoring(bv["chunk"]))
+                tier_view(av["chunk"], tier=tier), tier_view(bv["chunk"], tier=tier)
             ).edits
             for av, bv in zip(a, b, strict=True)
         )
@@ -87,8 +85,8 @@ def test_adjudication_counts_are_the_expected_values():
     adj = _report()["adjudication_summary"]
     assert adj == {
         "tier1_disagreements_reconciled": 18,
-        "tier2_disagreements_reconciled": 165,
-        "tier3_disagreements_reconciled": 280,
+        "tier2_disagreements_reconciled": 33,
+        "tier3_disagreements_reconciled": 148,
         "tier4_disagreements_reconciled": 80,
     }
 

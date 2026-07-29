@@ -4,6 +4,19 @@ Open Masorah v0.1 builds on the work of others, gratefully acknowledged. These
 are courtesy citations and provenance notes; for the **rights status** of each
 component, see [`LICENSE.md`](LICENSE.md).
 
+## Annotators
+
+The four-tier ground truth in this release was transcribed independently by two
+Tiberian-trained scholars and adjudicated to a consensus reference:
+
+- **Yosef Ginsberg** (annotator A) — Tiberian-trained transcriber, with prior published work
+  on the masorah parva of the Leningrad Codex.
+- **Rabbi David Zev Moster, PhD** (annotator B) — Director of the Biblical Hebrew Program at
+  the Jewish Theological Seminary and Director of the Institute of Biblical Culture. PhD in
+  Biblical Studies, Bar-Ilan University.
+
+The inter-annotator agreement reported in this benchmark is their work.
+
 ## UXLC / Tanach.us
 
 The consonantal text for folios F119A, F119B, and F120A was sourced from the
