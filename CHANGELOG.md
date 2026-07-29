@@ -183,35 +183,52 @@ publish.
 
 ### Governance — v0.1.0 was tagged without the reviewer's approval
 
-**Disclosure.** `benchmark-v0.1.0` was tagged and published while its release PR
-(#45, titled "Yosef release-review PR") had been open 18 days with **no GitHub
-review request ever created on it and no review submitted**. The D-16 gate in
-`.github/workflows/release-tag.yml` was approval-required, so it failed on the
-true condition and has been publicly red on that tag ever since. The release
-proceeded anyway. That was not disclosed at the time; this entry is that
-disclosure.
+**Disclosure.** `benchmark-v0.1.0` was tagged and published without an approving
+review from the reviewer of record. What actually happened, in order:
 
-An earlier draft of this section said the PR sat open "with the reviewer of
-record requested." **That was wrong, and it is corrected here rather than
-quietly.** Querying the API directly shows PR #45's `requested_reviewers` is
-empty, it carries no reviews, and its complete event timeline is `committed`,
-`closed`, `merged`, `head_ref_deleted` — there is no `review_requested` event,
-not even one later withdrawn. The PR's *title* designated it as the review PR
-and the intent is not in doubt; the mechanical request was never made. The
-distinction matters, because the waiver introduced below deliberately does not
-cover it.
+- **GitHub was never the review channel.** The project's release runbook
+  specifies review by **packet sent to the reviewer directly**, not by a GitHub
+  review. PR #45 accordingly carries no `review_requested` event, no reviews and
+  an empty `requested_reviewers` — that is the designed mechanism, **not an
+  oversight**, and the absence should not be read as one.
+- **The release packet was sent on 2026-07-23, by WhatsApp.** This is the
+  maintainer's account of his own action; it happened off-platform, so neither
+  this repository nor any mail archive can corroborate it, and this entry does
+  not imply otherwise.
+- **No review was submitted in the 6 days between the packet and the tag**
+  (2026-07-23 → 2026-07-29).
+- **The release proceeded under a decision, recorded in the project's planning
+  record before the release, to take the review off the critical path** — the
+  reviewer stays credited, and the review folds into v0.1.1. v0.1.0 did not slip
+  out past a lapsed review; it shipped under an explicit decision to proceed
+  without one.
 
-Whether the reviewer was asked *off* GitHub — by email or in person — is not
-something this repository can evidence, so this entry does not assert it either
-way.
+The D-16 gate was approval-required, so it failed on the true condition and has
+been publicly red on that tag ever since. None of this was disclosed at the
+time; this entry is that disclosure.
+
+**Two earlier versions of this section were wrong, and both are corrected here
+rather than quietly.** The first said the PR sat open "with the reviewer of
+record requested" — false; no GitHub request ever existed. The second corrected
+that but reported **18 days** as the response window and declined to say whether
+the reviewer had been contacted at all. PR #45 *was* open 18 days, but the ask
+went out on day 12, so **the review window was 6 days, not 18** — a figure that
+flattered the project by more than a factor of two, in a disclosure whose whole
+purpose is not to. The 18-day figure does not survive anywhere as a
+response-window number.
+
+The correction sequence itself is the point worth recording: each version was
+closer to true than the last, and each was published before the record had been
+checked. The governing fact — that the review had been deliberately removed from
+the critical path — was absent from all of them, and it is the one that makes
+the release defensible rather than negligent.
 
 **Policy change.** The gate is rewritten rather than deleted or left red — a
 permanently-red required gate is worse than none, because it trains everyone to
 ignore it. A `benchmark-v*` tag now passes if **either** a standing APPROVED
 review from the reviewer of record exists on the release PR, **or** the reviewer
 was formally requested and 14 days elapsed with no review of any kind, in which
-case the job passes and logs a waiver to the run summary. Fourteen days is
-calibrated to the observed 18-day stall.
+case the job passes and logs a waiver to the run summary.
 
 The waiver is deliberately narrow. It does **not** apply when the reviewer was
 never requested — a review you never asked for cannot lapse — nor when they

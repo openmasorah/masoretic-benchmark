@@ -31,21 +31,35 @@
 #
 # POLICY CHANGE 2026-07-29 -- approval OR lapsed review window
 # ------------------------------------------------------------
-# The original gate was approval-required, full stop. v0.1.0 was tagged anyway,
-# 18 days after the release PR opened, and the gate went publicly red. Leaving a
-# permanently-red required gate is worse than having no gate: it trains everyone
-# to ignore it.
+# The original gate was approval-required, full stop. v0.1.0 was tagged without
+# an approving review and the gate went publicly red. Leaving a permanently-red
+# required gate is worse than having no gate: it trains everyone to ignore it.
 #
-# NOTE, verified against the API 2026-07-29 and corrected here: on that release
-# PR (#45) NO review was ever requested. `requested_reviewers` is empty, there
-# are no reviews, and the timeline holds no `review_requested` event -- not even
-# a withdrawn one. An earlier version of this comment said the reviewer "was
-# requested"; that was false. The PR's title designated it the review PR, but
-# the mechanical request was never created.
+# WHAT ACTUALLY HAPPENED -- corrected twice, so read this rather than the git
+# history of this comment:
+#
+#   * GitHub was NEVER the review channel. The release runbook specifies a
+#     packet sent to the reviewer directly. PR #45 therefore has no
+#     `review_requested` event, no reviews, empty `requested_reviewers` --
+#     by design, not oversight. (Verified against the API 2026-07-29.)
+#   * The packet was sent 2026-07-23 by WhatsApp. That is the maintainer's
+#     account of his own action; it is off-platform, so neither this repo nor
+#     any mail archive corroborates it and this comment does not imply they do.
+#   * No review arrived in the 6 days between packet and tag.
+#   * The release proceeded under a decision, recorded in the project's planning
+#     record beforehand, to take the review off the critical path: reviewer
+#     credited, review folds into v0.1.1.
+#
+# Two earlier versions of this comment were wrong. The first said the reviewer
+# "was requested" -- false. The second said the PR sat open 18 days awaiting
+# review -- the PR was open 18 days, but the ask went out on day 12, so the
+# response window was 6 days. Do not reintroduce 18 as a response-window figure;
+# it overstates the wait by more than double.
 #
 # This matters for reading the policy below: v0.1.0 would fail the NEW gate too,
-# via the never-requested refusal rather than the window. The waiver is not a
-# retroactive amnesty for that tag, and was not designed as one.
+# via the never-requested refusal rather than the window -- because the review
+# never ran through GitHub at all. The waiver is not a retroactive amnesty for
+# that tag, and was not designed as one.
 #
 # The gate now passes a `benchmark-v*` tag if EITHER:
 #
@@ -98,7 +112,10 @@ permissions:
 
 env:
   # Days the reviewer of record has to respond before a release may proceed
-  # with a logged waiver. 14 matches the observed 18-day stall on v0.1.0.
+  # with a logged waiver. 14 is a policy choice, NOT calibrated to v0.1.0: this
+  # comment previously justified it as "matching the observed 18-day stall",
+  # which was wrong twice over -- the observed window was 6 days, and v0.1.0's
+  # review never ran through GitHub, so it produced no window to calibrate to.
   REVIEW_WINDOW_DAYS: "14"
 
 jobs:
