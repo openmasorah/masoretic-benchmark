@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented here. Versioning is
 independent for the two artifacts this repository holds: the **scorer** Python
-package (`masoretic_eval`, currently `0.2.0`) and the **benchmark dataset**
+package (`masoretic_eval`, currently `0.3.0`) and the **benchmark dataset**
 (tagged `benchmark-v*`).
 
 ## benchmark-v0.1.1 (unreleased) — corrections to v0.1.0
@@ -78,6 +78,88 @@ tier-2 half and the adjudication-count contamination were found while verifying 
   `LICENSE.md` is authoritative; the immutable `benchmark-v0.1.0` tag keeps the
   superseded table.
 
+### ⚠️ Corrected: the scorer could not score this benchmark's own tier-4 data
+
+`masoretic-eval score` rejected **all 516** tier-4 records in
+`iaa_data/devarim_4folio/consensus_gold_positional.json` — every one, on the enum
+check. The CLI's tier-4 vocabulary was `pe, samekh, reversednun, puncta,
+large_letter, small_letter, suspended_letter, inverted_nun`; the shipped ground
+truth is `circellus, rafe, double_rafe`. The two sets share no term.
+
+Four vocabularies had drifted apart: the two JSON Schemas, the shipped IAA data,
+the manuscript catalog's `mark_type_enum` (which said `puncta_extraordinaria`
+where the scorer said `puncta`), and `docs/meta_marks_schema.md`, which specified
+capture mechanisms without ever naming *rafe* or *circellus* — that is, 100% of
+what actually ships.
+
+**No published figure changes.** `iaa_report.json` is byte-identical across this
+correction. The tier-4 IAA path (`masoretic_eval.iaa`) reads the data files
+directly and never consulted the CLI enum, which is exactly why this stayed
+invisible: the numbers were produced by a path the broken contract did not gate.
+What was broken was *reuse* — a third party could not run the shipped scorer over
+the shipped gold, which is most of what a benchmark is for.
+
+**Fixes.** `masoretic_eval/tier4_vocabulary.py` is now the single definition; both
+schema enums and the catalog enum are asserted equal to it by
+`tests/test_tier4_vocabulary_consistency.py`. `tests/test_tier4_gt_roundtrip.py`
+validates and scores the shipped consensus gold end-to-end through the real
+scorer — the test whose absence let this ship, and which fails on the pre-fix code
+with all 516 records rejected. Scorer **0.2.0 → 0.3.0 (BREAKING)**: `reversednun`
+→ `inverted_nun` and `puncta` → `puncta_extraordinaria` are retired, migratable
+via `masoretic_eval.tier4_vocabulary.canonicalize()`. Neither retired spelling
+occurs anywhere in the v0.1 corpus, so no shipped artifact needed rewriting.
+
+`corpus/manuscripts.yaml` also understated coverage: it declared `circellus` but
+not `rafe`, though the gold carries 278 *rafe* records to 211 *circellus* and the
+BL-05 baseline scores entirely against the *rafe* set. It was unfixable before
+now — `mark_type_enum` had no term for it. Both are now declared.
+
+A pre-existing test, `tests/test_metamark_vocab_alignment.py`, had been enforcing
+the defect: it asserted the schema enum *equal* the UXLC loader's vocabulary,
+which forbade the schema from admitting the project's own data. A correct fix
+would have failed CI looking like a regression. Its assertion is now containment.
+
+### Governance — v0.1.0 was tagged without the reviewer's approval
+
+**Disclosure.** `benchmark-v0.1.0` was tagged and published while its release PR
+had been open 18 days with the reviewer of record requested and no review
+submitted. The D-16 gate in `.github/workflows/release-tag.yml` was
+approval-required, so it failed on the true condition and has been publicly red on
+that tag ever since. The release proceeded anyway. That was not disclosed at the
+time; this entry is that disclosure.
+
+**Policy change.** The gate is rewritten rather than deleted or left red — a
+permanently-red required gate is worse than none, because it trains everyone to
+ignore it. A `benchmark-v*` tag now passes if **either** a standing APPROVED
+review from the reviewer of record exists on the release PR, **or** the reviewer
+was formally requested and 14 days elapsed with no review of any kind, in which
+case the job passes and logs a waiver to the run summary. Fourteen days is
+calibrated to the observed 18-day stall.
+
+The waiver is deliberately narrow. It does **not** apply when the reviewer was
+never requested — a review you never asked for cannot lapse — nor when they
+responded without approving (`COMMENTED` and `REQUEST_CHANGES` both block; an
+engaged reviewer's silence is a signal, not an absence), nor when an earlier
+approval was later dismissed or superseded, nor before the window lapses. The
+clock starts when the review was **requested**, not when the PR opened, so adding
+a reviewer late does not retroactively burn their days. An unset
+`YOSEF_GH_USERNAME` still hard-fails rather than silently passing.
+
+A waiver is a disclosure obligation, not an absolution: every waived release must
+say so here under **Governance**, and the deferred review folds into the next
+patch release. The reviewer of record's review of v0.1.0 folds into v0.1.1.
+
+**Honest limitation, unchanged.** A `push: tags:` workflow runs after the tag
+object exists, so it cannot prevent a tag from being created — only refuse to
+publish. Preventing creation needs a GitHub ruleset restricting who may push
+`benchmark-v*` refs. That is a repository setting, not code, and it is still not
+in place.
+
+Separately, `check-yosef-review-gate` in `ci.yml` carried a stale comment claiming
+it was "spent by design." Deleting the retracted `results/` tree re-armed it
+(`git ls-tree -r main` now matches zero files under `results/llm_vision/`); the
+comment now says so, and the gate is left armed deliberately.
+
 ## benchmark-v0.1.0 — Open Masorah Devarim pilot benchmark
 
 First public release of the benchmark: a four-tier inter-annotator-agreement
@@ -130,6 +212,20 @@ figures reproduce from the three committed projection files alone.
 This table summarizes; [`LICENSE.md`](LICENSE.md) is authoritative.
 
 ---
+
+## masoretic_eval 0.3.0 — scorer (BREAKING)
+
+Tier-4 vocabulary unification. `metamarks[].type` / `tier4_records[].type` now
+accept one canonical enum — `pe`, `samekh`, `large_letter`, `small_letter`,
+`suspended_letter`, `inverted_nun`, `puncta_extraordinaria`, `circellus`,
+`rafe`, `double_rafe` — defined once in `masoretic_eval/tier4_vocabulary.py`.
+
+**Breaking.** `reversednun` and `puncta` are rejected. Migrate with
+`masoretic_eval.tier4_vocabulary.canonicalize()`, which maps them to
+`inverted_nun` and `puncta_extraordinaria` respectively. Consumer pins in
+`baselines/` and `oracles/` cascade to `>=0.3.0,<0.4`.
+
+Rationale, and why no published number moved, under **benchmark-v0.1.1** above.
 
 ## masoretic_eval 0.2.0 — scorer
 

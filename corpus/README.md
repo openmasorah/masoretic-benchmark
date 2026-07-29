@@ -60,9 +60,15 @@ The canonical contract lives at
 Controlled vocabularies (defined under `$defs`):
 
 - `coverage_enum`: `complete | partial | sample | none`
-- `mark_type_enum` (tier 4): `large_letter`, `small_letter`, `inverted_nun`,
-  `puncta_extraordinaria`, `circellus`, `line_filler`, `stichographic_layout`,
-  `suspended_letter`, `dotted_letter`, `rashe_tevot`
+- `mark_type_enum` (tier 4): the canonical scorer vocabulary — `pe`, `samekh`,
+  `large_letter`, `small_letter`, `suspended_letter`, `inverted_nun`,
+  `puncta_extraordinaria`, `circellus`, `rafe`, `double_rafe` — plus four
+  catalog-only phenomena that have no positional record type and so can be
+  declared as coverage but not scored: `line_filler`, `stichographic_layout`,
+  `dotted_letter`, `rashe_tevot`. Defined once in
+  [`masoretic_eval/tier4_vocabulary.py`](../masoretic_eval/tier4_vocabulary.py);
+  see [`docs/meta_marks_schema.md`](../docs/meta_marks_schema.md) for the
+  per-mark table.
 - `image_sources[].type`: `iiif_manifest | image_set | text_only |
   single_image`
 - `image_sources[].resolution`: `high | medium | low | unknown`

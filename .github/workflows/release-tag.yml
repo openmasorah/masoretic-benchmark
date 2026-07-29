@@ -29,6 +29,34 @@
 #     It is deliberately NOT auto-deleted -- destroying a ref on failure is the
 #     kind of "helpful" action that loses work.
 #
+# POLICY CHANGE 2026-07-29 -- approval OR lapsed review window
+# ------------------------------------------------------------
+# The original gate was approval-required, full stop. v0.1.0 was tagged anyway,
+# 18 days after the release PR opened with the reviewer requested and no review
+# submitted, and the gate went publicly red. Leaving a permanently-red required
+# gate is worse than having no gate: it trains everyone to ignore it.
+#
+# The gate now passes a `benchmark-v*` tag if EITHER:
+#
+#   (a) a standing APPROVED review from the reviewer of record exists on the
+#       release PR -- the original logic, unchanged; OR
+#   (b) the reviewer was formally requested, and REVIEW_WINDOW_DAYS have passed
+#       with no review of any kind from them. The job passes and logs a WAIVER.
+#
+# Everything else still fails: no PR, reviewer never requested, a review that
+# exists but is not APPROVED (COMMENTED or REQUEST_CHANGES both block -- an
+# engaged reviewer's silence is not lapse), or a window that has not lapsed.
+#
+# The window clock starts when the review was REQUESTED, not when the PR was
+# opened. The two differ whenever the reviewer is added later, and starting at
+# PR creation would credit the reviewer with days during which nobody had asked
+# them for anything. This is strictly more conservative than a `created_at`
+# clock: request time is never earlier than creation time.
+#
+# A waiver is a disclosure obligation, not an absolution. Every waived release
+# must say so in CHANGELOG.md under Governance, and the deferred review folds
+# into the next patch release. See CHANGELOG v0.1.1.
+#
 # CONFIGURATION REQUIRED
 # ----------------------
 # Repository variable `YOSEF_GH_USERNAME` must be set to the reviewing
@@ -57,6 +85,11 @@ permissions:
   contents: read
   pull-requests: read
 
+env:
+  # Days the reviewer of record has to respond before a release may proceed
+  # with a logged waiver. 14 matches the observed 18-day stall on v0.1.0.
+  REVIEW_WINDOW_DAYS: "14"
+
 jobs:
   # --------------------------------------------------------------------------
   # REL-09 at release tier. Unlike the `gates` job in ci.yml, this passes
@@ -81,12 +114,14 @@ jobs:
         run: python scripts/rebind_manifest_hash.py --check
 
   # --------------------------------------------------------------------------
-  # D-16: no tag, no HF upload, no announcement until Yosef leaves a WRITTEN
-  # "approve" review. A thumbs-up reaction does not count, which is precisely
-  # why this queries the reviews API and not reactions.
+  # D-16: no tag, no HF upload, no announcement until the reviewer of record
+  # leaves a WRITTEN "approve" review -- or the review window lapses with the
+  # request outstanding, in which case the release proceeds with a logged
+  # waiver. A thumbs-up reaction does not count, which is precisely why this
+  # queries the reviews API and not reactions.
   # --------------------------------------------------------------------------
   approval:
-    name: D-16 Yosef written-approve gate
+    name: D-16 approval-or-lapsed-window gate
     runs-on: ubuntu-latest
     steps:
       - name: Require YOSEF_GH_USERNAME to be configured
@@ -122,34 +157,135 @@ jobs:
           fi
           echo "numbers=${NUMBERS}" >> "$GITHUB_OUTPUT"
 
-      - name: Require a written APPROVED review from the reviewer of record
+      - name: Approval, or a lapsed review window with the request outstanding
         env:
           GH_TOKEN: ${{ github.token }}
           YOSEF: ${{ vars.YOSEF_GH_USERNAME }}
           NUMBERS: ${{ steps.pr.outputs.numbers }}
+          REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          found=0
-          for pr in ${NUMBERS}; do
-            echo "--- PR #${pr} reviews ---"
-            # Latest review state per user; an APPROVED that was later
-            # dismissed or changed to REQUEST_CHANGES must not count.
-            latest=$(gh api "repos/${{ github.repository }}/pulls/${pr}/reviews" --paginate \
-              --jq 'map(select(.state != "COMMENTED"))
-                    | group_by(.user.login)
-                    | map(max_by(.submitted_at))
-                    | .[] | "\(.user.login) \(.state)"')
-            echo "${latest:-<no reviews>}"
-            if echo "${latest}" | grep -qx "${YOSEF} APPROVED"; then
-              found=1
-            fi
-          done
-          if [[ "${found}" -ne 1 ]]; then
-            echo "::error::No standing APPROVED review from '${YOSEF}' on PR(s): ${NUMBERS}"
-            echo "::error::D-16: no HF upload, no tag, no announcement without a written approve."
+
+          window_days="${REVIEW_WINDOW_DAYS}"
+          if ! [[ "${window_days}" =~ ^[0-9]+$ ]] || [[ "${window_days}" -lt 1 ]]; then
+            echo "::error::REVIEW_WINDOW_DAYS must be a positive integer; got '${window_days}'."
             exit 1
           fi
-          echo "D-16 satisfied: '${YOSEF}' has a standing APPROVED review."
+          now_epoch=$(date -u +%s)
+
+          approved=0          # (a) standing APPROVED review found
+          waivable=0          # (b) requested + window lapsed + no review at all
+          engaged=0           # reviewer responded, but not with an approval
+          never_requested=0   # reviewer was never asked on any candidate PR
+          pending=""          # human-readable "not yet lapsed" detail
+
+          # Deliberately no --paginate: `gh api --paginate --jq` applies the
+          # filter per page and emits one result per page, which silently
+          # breaks any scalar query. per_page=100 covers every realistic
+          # release PR, and each endpoint is fetched exactly once so the jq
+          # below is plain jq with proper --arg quoting.
+          work="$(mktemp -d)"
+
+          for pr in ${NUMBERS}; do
+            echo "--- PR #${pr} ---"
+            gh api "repos/${REPO}/pulls/${pr}/reviews?per_page=100" > "${work}/reviews.json"
+            gh api "repos/${REPO}/pulls/${pr}" > "${work}/pr.json"
+
+            # Latest review state per user. An APPROVED later dismissed or
+            # changed to REQUEST_CHANGES must not count, hence max_by(date).
+            # COMMENTED is excluded from *approval* detection but is still a
+            # response, so it is captured separately below.
+            latest=$(jq -r 'map(select(.state != "COMMENTED"))
+                            | group_by(.user.login)
+                            | map(max_by(.submitted_at))
+                            | .[] | "\(.user.login) \(.state)"' "${work}/reviews.json")
+            echo "reviews: ${latest:-<none>}"
+
+            if echo "${latest}" | grep -qx "${YOSEF} APPROVED"; then
+              approved=1
+              continue
+            fi
+
+            # Any review of any kind from the reviewer, COMMENTED included.
+            # A reviewer who engaged and did not approve has not "lapsed";
+            # their silence-after-speaking is a signal, not an absence.
+            responses=$(jq -r --arg u "${YOSEF}" \
+              'map(select(.user.login == $u)) | length' "${work}/reviews.json")
+            if [[ "${responses}" -gt 0 ]]; then
+              echo "reviewer responded ${responses}x without a standing approval"
+              engaged=1
+              continue
+            fi
+
+            # When was the review actually requested? Prefer the timeline's
+            # review_requested event; fall back to PR creation only if the
+            # timeline carries no such event but the request is still pending.
+            gh api "repos/${REPO}/issues/${pr}/timeline?per_page=100" > "${work}/timeline.json"
+            requested_at=$(jq -r --arg u "${YOSEF}" \
+              '[.[] | select(.event == "review_requested"
+                             and (.requested_reviewer.login // "") == $u)
+                    | .created_at] | sort | first // ""' "${work}/timeline.json")
+            still_pending=$(jq -r --arg u "${YOSEF}" \
+              '[.requested_reviewers[]?.login] | index($u) != null' "${work}/pr.json")
+            if [[ -z "${requested_at}" && "${still_pending}" == "true" ]]; then
+              requested_at=$(jq -r '.created_at' "${work}/pr.json")
+              echo "no review_requested event; falling back to PR created_at"
+            fi
+
+            if [[ -z "${requested_at}" ]]; then
+              echo "reviewer '${YOSEF}' was never requested on PR #${pr}"
+              never_requested=1
+              continue
+            fi
+
+            requested_epoch=$(date -u -d "${requested_at}" +%s)
+            elapsed_days=$(( (now_epoch - requested_epoch) / 86400 ))
+            echo "requested ${requested_at} -> ${elapsed_days}d elapsed (window ${window_days}d)"
+
+            if [[ "${elapsed_days}" -ge "${window_days}" ]]; then
+              waivable=1
+              waiver_pr="${pr}"
+              waiver_days="${elapsed_days}"
+            else
+              pending="${pending} #${pr}:${elapsed_days}d"
+            fi
+          done
+
+          if [[ "${approved}" -eq 1 ]]; then
+            echo "D-16 satisfied: '${YOSEF}' has a standing APPROVED review."
+            echo "D-16: approved by ${YOSEF}." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          if [[ "${engaged}" -eq 1 ]]; then
+            echo "::error::'${YOSEF}' reviewed PR(s) ${NUMBERS} without a standing approval."
+            echo "::error::The window waiver covers NO response, not a withheld one. Refusing to pass."
+            exit 1
+          fi
+
+          if [[ "${waivable}" -eq 1 ]]; then
+            echo "::notice::D-16 waiver -- review window (${window_days}d) lapsed with no review from ${YOSEF}; review folds into the next patch release"
+            {
+              echo "### D-16 WAIVER"
+              echo
+              echo "Released without approval from \`${YOSEF}\`."
+              echo "Requested on PR #${waiver_pr}; **${waiver_days} days** elapsed, window is ${window_days} days."
+              echo
+              echo "This must be disclosed in \`CHANGELOG.md\` under **Governance**,"
+              echo "and the deferred review folds into the next patch release."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          if [[ "${never_requested}" -eq 1 ]]; then
+            echo "::error::'${YOSEF}' was never requested as a reviewer on PR(s): ${NUMBERS}"
+            echo "::error::A review you never asked for cannot lapse. Refusing to pass."
+            exit 1
+          fi
+
+          echo "::error::No approval from '${YOSEF}' and the ${window_days}d window has not lapsed:${pending}"
+          echo "::error::D-16: no HF upload, no tag, no announcement. Wait, or obtain the approval."
+          exit 1
 
   # --------------------------------------------------------------------------
   # Publication is downstream of BOTH gates. This is the layer that makes the

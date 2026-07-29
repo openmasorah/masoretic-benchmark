@@ -9,7 +9,7 @@ description = "Phase 3 baselines for the Masoretic CER benchmark."
 requires-python = ">=3.11,<3.13"
 license = { text = "Apache-2.0" }
 dependencies = [
-    "masoretic-eval[page-xml]>=0.2.0,<0.3",
+    "masoretic-eval[page-xml]>=0.3.0,<0.4",
     "masoretic-oracles>=0.1.0,<0.2",
     "jsonschema>=4.0",
     "tenacity>=8.0",
