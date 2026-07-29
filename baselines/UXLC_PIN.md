@@ -21,12 +21,13 @@ alone (see `iaa_report.json` `_note` and the CHANGELOG).
 
 ## Fetch + verify
 
-The file is fetched from tanach.us (via `gt_infra.uxlc_import.fetch_uxlc`) and
-cached at `baselines/tests/fixtures/_uxlc_cache/Deuteronomy.xml` (gitignored;
-never committed). To reproduce:
+The file is a direct download from tanach.us, cached at
+`baselines/tests/fixtures/_uxlc_cache/Deuteronomy.xml` (gitignored; never
+committed). To reproduce and verify against this pin:
 
 ```bash
-# re-fetch (however the cache was populated), then verify against this pin:
+curl -sSL https://tanach.us/Books/Deuteronomy.xml \
+  -o baselines/tests/fixtures/_uxlc_cache/Deuteronomy.xml
 shasum -a 256 baselines/tests/fixtures/_uxlc_cache/Deuteronomy.xml
 # expected: 55fd384d757453f1b8f6672ea75d9ef58c015a0093c9eee92905fd1f70e9ce07
 ```
