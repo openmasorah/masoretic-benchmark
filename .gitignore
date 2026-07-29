@@ -27,6 +27,7 @@ baselines/.cache/
 # gt_infra.uxlc_import.fetch_uxlc.fetch_uxlc_book). Reproducible — re-fetch
 # at any time. Keeps the repo lean while preserving deterministic provenance
 # (each gt_adapter golden's _provenance block records the source).
+# baselines/UXLC_PIN.md pins the source version + sha256.
 baselines/tests/fixtures/_uxlc_cache/
 
 # Regen artifacts from scripts/regenerate_*.py.

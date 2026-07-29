@@ -5,6 +5,8 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](.python-version)
 
+> **Licensing:** the Apache-2.0 badge above covers the scorer *code* only. The dataset is multi-component — consonantal text is Public Domain, annotation data (Tiers 2–4) is CC0-1.0, and Open Masorah's schema, adjudication, and compilation are CC-BY-4.0. See [`LICENSE.md`](LICENSE.md) for the authoritative statement.
+
 A 4-tier Character Error Rate (CER) scorer and public benchmark dataset for medieval Hebrew manuscript transcription.
 
 `masoretic-eval` evaluates Hebrew OCR/HTR predictions against ground truth at four tiers — consonants, nikkud, full text, and metamark records — producing reproducible, pre-registered scores for the IAA Leningrad Codex Devarim folio set.
