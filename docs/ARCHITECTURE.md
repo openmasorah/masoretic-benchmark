@@ -166,7 +166,7 @@ masoretic-benchmark/
 │   ├── phase_0_manifest.changelog.md     # Append-only manifest changelog.
 │   └── PREDICTION_SCHEMA_CHANGELOG.md    # Append-only prediction-schema changelog.
 │                           # results/ is absent in v0.1: baselines are deferred
-│                           # to v0.1.1 (see README "Baselines"). When promoted, a
+│                           # to a future release (see README "Baselines"). When promoted, a
 │                           # baseline writes results/<baseline_id>/<folio>.json +
 │                           # run_meta.json, and scores land in results/scores/.
 ├── tests/                  # Scorer test suite (pytest).
@@ -267,7 +267,7 @@ Leningrad Codex book of Devarim (Deuteronomy): `F118B`, `F119A`, `F119B`,
 3. `results/` (per-baseline predictions + `results/scores/` headline CER + F1) —
    **withdrawn in v0.1**; no baseline prediction/score tree ships. The earlier
    F118B draft scores were retracted (see `baselines/EVALUATION_PROTOCOL.md`,
-   2026-07-10 row) and re-emission is deferred to v0.1.1.
+   2026-07-10 row) and re-emission is deferred to a future release.
 
 v0.1 ships no automated OCR/HTR baseline predictions or scores; the release is
 the ground truth, the inter-annotator agreement measurement, and the scorer.
