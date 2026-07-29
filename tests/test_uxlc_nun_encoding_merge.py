@@ -74,7 +74,7 @@ def test_ordinals_are_unique_per_verse(marks) -> None:
         "published number is affected. Fixing it means merging the two "
         "collection passes into one document-order walk — a behaviour change to "
         "ordinal assignment, which is a pre-registered v0.2 decision, not a "
-        "patch-release edit.",
+        "patch-release edit."
     ),
     strict=True,
 )
