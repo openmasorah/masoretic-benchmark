@@ -36,7 +36,7 @@ Optional extras instead of `[all]`:
   `tenacity`); listed for symmetry.
 - `[dev]` — `pytest`, `pytest-mock`.
 
-`masoretic-eval >= 0.2.0,<0.3` is a hard dependency. The scorer must be
+`masoretic-eval>=0.3.0,<0.4` is a hard dependency. The scorer must be
 installed (editable or wheel) before installing this package.
 
 ## Modules

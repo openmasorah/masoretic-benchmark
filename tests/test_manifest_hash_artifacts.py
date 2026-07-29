@@ -1,7 +1,7 @@
 """`manifest_hash` binding, and the v0.1 absence of a promoted results tree.
 
 v0.1 ships under Option A: the IAA / adjudicated-GT benchmark and the scorer.
-Automated baselines are deferred to v0.1.1, so `results/` and
+Automated baselines are deferred to a future release, so `results/` and
 `results_provisional/` are not part of the public tree.
 
 This file used to pin an expected set of 11 promoted F118B artifacts. Those
@@ -14,7 +14,7 @@ Two properties now, and neither is vacuous:
 
 1. The tree really is absent. An empty glob must be asserted, not assumed --
    otherwise property 2 silently tests nothing.
-2. *If* a promoted artifact exists (the v0.1.1 re-promotion), it binds to the
+2. *If* a promoted artifact exists (whenever a release re-promotes one), it binds to the
    current manifest. This keeps the rebind coupling guarded across the gap.
 """
 
@@ -62,7 +62,7 @@ def _tracked_under(*paths: str) -> list[str]:
 
 
 def test_results_trees_publish_nothing_under_v01_option_a():
-    """Baselines are deferred to v0.1.1. Their absence is intentional, so assert it.
+    """Baselines are deferred to a future release. Their absence is intentional, so assert it.
 
     Checks tracked content, not directory existence: running a baseline locally
     creates `results/<bl>/<folio>/*.jpg` line crops, which are gitignored and were
@@ -72,14 +72,14 @@ def test_results_trees_publish_nothing_under_v01_option_a():
     assert not tracked, (
         "the withdrawn result trees are tracked again: "
         f"{tracked[:5]}{'...' if len(tracked) > 5 else ''}. "
-        "If this is the v0.1.1 re-promotion, replace this test with a strict "
+        "If this is the re-promotion, replace this test with a strict "
         "expected-set pin -- but only over re-emitted predictions (pinned "
         "transformers) and ROI/main-text scores."
     )
 
 
 def test_any_promoted_artifact_binds_to_the_current_manifest_hash():
-    """Guards the rebind coupling across the v0.1 -> v0.1.1 gap.
+    """Guards the rebind coupling across the gap in which no promoted artifact exists.
 
     Passes trivially while `results/` is absent -- which is exactly why the test
     above asserts that absence rather than letting it pass unnoticed.

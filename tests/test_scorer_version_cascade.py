@@ -19,6 +19,7 @@ release invariant that would have flagged the manifest was an unimplemented
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 from pathlib import Path
 
@@ -44,10 +45,10 @@ def _load(path: Path) -> dict:
 def test_no_promoted_run_metas_under_v01_option_a():
     """Guard the parametrization: an empty glob makes every run_meta test below vacuous.
 
-    Under v0.1 (Option A) baselines are deferred to v0.1.1, so no `run_meta.json` is
+    Under v0.1 (Option A) baselines are deferred to a future release, so no `run_meta.json` is
     published and there is nothing to cascade into. That is the expected state -- but
     it has to be *asserted*, or the parametrized tests would pass by finding nothing
-    and we would have no signal when v0.1.1 re-promotes an artifact carrying a stale
+    and we would have no signal when a release re-promotes an artifact carrying a stale
     scorer_version.
     """
     tracked = subprocess.check_output(
@@ -117,6 +118,67 @@ def test_the_whole_version_chain_is_one_value():
     assert len(set(chain.values())) == 1, "scorer version chain has drifted: " + ", ".join(
         f"{k}={v}" for k, v in chain.items()
     )
+
+
+# ---------------------------------------------------------------------------
+# Documentation surfaces.
+#
+# The version chain above was made airtight and the docs still shipped `0.2.0`
+# in six places, because no gate had ever looked at prose. A reader following
+# GETTING-STARTED sees a `scorer_version` the scorer cannot emit, which is the
+# same defect as a stale field -- it just fails at a human instead of a test.
+#
+# `CHANGELOG.md` is excluded on purpose: it is a historical record, and quoting
+# the version a past release shipped is precisely its job.
+# ---------------------------------------------------------------------------
+
+_SCORER_VERSION_CLAIM = re.compile(r'"scorer_version":\s*"([0-9][^"]*)"')
+_DUNDER_VERSION_CLAIM = re.compile(r"__version__`?\s*=\s*`?([0-9][0-9.]*)")
+_EVAL_PIN_CLAIM = re.compile(r"(masoretic-eval(?:\[[a-z-]+\])?>=[0-9][0-9.]*,<[0-9][0-9.]*)")
+
+
+def _tracked_docs() -> list[Path]:
+    out = subprocess.check_output(
+        ["git", "-C", str(REPO_ROOT), "ls-files", "--", "*.md"], text=True
+    ).splitlines()
+    return [REPO_ROOT / p for p in out if Path(p).name != "CHANGELOG.md"]
+
+
+def test_docs_do_not_advertise_a_scorer_version_the_package_cannot_emit():
+    stale = [
+        f"{p.relative_to(REPO_ROOT)}:{n}: scorer_version {m.group(1)!r}"
+        for p in _tracked_docs()
+        for n, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1)
+        for m in _SCORER_VERSION_CLAIM.finditer(line)
+        if m.group(1) != masoretic_eval.__version__
+    ] + [
+        f"{p.relative_to(REPO_ROOT)}:{n}: __version__ {m.group(1)!r}"
+        for p in _tracked_docs()
+        for n, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1)
+        for m in _DUNDER_VERSION_CLAIM.finditer(line)
+        if m.group(1) != masoretic_eval.__version__
+    ]
+
+    assert not stale, f"docs claim a version other than {masoretic_eval.__version__}: " + "; ".join(
+        stale
+    )
+
+
+def test_docs_quote_dependency_pins_that_the_pyprojects_actually_declare():
+    """A documented pin nobody satisfies is worse than none -- it is followed."""
+    real = "\n".join(
+        (REPO_ROOT / f).read_text(encoding="utf-8")
+        for f in ("oracles/pyproject.toml", "baselines/pyproject.toml")
+    )
+    wrong = [
+        f"{p.relative_to(REPO_ROOT)}:{n}: {m.group(1)!r}"
+        for p in _tracked_docs()
+        for n, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1)
+        for m in _EVAL_PIN_CLAIM.finditer(line.replace(" ", ""))
+        if m.group(1) not in real.replace(" ", "")
+    ]
+
+    assert not wrong, "docs quote masoretic-eval pins no pyproject declares: " + "; ".join(wrong)
 
 
 @pytest.mark.parametrize("run_meta", RUN_METAS, ids=lambda p: p.parent.name)

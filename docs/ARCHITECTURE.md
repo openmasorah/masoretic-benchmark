@@ -91,7 +91,7 @@ A typical scoring run for one folio executes the following sequence:
    separately, never folded into the composite.
 9. **Serialization.** `masoretic_eval.output_schema.serialize` emits the final
    JSON object with `prediction_id`, `gt_version`, `manifest_hash`,
-   `scorer_version` (`__version__` = `0.2.0`), the four tier blocks, the
+   `scorer_version` (`__version__` = `0.3.0`), the four tier blocks, the
    composite, the confusion matrices, and the standard caveats array. The
    file is written with `indent=2, ensure_ascii=False` so Hebrew is human-readable.
 
