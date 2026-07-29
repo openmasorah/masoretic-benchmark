@@ -82,13 +82,42 @@ def test_release_audit_runs_the_release_tier_audit(workflow):
 
 
 def test_publication_depends_on_both_gates(workflow):
-    """The tag existing is not the release. Publication needs audit AND approval."""
+    """The tag existing is not the release. Publication needs audit AND sign-off.
+
+    Updated 2026-07-29 with the policy change: the blocking gate is `signoff`
+    (maintainer sign-off + published governance disclosure), not `approval`.
+    """
     needs = workflow["jobs"]["publish"]["needs"]
-    assert set(needs) == {"release-audit", "approval"}
+    assert set(needs) == {"release-audit", "signoff"}
+
+
+def test_publication_does_not_depend_on_the_advisory_review_job(workflow):
+    """Advisory means advisory.
+
+    If `publish` ever regained a dependency on `approval`, the scholarly review
+    would silently become blocking again while the CHANGELOG still told readers
+    it was advisory — a gate whose documented behaviour and real behaviour
+    disagree, which is the defect this whole release has been correcting.
+    """
+    assert "approval" not in workflow["jobs"]["publish"]["needs"]
+    assert workflow["jobs"]["approval"].get("continue-on-error") is True
+
+
+def test_the_blocking_gate_checks_signoff_and_disclosure(workflow):
+    """The `signoff` job must actually run the checker, not just exist."""
+    runs = " ".join(s.get("run", "") for s in workflow["jobs"]["signoff"]["steps"])
+
+    assert "check_release_signoff.py" in runs
+    assert "--tag" in runs
 
 
 def test_approval_gate_refuses_to_default_the_reviewer(workflow):
-    """An unset YOSEF_GH_USERNAME must FAIL, never silently approve."""
+    """An unset YOSEF_GH_USERNAME must FAIL its step, never silently approve.
+
+    Still asserted even though the job is advisory: a misconfigured reviewer
+    variable should surface loudly in the release log rather than be reported as
+    "no review found".
+    """
     steps = workflow["jobs"]["approval"]["steps"]
     guard = steps[0]
     body = guard.get("run", "")

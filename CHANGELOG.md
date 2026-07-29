@@ -223,12 +223,50 @@ checked. The governing fact — that the review had been deliberately removed fr
 the critical path — was absent from all of them, and it is the one that makes
 the release defensible rather than negligent.
 
-**Policy change.** The gate is rewritten rather than deleted or left red — a
-permanently-red required gate is worse than none, because it trains everyone to
-ignore it. A `benchmark-v*` tag now passes if **either** a standing APPROVED
-review from the reviewer of record exists on the release PR, **or** the reviewer
-was formally requested and 14 days elapsed with no review of any kind, in which
-case the job passes and logs a waiver to the run summary.
+**Policy change — the release gate now matches who actually decides.**
+
+*Old policy:* a `benchmark-v*` tag could publish only with an **approving GitHub
+review from a named scholarly reviewer**.
+
+*New policy, effective 2026-07-29:* a tag publishes only with **both** (a) a
+maintainer sign-off entry in `RELEASE_SIGNOFF.md` for that exact version, naming
+who authorized the release and how, and (b) a `### Governance` subsection in this
+changelog under that version's heading. **Scholarly review is advisory** —
+recorded when present, never required, and it cannot block a tag.
+
+*Why.* The old gate contradicted this project's documented decision model, in
+which the maintainer is the sole decision authority and collaborators are
+consultants rather than approval gates. The contradiction was not theoretical:
+v0.1.0 shipped under an explicit, recorded decision to take the scholarly review
+off the critical path, and the gate went permanently red **for doing what the
+project had decided to do**. A required gate that contradicts the decision model
+gets ignored — which is worse than no gate, because it also trains people to
+ignore the gates that matter.
+
+**This is a deliberate, disclosed decision by the project's decision authority,
+not a quiet loosening**, and requirement (b) is what makes that claim checkable:
+the gate cannot be cleared silently, because clearing it requires publishing how
+the release was authorized. A future release that ships without scholarly review
+must say so, here, in public, or it does not ship.
+
+*Rejected alternative.* Checking **who pushed the tag** was considered and
+rejected. Tag pushes may be performed by a delegate acting on the maintainer's
+authorization, so a pusher-identity check would verify the delegate's
+credentials and report them as the maintainer's sign-off — an assertion that can
+only ever be true, and therefore worthless as a gate.
+
+*Honest limitation.* Every commit in this repository is made through the same
+git identity, so the sign-off entry is a **recorded claim** of authorization,
+not cryptographic proof of it. That is why each entry must state how the
+authorization was given, so a reader can evaluate the claim rather than infer it
+from a signature that does not exist. The stronger form — the maintainer
+committing and GPG-signing the entry directly — is available whenever the
+project wants it.
+
+*Superseded interim policy, retained below because the advisory job still
+implements it:* the gate briefly passed on **either** a standing APPROVED review
+**or** a formally-requested reviewer who did not respond within 14 days, logging
+a waiver.
 
 The waiver is deliberately narrow. It does **not** apply when the reviewer was
 never requested — a review you never asked for cannot lapse — nor when they

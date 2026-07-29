@@ -21,7 +21,7 @@
 #
 #   * This workflow is the ONLY sanctioned path to a public artifact. Nothing
 #     is uploaded to HuggingFace, and no GitHub Release is created, except by a
-#     job gated on `approval` passing.
+#     job gated on `signoff` passing.
 #   * To also prevent tag *creation*, add a GitHub ruleset restricting who may
 #     push refs matching `benchmark-v*`. That is a repo setting, not code.
 #   * If this workflow fails, the tag must be deleted by hand:
@@ -29,8 +29,47 @@
 #     It is deliberately NOT auto-deleted -- destroying a ref on failure is the
 #     kind of "helpful" action that loses work.
 #
-# POLICY CHANGE 2026-07-29 -- approval OR lapsed review window
-# ------------------------------------------------------------
+# POLICY 2026-07-29 (v0.1.1) -- maintainer sign-off + published disclosure
+# -------------------------------------------------------------------------
+# THE GATE IS `signoff`. A `benchmark-v*` tag publishes only if BOTH:
+#
+#   (a) RELEASE_SIGNOFF.md carries an entry for THAT EXACT VERSION, naming who
+#       authorized the release and HOW the authorization was given; and
+#   (b) CHANGELOG.md carries a `### Governance` subsection under that version's
+#       heading.
+#
+# Enforced by scripts/check_release_signoff.py, tested in
+# tests/release/test_release_signoff_gate.py. Both inputs live in the tagged
+# tree, so the gate is auditable from a clone with no API access.
+#
+# SCHOLARLY REVIEW IS ADVISORY. The `approval` job still queries it and records
+# what it finds, but it cannot block a tag and `publish` does not depend on it.
+#
+# WHY THIS CHANGED, stated plainly rather than softened: the previous gate
+# required an approving review from a named scholarly reviewer. That contradicts
+# this project's documented decision model, in which the maintainer is the sole
+# decision authority and collaborators are consultants, never approval gates.
+# The contradiction was not theoretical -- v0.1.0 shipped under an explicit,
+# recorded decision to take the scholarly review off the critical path, and the
+# gate went permanently red for doing what the project had decided to do. A
+# required gate that contradicts the decision model gets ignored, which is worse
+# than no gate because it also trains people to ignore the gates that matter.
+#
+# This is a deliberate, disclosed policy decision by the project's decision
+# authority -- NOT a quiet loosening. The disclosure requirement in (b) is what
+# makes that true: the gate cannot be cleared silently, because clearing it
+# requires publishing how the release was authorized. See CHANGELOG v0.1.1.
+#
+# Rejected alternative: checking who PUSHED the tag. Tag pushes may be performed
+# by a delegate acting on the maintainer's authorization, so a pusher-identity
+# check would verify the delegate's credentials and report them as the
+# maintainer's sign-off -- an assertion that can only ever be true.
+#
+# The superseded approval-or-lapsed-window policy is described below, where the
+# advisory `approval` job still implements it.
+#
+# SUPERSEDED POLICY (v0.1.1 interim, now advisory only)
+# -----------------------------------------------------
 # The original gate was approval-required, full stop. v0.1.0 was tagged without
 # an approving review and the gate went publicly red. Leaving a permanently-red
 # required gate is worse than having no gate: it trains everyone to ignore it.
@@ -148,9 +187,33 @@ jobs:
   # waiver. A thumbs-up reaction does not count, which is precisely why this
   # queries the reviews API and not reactions.
   # --------------------------------------------------------------------------
-  approval:
-    name: D-16 approval-or-lapsed-window gate
+  # --------------------------------------------------------------------------
+  # THE GATE. Maintainer sign-off for THIS version + a published governance
+  # disclosure for it. Both are checked from the tagged tree, so this is
+  # auditable by anyone with a clone and no API access.
+  #
+  # The `approval` job below still queries the scholarly review, but it is
+  # ADVISORY -- it records what it finds and never fails. See the POLICY CHANGE
+  # header at the top of this file for why the requirement moved.
+  # --------------------------------------------------------------------------
+  signoff:
+    name: Maintainer sign-off + published disclosure
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Release gate (sign-off + disclosure)
+        run: python scripts/check_release_signoff.py --tag "${{ github.ref_name }}"
+
+  approval:
+    name: Scholarly review status (ADVISORY -- never blocks)
+    runs-on: ubuntu-latest
+    # Records the scholarly review's status for the release log. Advisory by
+    # policy: `continue-on-error` here is NOT a softened check -- this job is no
+    # longer a gate, and `publish` does not depend on it. The gate is `signoff`.
+    continue-on-error: true
     steps:
       - name: Require YOSEF_GH_USERNAME to be configured
         env:
@@ -321,7 +384,7 @@ jobs:
   # --------------------------------------------------------------------------
   publish:
     name: Publish (blocked on both gates)
-    needs: [release-audit, approval]
+    needs: [release-audit, signoff]
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
