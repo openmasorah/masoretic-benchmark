@@ -184,11 +184,26 @@ publish.
 ### Governance — v0.1.0 was tagged without the reviewer's approval
 
 **Disclosure.** `benchmark-v0.1.0` was tagged and published while its release PR
-had been open 18 days with the reviewer of record requested and no review
-submitted. The D-16 gate in `.github/workflows/release-tag.yml` was
-approval-required, so it failed on the true condition and has been publicly red on
-that tag ever since. The release proceeded anyway. That was not disclosed at the
-time; this entry is that disclosure.
+(#45, titled "Yosef release-review PR") had been open 18 days with **no GitHub
+review request ever created on it and no review submitted**. The D-16 gate in
+`.github/workflows/release-tag.yml` was approval-required, so it failed on the
+true condition and has been publicly red on that tag ever since. The release
+proceeded anyway. That was not disclosed at the time; this entry is that
+disclosure.
+
+An earlier draft of this section said the PR sat open "with the reviewer of
+record requested." **That was wrong, and it is corrected here rather than
+quietly.** Querying the API directly shows PR #45's `requested_reviewers` is
+empty, it carries no reviews, and its complete event timeline is `committed`,
+`closed`, `merged`, `head_ref_deleted` — there is no `review_requested` event,
+not even one later withdrawn. The PR's *title* designated it as the review PR
+and the intent is not in doubt; the mechanical request was never made. The
+distinction matters, because the waiver introduced below deliberately does not
+cover it.
+
+Whether the reviewer was asked *off* GitHub — by email or in person — is not
+something this repository can evidence, so this entry does not assert it either
+way.
 
 **Policy change.** The gate is rewritten rather than deleted or left red — a
 permanently-red required gate is worse than none, because it trains everyone to

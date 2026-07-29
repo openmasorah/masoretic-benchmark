@@ -32,9 +32,20 @@
 # POLICY CHANGE 2026-07-29 -- approval OR lapsed review window
 # ------------------------------------------------------------
 # The original gate was approval-required, full stop. v0.1.0 was tagged anyway,
-# 18 days after the release PR opened with the reviewer requested and no review
-# submitted, and the gate went publicly red. Leaving a permanently-red required
-# gate is worse than having no gate: it trains everyone to ignore it.
+# 18 days after the release PR opened, and the gate went publicly red. Leaving a
+# permanently-red required gate is worse than having no gate: it trains everyone
+# to ignore it.
+#
+# NOTE, verified against the API 2026-07-29 and corrected here: on that release
+# PR (#45) NO review was ever requested. `requested_reviewers` is empty, there
+# are no reviews, and the timeline holds no `review_requested` event -- not even
+# a withdrawn one. An earlier version of this comment said the reviewer "was
+# requested"; that was false. The PR's title designated it the review PR, but
+# the mechanical request was never created.
+#
+# This matters for reading the policy below: v0.1.0 would fail the NEW gate too,
+# via the never-requested refusal rather than the window. The waiver is not a
+# retroactive amnesty for that tag, and was not designed as one.
 #
 # The gate now passes a `benchmark-v*` tag if EITHER:
 #
