@@ -59,6 +59,28 @@ def _run_audit(root: Path, *args: str) -> subprocess.CompletedProcess[str]:
     )
 
 
+def _placeholder_cer_tier() -> dict:
+    """An all-zero but schema-complete per-tier CER block.
+
+    Kept in one place so adding a field to ``cer_tier`` in
+    ``schemas/iaa_report.schema.json`` does not silently turn the placeholder
+    red-team test into a schema-validation test.
+    """
+    return {
+        "cer_vs_consensus_b": 0.0,
+        "ci95": [0.0, 0.0],
+        "cer_vs_consensus_a": 0.0,
+        "ci95_vs_consensus_a": [0.0, 0.0],
+        "cer_a_vs_b_round0": 0.0,
+        "ci95_a_vs_b_round0": [0.0, 0.0],
+        "denominator_codepoints_consensus": 1,
+        "denominator_codepoints_a": 1,
+        "edits_vs_consensus_b": 0,
+        "edits_vs_consensus_a": 0,
+        "edits_a_vs_b_round0": 0,
+    }
+
+
 def test_clean_repo_passes_audit(tmp_path):
     root = _bootstrap_clean_tmp(tmp_path)
     r = _run_audit(root, "--strict")
@@ -80,9 +102,13 @@ def test_placeholder_iaa_report_fails_release_tier_audit(tmp_path):
             "leningrad_devarim_F119A_fixture",
             "leningrad_devarim_F120A_fixture",
         ],
-        "tier1": {"cer_vs_consensus_b": 0.0, "ci95": [0.0, 0.0]},
-        "tier2": {"cer_vs_consensus_b": 0.0, "ci95": [0.0, 0.0]},
-        "tier3": {"cer_vs_consensus_b": 0.0, "ci95": [0.0, 0.0]},
+        # Schema-valid but all-zero: the point of this fixture is that
+        # `iaa_status: placeholder` must be caught by the RELEASE tier, not by
+        # the schema. Carries the full v0.1.1 field set so the test still
+        # exercises that distinction rather than tripping on a missing property.
+        "tier1": _placeholder_cer_tier(),
+        "tier2": _placeholder_cer_tier(),
+        "tier3": _placeholder_cer_tier(),
         "tier4": {"f1_mean": 1.0, "ci95": [1.0, 1.0]},
         "adjudication_summary": {
             "tier1_disagreements_reconciled": 0,

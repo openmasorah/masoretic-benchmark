@@ -26,14 +26,38 @@
   "$defs": {
     "cer_tier": {
       "type": "object",
-      "required": ["cer_vs_consensus_b", "ci95"],
+      "required": [
+        "cer_vs_consensus_b", "ci95",
+        "cer_vs_consensus_a", "ci95_vs_consensus_a",
+        "cer_a_vs_b_round0", "ci95_a_vs_b_round0",
+        "denominator_codepoints_consensus", "denominator_codepoints_a",
+        "edits_vs_consensus_b", "edits_vs_consensus_a", "edits_a_vs_b_round0"
+      ],
       "properties": {
         "cer_vs_consensus_b": {
           "type": "number",
           "minimum": 0,
-          "description": "Annotator B's round-0 transcription vs the adjudicated consensus reference, per DRAFT_v4 §5.2. NOT a bidirectional A-vs-B agreement figure and NOT an independent human-vs-reference baseline: the consensus is A's round-1 revision, byte-identical to B's round-2 endorsement, so it is not independent of either annotator. The paper reports no bidirectional tier-1/2/3 CER; the word does not appear in it. Renamed from bidirectional_cer_mean 2026-07-10 (B3)."
+          "description": "ADJUDICATION DIAGNOSTIC, not an agreement figure. Annotator B's round-0 transcription vs the adjudicated consensus reference, per DRAFT_v4 §5.2. NOT a bidirectional A-vs-B agreement figure and NOT an independent human-vs-reference baseline: the consensus is A's round-1 revision, byte-identical to B's round-2 endorsement, so it is not independent of either annotator. For inter-annotator agreement cite cer_a_vs_b_round0. Renamed from bidirectional_cer_mean 2026-07-10 (B3)."
         },
-        "ci95": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2}
+        "ci95": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2, "description": "95% CI for cer_vs_consensus_b. Name kept for backward compatibility with benchmark-v0.1.0 consumers; the sibling blocks use explicit ci95_* names."},
+        "cer_vs_consensus_a": {
+          "type": "number",
+          "minimum": 0,
+          "description": "THE CIRCULARITY, QUANTIFIED. Annotator A's round-0 vs the adjudicated consensus. Near zero BY CONSTRUCTION -- the consensus is A's own round-1 revision -- so this measures how little A changed its mind during adjudication, not agreement with an independent reference. Published so the reader can see the circularity rather than infer it. Never cite as inter-annotator agreement."
+        },
+        "ci95_vs_consensus_a": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2},
+        "cer_a_vs_b_round0": {
+          "type": "number",
+          "minimum": 0,
+          "description": "THE INTER-ANNOTATOR AGREEMENT FIGURE -- cite this one. Annotator A round-0 vs annotator B round-0: the only comparison here between two mutually independent, blind, PRE-adjudication transcriptions. DIRECTIONAL: annotator A is the reference/denominator; the B-as-reference direction differs slightly by denominator asymmetry and is given in iaa_report.json::_note. Its edit counts are identical to adjudication_summary tiers 1-3, which is the same measurement expressed as edit operations -- not independent corroboration."
+        },
+        "ci95_a_vs_b_round0": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2},
+        "reference_side": {"type": "string"},
+        "denominator_codepoints_consensus": {"type": "integer", "minimum": 1, "description": "Consensus-side code points on this tier's view, over all 96 verses; the denominator for both cer_vs_consensus_* figures. Reference-dependent -- see denominator_codepoints_a."},
+        "denominator_codepoints_a": {"type": "integer", "minimum": 1, "description": "Annotator-A-side code points on this tier's view; the denominator for cer_a_vs_b_round0. Differs from the consensus side (one code point at tier 2, twelve at tier 3), which is why both are published."},
+        "edits_vs_consensus_b": {"type": "integer", "minimum": 0, "description": "Raw cluster-aligned code-point edit operations behind cer_vs_consensus_b."},
+        "edits_vs_consensus_a": {"type": "integer", "minimum": 0, "description": "Raw edit operations behind cer_vs_consensus_a. Published so a 0.0000 CER is legible as a real measurement (0 edits at tier 1) rather than an unpopulated field."},
+        "edits_a_vs_b_round0": {"type": "integer", "minimum": 0, "description": "Raw edit operations behind cer_a_vs_b_round0. Equals adjudication_summary.tierN_disagreements_reconciled by construction."}
       }
     },
     "f1_tier": {
