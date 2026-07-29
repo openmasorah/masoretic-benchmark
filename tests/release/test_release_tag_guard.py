@@ -143,7 +143,28 @@ def test_approval_gate_uses_latest_review_state_per_user(workflow):
 
 
 def test_ci_yml_does_not_claim_to_be_d16():
-    """The A-03 title gate must not masquerade as D-16's approve gate."""
+    """The A-03 title gate must not masquerade as the release gate."""
     ci = (REPO_ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
     assert "THIS IS NOT D-16" in ci
     assert "NOT D-16" in ci  # also in the job's display name
+
+
+def test_ci_yml_points_at_the_CURRENT_release_gate():
+    """Disclaiming the wrong gate is only half the job; it must name the right one.
+
+    This comment survived the policy change at 721077b still describing the
+    release gate as "approval from the reviewer of record, or a lapsed review
+    window with a logged waiver" -- a stale governance claim sitting in the
+    tree that gets tagged, which is the class the whole X-series closed. It has
+    zero executable effect, and that is exactly why nothing caught it.
+    """
+    ci = (REPO_ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+
+    assert "RELEASE_SIGNOFF.md" in ci, (
+        "ci.yml describes the release gate without naming the sign-off file it actually requires"
+    )
+    assert "ADVISORY" in ci or "advisory" in ci, (
+        "ci.yml must say scholarly review is advisory; the superseded policy made "
+        "it blocking, and a reader following this comment would expect a gate that "
+        "no longer exists"
+    )

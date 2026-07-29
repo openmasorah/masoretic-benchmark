@@ -368,10 +368,20 @@ jobs:
   # [YOSEF-REVIEW] prefix in its PR title; subsequent BL-01 PRs auto-merge.
   # The gate ONLY runs on pull_request events; no manual nor scheduled trigger.
   #
-  # THIS IS NOT D-16. It checks a PR *title prefix*, not a written approve.
-  # D-16 (approval from the reviewer of record, or a lapsed review window with
-  # a logged waiver, before any tag / HF upload / announcement) is enforced in
-  # .github/workflows/release-tag.yml. Do not cite this job as D-16's gate.
+  # THIS IS NOT D-16. It checks a PR *title prefix*, not a release authorization.
+  #
+  # The release gate -- an entry in RELEASE_SIGNOFF.md for the exact version,
+  # naming who authorized the release and how, PLUS a `### Governance`
+  # subsection under that version's heading in CHANGELOG.md, before any tag /
+  # HF upload / announcement -- is enforced by the `signoff` job in
+  # .github/workflows/release-tag.yml, via scripts/check_release_signoff.py.
+  # Scholarly review is ADVISORY and cannot block a tag.
+  #
+  # "D-16" now refers to the SUPERSEDED policy this comment used to describe:
+  # approval from the reviewer of record, or a lapsed review window with a
+  # logged waiver. It was replaced at 721077b, and release-tag.yml uses the
+  # label the same way -- every live D-16 mention there is inside the advisory
+  # `approval` job. Do not cite this job as the release gate.
   #
   # STATUS 2026-07-29 -- RE-ARMED, correcting a stale comment. This block used
   # to say the job was "spent by design: main already carries

@@ -747,6 +747,9 @@ def test_no_surface_still_promises_the_review_folds_into_v0_1_1() -> None:
         REPO_ROOT / ".github" / "workflows" / "release-tag.yml",
         REPO_ROOT / "RELEASE_SIGNOFF.md",
         REPO_ROOT / "README.md",
+        # Added after ci.yml was found carrying a stale governance claim that no
+        # surface list covered. Comment-only files still ship in the tagged tree.
+        REPO_ROOT / ".github" / "workflows" / "ci.yml",
     ]
     offenders = [
         f"{p.relative_to(REPO_ROOT)}:{n}"
