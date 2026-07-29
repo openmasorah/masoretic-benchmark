@@ -20,6 +20,13 @@ version being tagged.
 
 ## What an entry must contain
 
+**The heading.** Start the entry with a `##` heading containing the exact tag —
+`## benchmark-v0.1.1`. A trailing date or note is fine and is the house style,
+matching the CHANGELOG: `## benchmark-v0.1.1 (2026-07-29)`. What the heading may
+*not* do is name a different version: the tag must appear as a whole token, so a
+heading for `benchmark-v0.1.10` does not authorize `benchmark-v0.1.1`, and the
+`Version` field below must name the same release as the heading.
+
 | Field | Meaning |
 |---|---|
 | **Version** | The exact tag, e.g. `benchmark-v0.1.1`. An entry for another version authorizes nothing. |

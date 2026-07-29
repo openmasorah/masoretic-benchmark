@@ -152,6 +152,63 @@ def test_every_required_field_is_also_checked_for_EMPTINESS(field: str, tmp_path
     )
 
 
+# ---------------------------------------------------------------------------
+# Heading form, sign-off half. One rule shared with the disclosure half.
+#
+# These two halves used to disagree: the disclosure half accepted a heading
+# CONTAINING the anchored tag, the sign-off half demanded exactly `## <tag>`.
+# At v0.1.1 the maintainer's entry was headed `## benchmark-v0.1.1 (2026-07-29)`
+# -- the CHANGELOG's own convention -- every field valid, and the gate refused
+# it over the suffix while accepting the identical form in the CHANGELOG.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("label", "heading_suffix"),
+    [
+        ("bare", ""),
+        # The real v0.1.1 form. This is the regression: it was REFUSED.
+        ("dated", " (2026-07-29)"),
+        ("dated-with-note", " (2026-07-29) — corrections to v0.1.0"),
+        ("note-only", " — maintainer sign-off"),
+    ],
+)
+def test_a_heading_suffix_does_not_void_a_valid_entry(
+    label: str, heading_suffix: str, tmp_path: Path
+) -> None:
+    entry = GOOD_SIGNOFF.replace(f"## {TAG}\n", f"## {TAG}{heading_suffix}\n")
+    signoff = _write(tmp_path, "RELEASE_SIGNOFF.md", entry)
+
+    assert check_signoff(TAG, signoff) == [], (
+        f"[{label}] a complete, correct entry was voided by its heading suffix"
+    )
+
+
+@pytest.mark.parametrize("suffix", ["-rc1", ".post1", "garbage", "9", "-final"])
+def test_a_suffixed_VERSION_in_the_signoff_heading_authorizes_nothing(
+    suffix: str, tmp_path: Path
+) -> None:
+    """Mirrors the disclosure half. Accepting a trailing NOTE is not accepting a
+    different version: the tag must still appear as a whole token.
+    """
+    entry = GOOD_SIGNOFF.replace(f"## {TAG}\n", f"## {TAG}{suffix}\n")
+    signoff = _write(tmp_path, "RELEASE_SIGNOFF.md", entry)
+
+    errors = check_signoff(TAG, signoff)
+
+    assert errors, f"'{TAG}{suffix}' was accepted as the sign-off for '{TAG}'"
+    assert "no sign-off entry for" in errors[0]
+
+
+def test_the_SHIPPED_v0_1_1_signoff_entry_passes_the_gate() -> None:
+    """The entry the maintainer actually committed, in the tree, unedited.
+
+    A governance record is not edited to fit a tool defect, so the fix has to
+    accept it as written. This is the end-to-end assertion that it does.
+    """
+    assert check_signoff("benchmark-v0.1.1") == []
+
+
 def test_the_version_field_must_name_the_same_release_as_the_heading(tmp_path: Path) -> None:
     """Two claims, one gate. Only the heading was ever read.
 
