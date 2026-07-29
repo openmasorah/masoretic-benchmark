@@ -88,7 +88,7 @@
 #   * The release proceeded under a decision, recorded in the project's planning
 #     record beforehand, to take the review off the critical path: reviewer
 #     credited, review remains outstanding for a future release. It did NOT
-#     fold into v0.1.1 -- v0.1.1 also ships without it, under the disclosed
+#     land in v0.1.1 either -- v0.1.1 also ships without it, under the disclosed
 #     maintainer-sign-off policy.
 #
 # Two earlier versions of this comment were wrong. The first said the reviewer
@@ -120,8 +120,8 @@
 # clock: request time is never earlier than creation time.
 #
 # A waiver is a disclosure obligation, not an absolution. Every waived release
-# must say so in CHANGELOG.md under Governance, and the deferred review folds
-# into the next patch release. See CHANGELOG v0.1.1.
+# must say so in CHANGELOG.md under Governance, and the deferred review remains
+# outstanding for a future release. See CHANGELOG v0.1.1.
 #
 # CONFIGURATION REQUIRED
 # ----------------------
@@ -362,7 +362,7 @@ jobs:
           fi
 
           if [[ "${waivable}" -eq 1 ]]; then
-            echo "::notice::D-16 waiver -- review window (${window_days}d) lapsed with no review from ${YOSEF}; review folds into the next patch release"
+            echo "::notice::D-16 waiver -- review window (${window_days}d) lapsed with no review from ${YOSEF}; review remains outstanding for a future release"
             {
               echo "### D-16 WAIVER"
               echo
@@ -370,7 +370,7 @@ jobs:
               echo "Requested on PR #${waiver_pr}; **${waiver_days} days** elapsed, window is ${window_days} days."
               echo
               echo "This must be disclosed in \`CHANGELOG.md\` under **Governance**,"
-              echo "and the deferred review folds into the next patch release."
+              echo "and the deferred review remains outstanding for a future release."
             } >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi

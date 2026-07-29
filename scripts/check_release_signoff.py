@@ -56,7 +56,7 @@ from __future__ import annotations
 import argparse
 import re
 import sys
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -86,13 +86,60 @@ def _section(text: str, heading: str) -> str | None:
 
 
 def _version_anchored(tag: str) -> re.Pattern[str]:
-    """Match ``tag`` as a whole version, never as a prefix of a longer one.
+    """Match ``tag`` as a whole token, never as a prefix of a longer one.
 
     A plain substring test reports ``benchmark-v0.1.1`` as present in a
     ``benchmark-v0.1.10`` heading, and first-match-wins would then let a future
     release's disclosure satisfy this one's gate.
+
+    Excluding a *numeric* suffix was not enough. Probes against the first
+    version of this fix showed ``benchmark-v0.1.1-rc1``, ``benchmark-v0.1.1.post1``
+    and even ``benchmark-v0.1.1garbage`` all authorizing ``benchmark-v0.1.1``,
+    because none of them continues with a digit. Pre-releases and post-releases
+    are precisely the neighbouring versions a release gate must distinguish.
+
+    So the rule is a real token boundary: the tag must be followed by
+    whitespace or end-of-line, which admits the shipped heading form
+    ``## benchmark-v0.1.1 (2026-07-29) -- ...`` and rejects every suffix.
     """
-    return re.compile(rf"(?<![\w.]){re.escape(tag)}(?!\d)(?!\.\d)")
+    return re.compile(rf"(?<![\w.-]){re.escape(tag)}(?=\s|$)")
+
+
+#: Bodies that occupy the space a disclosure should fill without disclosing
+#: anything. Compared after HTML comments are stripped and markdown
+#: punctuation is collapsed, so "- TBD" and "**TODO**" are covered too.
+PLACEHOLDER_BODIES = frozenset(
+    {"tbd", "todo", "tba", "n/a", "na", "none", "nil", "xxx", "pending", "coming soon"}
+)
+
+_HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
+_MARKDOWN_NOISE_RE = re.compile(r"[\s*_`>#.\-]+")
+
+
+def _is_substantive(content: str) -> bool:
+    """Does this section body actually say something?
+
+    Requiring merely non-whitespace was not enough. Probes showed a Governance
+    body consisting only of ``<!-- no published disclosure -->`` clearing the
+    gate -- an HTML comment renders as nothing at all, so the published page
+    would show a bare heading while the gate reported a disclosure. ``TBD`` and
+    ``-`` cleared it too.
+
+    This is not a quality judgement and there is no length threshold. It rejects
+    exactly two things: content that renders to nothing, and a fixed set of
+    words that are conventional stand-ins for content not yet written.
+    """
+    visible = _HTML_COMMENT_RE.sub("", content).strip()
+    if not visible:
+        return False
+
+    # Collapse markdown scaffolding so "- **TBD**" reduces to "tbd", and a body
+    # of only "---" or "..." reduces to nothing at all.
+    normalized = _MARKDOWN_NOISE_RE.sub(" ", visible).strip().lower()
+    if not normalized:
+        return False
+
+    return normalized not in PLACEHOLDER_BODIES
 
 
 def _field_line(body: str, field: str) -> str | None:
@@ -167,16 +214,45 @@ def check_signoff(tag: str, signoff_path: Path = SIGNOFF_PATH) -> list[str]:
     # enough: 'yes' and 'soon' are non-empty and record nothing auditable.
     signed_off = values.get("Signed off")
     if signed_off is not None:
-        try:
-            date.fromisoformat(signed_off)
-        except ValueError:
-            errors.append(
-                f"{signoff_path.name} entry for {tag!r} has 'Signed off: {signed_off}', "
-                f"which is not an ISO date (YYYY-MM-DD). The field records WHEN "
-                f"authorization was given; an unparseable value records nothing."
-            )
+        errors.extend(_check_signed_off(signed_off, tag, signoff_path.name))
 
     return errors
+
+
+#: Only the extended ISO form. ``date.fromisoformat`` also accepts the compact
+#: ``20260729``, which reads as a number rather than a date to a human auditor.
+_ISO_DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
+
+
+def _check_signed_off(value: str, tag: str, filename: str) -> list[str]:
+    """``Signed off`` must be a real, already-elapsed calendar date."""
+    if not _ISO_DATE_RE.fullmatch(value):
+        return [
+            f"{filename} entry for {tag!r} has 'Signed off: {value}', which is not an "
+            f"ISO date in YYYY-MM-DD form. The field records WHEN authorization was "
+            f"given; a value a reader cannot parse as a date records nothing."
+        ]
+
+    try:
+        signed = date.fromisoformat(value)
+    except ValueError:
+        return [
+            f"{filename} entry for {tag!r} has 'Signed off: {value}', which is not a "
+            f"real calendar date."
+        ]
+
+    # One day of slack, not zero: the maintainer may sign in a timezone ahead of
+    # the runner's, and rejecting a same-moment sign-off as "the future" would
+    # be a gate that fails for being in the wrong place. A day covers every
+    # offset; it does not admit a date anyone would call future-dated.
+    if signed > date.today() + timedelta(days=1):
+        return [
+            f"{filename} entry for {tag!r} is dated {value}, in the future. A release "
+            f"cannot be authorized before the authorization happened -- either the "
+            f"date is a typo or the entry was written ahead of the decision."
+        ]
+
+    return []
 
 
 def check_disclosure(tag: str, changelog_path: Path = CHANGELOG_PATH) -> list[str]:
@@ -218,15 +294,17 @@ def check_disclosure(tag: str, changelog_path: Path = CHANGELOG_PATH) -> list[st
         ]
 
     # A heading with nothing under it satisfies the letter of the requirement and
-    # none of its purpose. A bare heading is not a statement.
+    # none of its purpose. A bare heading is not a statement -- and neither is
+    # one whose body renders to nothing (an HTML comment) or says only "TBD".
     rest = body[match.end() :]
     stop = re.search(r"^#{1,3}\s", rest, re.MULTILINE)
     content = rest[: stop.start()] if stop else rest
-    if not content.strip():
+    if not _is_substantive(content):
         return [
-            f"{changelog_path.name} section for {tag!r} has an EMPTY '### Governance' "
-            f"subsection. A bare heading is not a disclosure -- state how the release "
-            f"was authorized and what review it did or did not receive."
+            f"{changelog_path.name} section for {tag!r} has an EMPTY or placeholder "
+            f"'### Governance' subsection. A bare heading, an HTML comment and a 'TBD' "
+            f"are not disclosures -- state how the release was authorized and what "
+            f"review it did or did not receive."
         ]
     return []
 

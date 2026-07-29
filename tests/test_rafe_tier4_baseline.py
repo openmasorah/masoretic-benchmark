@@ -112,6 +112,53 @@ def test_end_to_end_pinned_number_vs_public_consensus():
     # Secondary tol-1 cell reported in the JSON — pin it too.
     assert round(pooled_rafe_f1(payloads, tolerance=1).f1, 3) == 0.662
 
+    # The PUBLISHED precision, 4dp, as it appears in README.md and CHANGELOG.md.
+    # The 3dp pins above cannot catch a drift smaller than a thousandth, which
+    # is exactly the size of movement that would silently invalidate a printed
+    # figure while every existing assertion stayed green.
+    assert round(r.f1, 4) == 0.6210
+    assert round(r.precision, 4) == 0.4764
+    assert round(r.recall, 4) == 0.8918
+
+
+def test_published_confidence_interval_is_reproducible():
+    """Pin the printed interval, not just the printed point estimate.
+
+    README.md publishes `F1 0.6210 (exact) [0.5743, 0.6651]`. The point
+    estimate is pinned above, but nothing tied the *interval* to anything --
+    and the interval has its own failure mode the point estimate cannot catch:
+    a change to `b`, to the seed, or to the resampling itself moves the bounds
+    while F1 stays exactly where it was.
+
+    This runs the real 10,000-resample bootstrap (~8s) rather than a cheaper
+    approximation, because a reproduction at different settings would not be a
+    reproduction of the published number.
+    """
+    from masoretic_eval.iaa.bootstrap import (  # noqa: PLC0415
+        DEFAULT_B,
+        DEFAULT_SEED,
+        bootstrap_metric,
+    )
+
+    data = json.loads(CONSENSUS.read_text())
+    payloads = []
+    for v in data["verses"]:
+        vref = v["verse_ref"]
+        gold = detections_from_records(
+            [Tier4Record(m["type"], vref, m["ordinal"]) for m in v["tier4_positional"]]
+        )
+        payloads.append((gold, detections_from_records(predict_rafe(v["chunk"], vref))))
+
+    ci = bootstrap_metric(
+        payloads, lambda ps: pooled_rafe_f1(ps, tolerance=0).f1, b=DEFAULT_B, seed=DEFAULT_SEED
+    )
+
+    # The settings are part of the published claim: a reproduction at a
+    # different b or seed is a different measurement wearing the same number.
+    assert (DEFAULT_B, DEFAULT_SEED) == (10000, 0xBEEF)
+    assert round(ci.ci_lower, 4) == 0.5743
+    assert round(ci.ci_upper, 4) == 0.6651
+
 
 def _consensus_payloads():
     data = json.loads(CONSENSUS.read_text())

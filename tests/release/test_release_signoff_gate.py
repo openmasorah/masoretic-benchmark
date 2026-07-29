@@ -14,6 +14,7 @@ summary line instead of the process exit status.
 from __future__ import annotations
 
 import sys
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -165,15 +166,58 @@ def test_the_version_field_must_name_the_same_release_as_the_heading(tmp_path: P
     assert any("benchmark-v0.0.9" in e and "same release" in e for e in errors), errors
 
 
-@pytest.mark.parametrize("bad", ["yes", "soon", "2026-13-45", "when it ships"])
-def test_signed_off_must_parse_as_a_date(bad: str, tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    ("bad", "reason"),
+    [
+        ("yes", "not an ISO date"),
+        ("soon", "not an ISO date"),
+        ("when it ships", "not an ISO date"),
+        # `date.fromisoformat` accepts the compact form, which reads as a number
+        # rather than a date to the human auditor the field exists for.
+        ("20260729", "not an ISO date"),
+        # Well-formed but impossible. This refuses at the calendar, not at the
+        # shape, and the two are pinned separately -- a shape check that happened
+        # to swallow this would look identical from the exit code alone.
+        ("2026-13-45", "not a real calendar date"),
+    ],
+)
+def test_signed_off_must_parse_as_a_date(bad: str, reason: str, tmp_path: Path) -> None:
     """Non-empty is not enough -- 'soon' records nothing auditable."""
     undated = GOOD_SIGNOFF.replace("- **Signed off:** 2026-07-29", f"- **Signed off:** {bad}")
     signoff = _write(tmp_path, "RELEASE_SIGNOFF.md", undated)
 
     errors = check_signoff(TAG, signoff)
 
-    assert any("not an ISO date" in e for e in errors), errors
+    assert any(reason in e for e in errors), f"{bad!r} refused, but not for {reason!r}: {errors}"
+
+
+def test_signed_off_may_not_be_dated_in_the_future(tmp_path: Path) -> None:
+    """A release cannot be authorized before the authorization happened.
+
+    A well-formed date passed unconditionally, so an entry could be written
+    ahead of the decision it records and the gate would call it authorized.
+    """
+    ahead = GOOD_SIGNOFF.replace("- **Signed off:** 2026-07-29", "- **Signed off:** 2099-01-01")
+    signoff = _write(tmp_path, "RELEASE_SIGNOFF.md", ahead)
+
+    errors = check_signoff(TAG, signoff)
+
+    assert any("in the future" in e for e in errors), errors
+
+
+def test_a_signoff_dated_today_is_accepted(tmp_path: Path) -> None:
+    """The positive control for the future-date check.
+
+    Guards the obvious over-correction: rejecting the future must not reject
+    the present, which is when a real sign-off is actually written. One day of
+    slack is deliberate -- the maintainer may sign in a timezone ahead of the
+    runner's, and a gate that fails for being in the wrong place is not a gate.
+    """
+    today = date.today().isoformat()
+    entry = GOOD_SIGNOFF.replace("- **Signed off:** 2026-07-29", f"- **Signed off:** {today}")
+    signoff = _write(tmp_path, "RELEASE_SIGNOFF.md", entry)
+
+    assert check_signoff(TAG, signoff) == []
 
 
 # ---------------------------------------------------------------------------
@@ -262,6 +306,68 @@ def test_a_data_governance_heading_is_not_a_governance_disclosure(tmp_path: Path
     assert "no '### Governance'" in errors[0]
 
 
+@pytest.mark.parametrize("suffix", ["-rc1", ".post1", "garbage", "9", "-final"])
+def test_no_suffixed_version_heading_can_authorize_this_tag(suffix: str, tmp_path: Path) -> None:
+    """Excluding a NUMERIC suffix was not enough, and probes proved it.
+
+    `benchmark-v0.1.1-rc1`, `benchmark-v0.1.1.post1` and even
+    `benchmark-v0.1.1garbage` all cleared the first version of this fix,
+    because none of them continues with a digit. Pre-releases and post-releases
+    are exactly the neighbouring versions a release gate has to tell apart, so
+    the rule is now a real token boundary rather than a list of bad next
+    characters.
+    """
+    changelog = _write(
+        tmp_path,
+        "CHANGELOG.md",
+        f"# Changelog\n\n## {TAG}{suffix} — a different release\n\n"
+        f"### Governance\n\nIts own disclosure.\n",
+    )
+
+    errors = check_disclosure(TAG, changelog)
+
+    assert errors, f"'{TAG}{suffix}' was accepted as the disclosure for '{TAG}'"
+    assert "no '## ..." in errors[0]
+
+
+def test_the_shipped_heading_form_still_matches() -> None:
+    """Positive control for the boundary rule.
+
+    Tightening the anchor to "whitespace or end of line" is exactly the kind of
+    change that rejects the real heading -- `## benchmark-v0.1.1 (2026-07-29)
+    — corrections to v0.1.0` -- along with the fakes.
+    """
+    assert check_disclosure("benchmark-v0.1.1") == []
+
+
+@pytest.mark.parametrize(
+    "hollow",
+    [
+        # Renders as literally nothing on the published page while the gate
+        # reports a disclosure. This one was found by probe, not by reading.
+        "<!-- no published disclosure -->",
+        "TBD",
+        "TODO",
+        "N/A",
+        "-",
+        "...",
+        "- **TBD**",
+    ],
+)
+def test_a_placeholder_governance_body_is_not_a_disclosure(hollow: str, tmp_path: Path) -> None:
+    """Non-whitespace was the wrong bar; it admits everything above."""
+    changelog = _write(
+        tmp_path,
+        "CHANGELOG.md",
+        f"# Changelog\n\n## {TAG} (2026-07-29) — a release\n\n### Governance\n\n{hollow}\n",
+    )
+
+    errors = check_disclosure(TAG, changelog)
+
+    assert errors, f"a Governance body of {hollow!r} cleared the disclosure requirement"
+    assert "placeholder" in errors[0]
+
+
 def test_a_bare_governance_heading_is_not_a_statement(tmp_path: Path) -> None:
     """The heading is the container, not the disclosure."""
     hollow = GOOD_CHANGELOG.replace(
@@ -327,19 +433,30 @@ def test_no_surface_still_promises_the_review_folds_into_v0_1_1() -> None:
     This is the F2 false-promise class appearing inside the disclosure that was
     written to correct it: a commitment whose deadline is the very release
     making the commitment.
+
+    Widened from the exact string "folds into v0.1.1" after the first fix left
+    the same promise alive four times in the workflow as "folds into the next
+    patch release" -- the identical commitment, phrased so an exact-match guard
+    could not see it. The class is the deferral idiom, not one spelling of it.
     """
     surfaces = [
         REPO_ROOT / "CHANGELOG.md",
         REPO_ROOT / ".github" / "workflows" / "release-tag.yml",
         REPO_ROOT / "RELEASE_SIGNOFF.md",
+        REPO_ROOT / "README.md",
     ]
     offenders = [
-        p.relative_to(REPO_ROOT)
+        f"{p.relative_to(REPO_ROOT)}:{n}"
         for p in surfaces
-        if "folds into v0.1.1" in p.read_text(encoding="utf-8")
+        for n, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1)
+        if "folds into" in line or "fold into" in line or "folds forward" in line
     ]
 
-    assert not offenders, f"self-referential review promise survives in {offenders}"
+    assert not offenders, (
+        "the review-deferral promise survives in " + ", ".join(offenders) + " -- say "
+        "'remains outstanding for a future release'; a named next release is a "
+        "commitment nobody is holding"
+    )
 
 
 def test_the_gate_would_refuse_the_current_tree_for_an_unsigned_version() -> None:

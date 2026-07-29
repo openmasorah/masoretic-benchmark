@@ -132,9 +132,24 @@ def test_the_whole_version_chain_is_one_value():
 # the version a past release shipped is precisely its job.
 # ---------------------------------------------------------------------------
 
-_SCORER_VERSION_CLAIM = re.compile(r'"scorer_version":\s*"([0-9][^"]*)"')
-_DUNDER_VERSION_CLAIM = re.compile(r"__version__`?\s*=\s*`?([0-9][0-9.]*)")
+#: Both spellings a doc uses for the emitted field: the quoted JSON sample form
+#: and the bare prose form (``scorer_version: 0.3.0``). Matching only the first
+#: left docs/CONFIGURATION.md stale through the previous sweep.
+_VERSION_CLAIMS = (
+    ("scorer_version", re.compile(r'"scorer_version":\s*"([0-9][^"]*)"')),
+    ("scorer_version", re.compile(r"(?<!\")scorer_version:\s*`?([0-9][0-9.]*)")),
+    ("__version__", re.compile(r"__version__`?\s*=\s*`?([0-9][0-9.]*)")),
+)
+
 _EVAL_PIN_CLAIM = re.compile(r"(masoretic-eval(?:\[[a-z-]+\])?>=[0-9][0-9.]*,<[0-9][0-9.]*)")
+
+#: A *bare* pin -- ``>=0.3.0,<0.4`` with no package name -- only counts as a
+#: claim about a pyproject when the line says it is one. `docs/DEVELOPMENT.md`
+#: legitimately quotes the long-dead `>=0.1.0,<0.2` while narrating the incident
+#: that motivated the check, and no regex can tell that from a stale current
+#: claim. Scoping to lines that name a pyproject keeps the check to what it can
+#: actually adjudicate: "this doc says a pyproject declares X".
+_BARE_PIN_CLAIM = re.compile(r"`(>=[0-9][0-9.]*,<[0-9][0-9.]*)`")
 
 
 def _tracked_docs() -> list[Path]:
@@ -144,18 +159,18 @@ def _tracked_docs() -> list[Path]:
     return [REPO_ROOT / p for p in out if Path(p).name != "CHANGELOG.md"]
 
 
+def _doc_lines():
+    for path in _tracked_docs():
+        for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            yield path, n, line
+
+
 def test_docs_do_not_advertise_a_scorer_version_the_package_cannot_emit():
     stale = [
-        f"{p.relative_to(REPO_ROOT)}:{n}: scorer_version {m.group(1)!r}"
-        for p in _tracked_docs()
-        for n, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1)
-        for m in _SCORER_VERSION_CLAIM.finditer(line)
-        if m.group(1) != masoretic_eval.__version__
-    ] + [
-        f"{p.relative_to(REPO_ROOT)}:{n}: __version__ {m.group(1)!r}"
-        for p in _tracked_docs()
-        for n, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1)
-        for m in _DUNDER_VERSION_CLAIM.finditer(line)
+        f"{p.relative_to(REPO_ROOT)}:{n}: {label} {m.group(1)!r}"
+        for p, n, line in _doc_lines()
+        for label, pattern in _VERSION_CLAIMS
+        for m in pattern.finditer(line)
         if m.group(1) != masoretic_eval.__version__
     ]
 
@@ -169,16 +184,22 @@ def test_docs_quote_dependency_pins_that_the_pyprojects_actually_declare():
     real = "\n".join(
         (REPO_ROOT / f).read_text(encoding="utf-8")
         for f in ("oracles/pyproject.toml", "baselines/pyproject.toml")
-    )
+    ).replace(" ", "")
+
     wrong = [
         f"{p.relative_to(REPO_ROOT)}:{n}: {m.group(1)!r}"
-        for p in _tracked_docs()
-        for n, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1)
+        for p, n, line in _doc_lines()
         for m in _EVAL_PIN_CLAIM.finditer(line.replace(" ", ""))
-        if m.group(1) not in real.replace(" ", "")
+        if m.group(1) not in real
+    ] + [
+        f"{p.relative_to(REPO_ROOT)}:{n}: bare pin {m.group(1)!r}"
+        for p, n, line in _doc_lines()
+        if "pyproject" in line
+        for m in _BARE_PIN_CLAIM.finditer(line)
+        if m.group(1).replace(" ", "") not in real
     ]
 
-    assert not wrong, "docs quote masoretic-eval pins no pyproject declares: " + "; ".join(wrong)
+    assert not wrong, "docs quote pins no pyproject declares: " + "; ".join(wrong)
 
 
 @pytest.mark.parametrize("run_meta", RUN_METAS, ids=lambda p: p.parent.name)
