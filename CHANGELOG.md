@@ -119,6 +119,61 @@ the defect: it asserted the schema enum *equal* the UXLC loader's vocabulary,
 which forbade the schema from admitting the project's own data. A correct fix
 would have failed CI looking like a regression. Its assertion is now containment.
 
+### Published: what the IAA numbers are actually entitled to claim
+
+v0.1.0 published one tier-1/2/3 CER block, `cer_vs_consensus_b`, and it is a
+diagnostic rather than an agreement measurement — the consensus reference *is*
+annotator A's round-1 revision, so it is not independent of either annotator.
+A reader wanting "inter-annotator agreement" had nothing else to cite.
+
+`iaa_report.json` now publishes all three comparisons, each labelled for what it
+is:
+
+| tier | **A vs B — agreement** | B vs consensus — diagnostic | A vs consensus — diagnostic |
+|---|---|---|---|
+| 1 | **0.0029** [0.0006, 0.0059] | 0.0029 [0.0006, 0.0059] | 0.0000 [0.0000, 0.0000] |
+| 2 | **0.0031** [0.0007, 0.0063] | 0.0031 [0.0006, 0.0062] | 0.0000 [0.0000, 0.0001] |
+| 3 | **0.0130** [0.0096, 0.0167] | 0.0119 [0.0085, 0.0156] | 0.0015 [0.0008, 0.0023] |
+
+**`cer_a_vs_b_round0` is now the figure to cite as inter-annotator agreement** —
+the only comparison between two mutually independent, blind, pre-adjudication
+transcriptions. It is directional (annotator A is the denominator; the other
+direction is 0.0028 / 0.0030 / 0.0130), and its raw edit counts (18 / 33 / 148)
+are identical to `adjudication_summary` tiers 1–3, which was always this same
+measurement expressed as edit operations rather than CER. Those are two views of
+one number, not mutual corroboration.
+
+**`cer_vs_consensus_a` publishes the circularity rather than leaving it to be
+inferred.** 0 edits at tier 1, 1 at tier 2, 18 at tier 3: it measures how little
+annotator A changed its mind during adjudication. Raw edit counts ship with every
+CER so a 0.0000 reads as a measurement, not an unpopulated field.
+
+**No previously published value moved.** `cer_vs_consensus_b`, tier-4 F1 0.9187,
+α 0.7470, BL-05 0.6210 and the adjudication summary are all unchanged.
+
+**Every figure is now generator-produced and re-verified.** The CERs were
+previously pinned constants; they are now computed from the three committed
+projections at generation time, checked against the pinned paper values (the
+generator refuses to write on a mismatch), and **recomputed by
+`generate_iaa_report.py --check` on every push** — a hand-edited `iaa_report.json`
+fails. Per-tier reference-side code-point denominators ship alongside, and they
+are published *per block* because they are reference-dependent: consensus-side
+5597 / 9221 / 11068, annotator-A-side 5597 / 9222 / 11056.
+
+**Also fixed: the published tier-4 figures were undefined from the tag alone.**
+The canonicalisation, matching, dropped-record and frame rules were cited only to
+an unpublished paper draft. They are now specified in the repository at
+`iaa_data/devarim_4folio/README.md`, including the α universe table — the
+headline α 0.7470 is the *positive-universe canon, UXLC-frame* value, and the
+full-universe figure is about 0.20 higher, so an unlabelled "α" was ambiguous
+between two very different numbers.
+
+`README.md` and `CITATION.cff` gain the scope qualifier this release always
+needed: **96 verses, 4 folios, one manuscript, two annotators**. The README's
+oracle disagreement-rate example values are relabelled as illustrative
+placeholders — they were readable as measurements this repository does not
+publish.
+
 ### Governance — v0.1.0 was tagged without the reviewer's approval
 
 **Disclosure.** `benchmark-v0.1.0` was tagged and published while its release PR

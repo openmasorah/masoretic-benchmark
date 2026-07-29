@@ -52,6 +52,7 @@ REPORT_PATH = REPO_ROOT / "iaa_report.json"
 SCHEMA_PATH = REPO_ROOT / "schemas" / "iaa_report.schema.json"
 A_PROJ = REPO_ROOT / "iaa_data" / "devarim_4folio" / "ginsberg_round0_positional.json"
 B_PROJ = REPO_ROOT / "iaa_data" / "devarim_4folio" / "moster_round0_positional.json"
+GOLD_PROJ = REPO_ROOT / "iaa_data" / "devarim_4folio" / "consensus_gold_positional.json"
 
 FOLIOS = [
     "leningrad_devarim_F118B_fixture",
@@ -82,6 +83,46 @@ CER_VS_CONSENSUS_B = {
 }
 TIER4_F1_EXACT = (0.9187, [0.8969, 0.9397])
 
+# A round-0 vs the adjudicated consensus. Publishes the adjudication anchor's
+# other half: near-zero by construction, because the consensus IS A's own
+# round-1 revision. Kept as a pinned expectation like the block above; the
+# generator recomputes it and refuses to write on a mismatch.
+CER_VS_CONSENSUS_A = {
+    "tier1": (0.0, [0.0, 0.0]),
+    "tier2": (0.0, [0.0, 0.0001]),
+    "tier3": (0.0015, [0.0008, 0.0023]),
+}
+
+# A round-0 vs B round-0 -- the only PRE-adjudication, mutually independent
+# figure in this report, and the one to cite as "inter-annotator agreement".
+# Direction: A is the reference (denominator). See ``CER_A_VS_B_REF_B`` for the
+# other direction, reported in the note so nobody rediscovers the asymmetry and
+# reads it as a discrepancy.
+CER_A_VS_B_ROUND0 = {
+    "tier1": (0.0029, [0.0006, 0.0059]),
+    "tier2": (0.0031, [0.0007, 0.0063]),
+    "tier3": (0.013, [0.0096, 0.0167]),
+}
+CER_A_VS_B_REF_B = {
+    "tier1": (0.0028, [0.0006, 0.0057]),
+    "tier2": (0.003, [0.0006, 0.0059]),
+    "tier3": (0.013, [0.0096, 0.0166]),
+}
+
+# Reference-side code-point denominators, per tier, over all 96 verses. These
+# are REFERENCE-DEPENDENT: the consensus and A sides differ slightly (a tier-2
+# codepoint, twelve at tier 3), so a single "the denominator" would be wrong for
+# two of the three blocks. Recomputed and asserted, never hand-copied.
+#
+# The v0.1.1 fix plan quoted 5597 / 9329 / 11176. Tiers 2 and 3 there are each
+# 108 too high -- exactly 27 `<DR>` tokens x 4 ASCII characters, i.e. the same
+# contamination the CER values had. Tier 1 was right because its consonant
+# filter drops ASCII.
+DENOMINATORS_CONSENSUS = {"tier1": 5597, "tier2": 9221, "tier3": 11068}
+DENOMINATORS_A = {"tier1": 5597, "tier2": 9222, "tier3": 11056}
+
+N_VERSES = 96
+
 # tier-4 adjudication count: FP+FN of the pair-level detection match under the
 # §5.1 headline config (UXLC-anchored, canonicalised; tp=452, fp=39, fn=41).
 # UXLC-frame — same frame as f1_mean, so the two are internally consistent.
@@ -92,6 +133,61 @@ TIER4_DISAGREEMENTS = 80
 
 class ReportError(RuntimeError):
     """Integrity problem; never swallowed."""
+
+
+def _load_verses(path: Path) -> list[dict]:
+    return json.loads(path.read_text(encoding="utf-8"))["verses"]
+
+
+def _macro(per_verse: list[float]) -> float:
+    return sum(per_verse) / len(per_verse) if per_verse else float("nan")
+
+
+def _cer_block(ref_path: Path, hyp_path: Path, tier: int) -> tuple[float, list[float]]:
+    """Macro-averaged per-verse CER + verse-bootstrap 95% CI, ``ref`` as denominator.
+
+    Identical path to ``masoretic_eval.iaa.compute._tier_cer_result``: per-verse
+    CER through ``iaa.cer.per_verse_cer``, then ``bootstrap_metric`` with
+    ``_macro_cer`` at the package defaults (B, seed 0xBEEF, percentile). Verified
+    to reproduce the published ``cer_vs_consensus_b`` point estimates AND their
+    CIs exactly, which is what licenses using it for the new blocks.
+    """
+    from masoretic_eval.iaa.bootstrap import (  # noqa: PLC0415
+        DEFAULT_B,
+        DEFAULT_SEED,
+        bootstrap_metric,
+    )
+    from masoretic_eval.iaa.cer import per_verse_cer  # noqa: PLC0415
+
+    ref, hyp = _load_verses(ref_path), _load_verses(hyp_path)
+    if len(ref) != len(hyp):
+        raise ReportError(f"projection length mismatch: {len(ref)} vs {len(hyp)}")
+    payloads = [
+        per_verse_cer(r["chunk"], h["chunk"], tier=tier) for r, h in zip(ref, hyp, strict=True)
+    ]
+    m = bootstrap_metric(payloads, _macro, b=DEFAULT_B, seed=DEFAULT_SEED)
+    return round(m.point, 4), [round(m.ci_lower, 4), round(m.ci_upper, 4)]
+
+
+def _denominator(path: Path, tier: int) -> int:
+    """Total code points on one side's tier view, over all verses."""
+    from masoretic_eval.iaa.cer import tier_view  # noqa: PLC0415
+
+    return sum(len(tier_view(v["chunk"], tier=tier)) for v in _load_verses(path))
+
+
+def _edits(ref_path: Path, hyp_path: Path, tier: int) -> int:
+    """Cluster-aligned code-point edit ops between two sides at one tier."""
+    from masoretic_eval.iaa.cer import tier_view  # noqa: PLC0415
+    from masoretic_eval.metrics.cer import cluster_aligned_cer  # noqa: PLC0415
+
+    ref, hyp = _load_verses(ref_path), _load_verses(hyp_path)
+    return sum(
+        cluster_aligned_cer(
+            tier_view(r["chunk"], tier=tier), tier_view(h["chunk"], tier=tier)
+        ).edits
+        for r, h in zip(ref, hyp, strict=True)
+    )
 
 
 def _tier_disagreement_edits(tier: int) -> int:
@@ -124,31 +220,129 @@ def build_report() -> dict:
     report: dict = {
         "iaa_status": "real",
         "folios": FOLIOS,
+        "n_verses": N_VERSES,
     }
-    for tier, (mean, ci) in CER_VS_CONSENSUS_B.items():
-        report[tier] = {"cer_vs_consensus_b": mean, "ci95": ci}
+
+    # Every CER below is COMPUTED here from the committed projections, then
+    # checked against its pinned expectation. The pin is the paper cross-check,
+    # not the source: if computation and pin ever disagree the generator
+    # refuses to write rather than silently publishing either one.
+    drift: list[str] = []
+    for tier in ("tier1", "tier2", "tier3"):
+        t = int(tier[-1])
+        vs_b = _cer_block(GOLD_PROJ, B_PROJ, t)
+        vs_a = _cer_block(GOLD_PROJ, A_PROJ, t)
+        a_vs_b = _cer_block(A_PROJ, B_PROJ, t)
+        b_vs_a = _cer_block(B_PROJ, A_PROJ, t)
+        for label, got, want in (
+            ("cer_vs_consensus_b", vs_b, CER_VS_CONSENSUS_B[tier]),
+            ("cer_vs_consensus_a", vs_a, CER_VS_CONSENSUS_A[tier]),
+            ("cer_a_vs_b_round0", a_vs_b, CER_A_VS_B_ROUND0[tier]),
+            ("cer_a_vs_b_round0 (ref=B)", b_vs_a, CER_A_VS_B_REF_B[tier]),
+        ):
+            if [got[0], got[1]] != [want[0], list(want[1])]:
+                drift.append(f"{tier}.{label}: computed {got} != pinned {want}")
+
+        den_gold, den_a = _denominator(GOLD_PROJ, t), _denominator(A_PROJ, t)
+        if den_gold != DENOMINATORS_CONSENSUS[tier] or den_a != DENOMINATORS_A[tier]:
+            drift.append(
+                f"{tier} denominators: computed consensus={den_gold} A={den_a} != pinned "
+                f"{DENOMINATORS_CONSENSUS[tier]} / {DENOMINATORS_A[tier]}"
+            )
+
+        report[tier] = {
+            "cer_vs_consensus_b": vs_b[0],
+            "ci95": vs_b[1],
+            "cer_vs_consensus_a": vs_a[0],
+            "ci95_vs_consensus_a": vs_a[1],
+            "cer_a_vs_b_round0": a_vs_b[0],
+            "ci95_a_vs_b_round0": a_vs_b[1],
+            "reference_side": (
+                "consensus for the vs_consensus_* figures; annotator A for a_vs_b_round0"
+            ),
+            "denominator_codepoints_consensus": den_gold,
+            "denominator_codepoints_a": den_a,
+            "edits_vs_consensus_b": _edits(GOLD_PROJ, B_PROJ, t),
+            "edits_vs_consensus_a": _edits(GOLD_PROJ, A_PROJ, t),
+            "edits_a_vs_b_round0": _edits(A_PROJ, B_PROJ, t),
+        }
+    if drift:
+        raise ReportError(
+            "computed IAA figures disagree with their pinned expectations; refusing to "
+            "write a report whose numbers nobody has reconciled:\n  " + "\n  ".join(drift)
+        )
+
     report["tier4"] = {"f1_mean": TIER4_F1_EXACT[0], "ci95": TIER4_F1_EXACT[1]}
     report["adjudication_summary"] = adjudication
     report["_note"] = {
+        "which_number_to_cite": (
+            "CITE `cer_a_vs_b_round0` AS INTER-ANNOTATOR AGREEMENT: 0.0029 / 0.0031 "
+            "/ 0.0130 at tiers 1/2/3. It is the only figure here computed between "
+            "two mutually independent, PRE-adjudication transcriptions. The two "
+            "`cer_vs_consensus_*` blocks are adjudication diagnostics, not "
+            "agreement measurements -- see their notes. Reporting either of them "
+            "as 'inter-annotator agreement' overstates the result, and reporting "
+            "`cer_vs_consensus_a` as one would be circular; it is near zero by "
+            "construction."
+        ),
+        "metric": (
+            "All CER figures: CLUSTER-ALIGNED code-point CER on NFD-normalised "
+            "projection strings (CGJ stripped first), macro-averaged over the 96 "
+            "verses, reference side as denominator; annotator-tool editor tokens "
+            "are stripped before scoring. Verse-bootstrap percentile 95% CIs, "
+            "seed 0xBEEF. All three blocks and every count in them recompute from "
+            "the three committed projection JSONs ALONE -- no UXLC cache -- via "
+            "scripts/generate_iaa_report.py --check. Only the tier-4 figures are "
+            "UXLC-frame. Per-tier reference-side code-point denominators are "
+            "published per block because they are reference-dependent; a single "
+            "'the denominator' would be wrong for two of the three."
+        ),
+        "cer_a_vs_b_round0": (
+            "Annotator A (Ginsberg) round-0 vs annotator B (Moster) round-0, "
+            "tiers 1-3. THE HEADLINE AGREEMENT FIGURE: both sides are blind, "
+            "pre-adjudication, and independent of each other. DIRECTIONAL -- A is "
+            "the reference/denominator. The other direction (B as reference) is "
+            "0.0028 / 0.0030 / 0.0130; the small tier-1/2 gap is denominator "
+            "asymmetry, not a discrepancy, and is stated here so nobody "
+            "rediscovers it and reads it as one. NOTE the edit counts "
+            "(18 / 33 / 148) are IDENTICAL to adjudication_summary tiers 1-3: "
+            "that summary always WAS this comparison, expressed as edit "
+            "operations instead of CER. These are two views of one measurement, "
+            "not two independent statistics -- do not present them as "
+            "corroborating each other."
+        ),
         "cer_vs_consensus_b": (
             "Annotator B's (Moster) round-0 transcription vs the adjudicated "
-            "consensus reference, tiers 1-3. Metric: CLUSTER-ALIGNED code-point "
-            "CER on NFD-normalised projection strings (CGJ stripped first), "
-            "macro-averaged over the 96 verses, reference side as denominator; "
-            "annotator-tool editor tokens are stripped before scoring. "
-            "Recomputable from the three committed projection JSONs alone. "
-            "CORRECTED 2026-07-29 -- the tier-2/tier-3 values in v0.1.0 counted "
-            "the `<DR>` token as literal text; see CHANGELOG v0.1.1. The "
-            "consensus is A's round-1 revision, byte-identical to B's round-2 "
-            "endorsement -- NOT independent of either annotator, and NOT a "
-            "bidirectional A-vs-B figure. A-vs-consensus is 0 edits at tier 1 "
-            "and a single edit at tier 2, so the tier-1/2 rows are in substance "
-            "a blind A-vs-B round-0 comparison."
+            "consensus reference, tiers 1-3. An ADJUDICATION DIAGNOSTIC, not an "
+            "agreement figure: the consensus is A's round-1 revision, "
+            "byte-identical to B's round-2 endorsement, so it is NOT independent "
+            "of either annotator. CORRECTED 2026-07-29 -- the tier-2/tier-3 "
+            "values in v0.1.0 counted the `<DR>` token as literal text; see "
+            "CHANGELOG v0.1.1."
+        ),
+        "cer_vs_consensus_a": (
+            "Annotator A's (Ginsberg) round-0 transcription vs the adjudicated "
+            "consensus -- 0 edits at tier 1, 1 at tier 2, 18 at tier 3. THIS IS "
+            "THE CIRCULARITY, QUANTIFIED, and it is published precisely so the "
+            "reader can see it rather than infer it: the consensus IS A's own "
+            "round-1 revision, so this measures how little A changed its mind "
+            "during adjudication, NOT how well A agrees with an independent "
+            "reference. The near-zero values are a property of the protocol, not "
+            "a quality result. Raw edit counts are published alongside so the "
+            "tier-1 zero is legible as a measurement rather than a stub."
         ),
         "tier4_f1_mean": (
-            "Pair-level tier-4 F1 EXACT point estimate (DRAFT_v4 §5.1 / App. A.3; "
-            "tp=452, fp=39, fn=41). This is the exact-match figure, NOT the paper's "
-            "F1 with +/-1-consonant tolerance (0.9472)."
+            "Pair-level tier-4 F1 EXACT point estimate, UXLC-frame (tp=452, fp=39, "
+            "fn=41). This is the exact-match figure, NOT the F1 with +/-1-consonant "
+            "tolerance (0.9472). The canonicalisation, matching, dropped-record and "
+            "frame rules behind it are specified IN THIS REPOSITORY at "
+            "iaa_data/devarim_4folio/README.md ('Tier-4 scoring specification'); they "
+            "were previously cited only to an unpublished paper draft, which left the "
+            "published figure undefined from the tag alone. The committed-data-only "
+            "counterpart is F1 exact 0.8988, and Krippendorff alpha 0.7470 here is the "
+            "positive-universe canon figure -- see that spec for the full alpha table, "
+            "since full-universe alpha is ~0.20 higher and an unlabelled 'alpha' is "
+            "ambiguous between them."
         ),
         "adjudication_summary": (
             "DESCRIPTIVE WORKFLOW STATISTIC -- the paper reports no such counts, "
@@ -226,6 +420,43 @@ def check(recompute: bool) -> list[str]:
                     f"adjudication_summary.tier{t}_disagreements_reconciled={got} "
                     f"but recomputation from the committed projections gives {want}"
                 )
+
+        # Every CER in the report recomputes from the committed projections.
+        # This is what makes "generator-produced" verifiable rather than
+        # asserted: a hand-edited iaa_report.json fails here.
+        for tier in ("tier1", "tier2", "tier3"):
+            t = int(tier[-1])
+            block = committed.get(tier, {})
+            for field, ci_field, (ref, hyp) in (
+                ("cer_vs_consensus_b", "ci95", (GOLD_PROJ, B_PROJ)),
+                ("cer_vs_consensus_a", "ci95_vs_consensus_a", (GOLD_PROJ, A_PROJ)),
+                ("cer_a_vs_b_round0", "ci95_a_vs_b_round0", (A_PROJ, B_PROJ)),
+            ):
+                point, ci = _cer_block(ref, hyp, t)
+                if block.get(field) != point or block.get(ci_field) != ci:
+                    errors.append(
+                        f"{tier}.{field}={block.get(field)} {block.get(ci_field)} but "
+                        f"recomputation gives {point} {ci}"
+                    )
+            for field, path in (
+                ("denominator_codepoints_consensus", GOLD_PROJ),
+                ("denominator_codepoints_a", A_PROJ),
+            ):
+                want_den = _denominator(path, t)
+                if block.get(field) != want_den:
+                    errors.append(
+                        f"{tier}.{field}={block.get(field)} but recomputation gives {want_den}"
+                    )
+            for field, (ref, hyp) in (
+                ("edits_vs_consensus_b", (GOLD_PROJ, B_PROJ)),
+                ("edits_vs_consensus_a", (GOLD_PROJ, A_PROJ)),
+                ("edits_a_vs_b_round0", (A_PROJ, B_PROJ)),
+            ):
+                want_edits = _edits(ref, hyp, t)
+                if block.get(field) != want_edits:
+                    errors.append(
+                        f"{tier}.{field}={block.get(field)} but recomputation gives {want_edits}"
+                    )
     return errors
 
 

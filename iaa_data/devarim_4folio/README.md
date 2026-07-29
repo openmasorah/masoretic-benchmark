@@ -130,3 +130,76 @@ python -m masoretic_eval.iaa \
 Both invocations produce a byte-identical `paper_iaa_results.json` (modulo
 the `metadata.a_sha256` / `metadata.b_sha256` pins, which identify the
 input file and so differ by construction).
+
+## Tier-4 scoring specification (self-contained)
+
+Until v0.1.1 the authoritative statement of these rules lived only in the
+project's unpublished paper draft, cited as "DRAFT_v4 §5.1 / App. A.3–A.4".
+That made the published figures unverifiable from the tag alone: a citer could
+obtain the numbers but not the definitions behind them. The rules are therefore
+restated here, in the repository, as the shipped specification.
+
+### Canonicalisation
+
+Tier-4 records carry three raw types: `circellus`, `rafe` and `double_rafe`
+(the last from the annotator tool's `<DR>` editor token). Before agreement is
+computed, **`{rafe, double_rafe} → rafe`**. The two are the same scribal
+phenomenon at different stroke counts, and the annotators did not apply the
+distinction consistently — A marked 25 doubles, B marked 56 — so scoring them
+as distinct types would measure notation habit rather than reading.
+
+The raw types survive in the committed projections and in the scorer's input
+vocabulary, so this fold is reversible by anyone who wants the finer view. It
+happens in `masoretic_eval/iaa/alpha.py`, downstream of extraction.
+
+### Matching
+
+A predicted record matches a reference record when `(type, verse_ref, ordinal)`
+agree exactly, where `ordinal` is the 1-based Hebrew-consonant offset of the
+anchoring consonant within its verse. The headline F1 is **exact**; a ±1
+consonant tolerance variant is reported separately and is always the larger
+number. Matching is exact-first-greedy, verified equivalent to maximum-cardinality
+matching on every bucket in this corpus.
+
+### Dropped records
+
+**4 annotator records are excluded** from the UXLC-frame figures — 1 from
+annotator A, 3 from annotator B — because their anchoring consonant could not
+be aligned to the UXLC backbone (the annotator's consonant stream diverged from
+UXLC at that point, so the ordinal has no referent in the shared frame). They
+are dropped symmetrically, not counted as errors against either annotator, and
+they remain present in the committed projections.
+
+(The exclusion applies to the two annotators' round-0 records, which is the
+population the tier-4 agreement figures are computed over. It is unrelated to
+the 516 tier-4 records in the adjudicated consensus gold, a different file.)
+
+### Frames
+
+Two frames are reported, and they are not interchangeable:
+
+- **UXLC-frame** (the published headline, F1 0.9187): ordinals resolved against
+  the UXLC 2.5 consonant backbone. Requires the pinned UXLC cache to regenerate
+  — see `baselines/UXLC_PIN.md`.
+- **Committed-data-only frame** (F1 exact 0.8988): ordinals resolved against
+  each annotator's own consonant stream. Regenerates from the files in this
+  directory alone. It is the lower number because per-annotator ordinal drift is
+  not reconciled against a shared backbone.
+
+Krippendorff α in the committed-data-only frame, with the **universe stated**,
+because the two universes differ by more than 0.2 and an unlabelled "α" is
+ambiguous between them:
+
+| α | canon (`{rafe,double_rafe}→rafe`) | raw |
+|---|---|---|
+| positive universe *(marked positions only)* | **0.6957** | 0.6583 |
+| full universe *(every consonant position)* | 0.8974 | 0.8726 |
+
+The published headline α 0.7470 is the **positive-universe canon** figure in the
+**UXLC frame**; its committed-data-only counterpart is the 0.6957 above. Compare
+like with like — the full-universe values are higher because the overwhelming
+majority of consonant positions carry no mark and both annotators agree on that
+trivially.
+
+Tiers 1–3 need no such distinction: every CER figure in `iaa_report.json`
+recomputes from the three projections in this directory with no external input.
