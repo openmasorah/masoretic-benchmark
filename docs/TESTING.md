@@ -229,7 +229,7 @@ end-to-end fixture. Two scoring tests bind it to the manifest:
   run leaves gitignored line crops behind), and that *if* an artifact carrying a
   `manifest_hash` ever reappears, it binds to the current
   `phase_0_manifest.json::manifest_hash`. That second half keeps the rebind
-  coupling guarded across the v0.1 → v0.1.1 gap.
+  coupling guarded across the gap from v0.1 to a future release.
 - `tests/test_manifest_immutable.py`, `tests/test_manifest_v02_fields.py` —
   exercise the same folio-id (`leningrad_devarim_F118B_fixture`) through
   the manifest schema validator and the append-only changelog rules.
