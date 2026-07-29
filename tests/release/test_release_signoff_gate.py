@@ -304,6 +304,44 @@ def test_the_shipped_changelog_satisfies_the_HARDENED_disclosure_rules() -> None
     assert check_disclosure("benchmark-v0.1.1") == []
 
 
+def test_the_disclosure_states_THIS_release_s_own_review_status() -> None:
+    """The disclosure must meet the standard it sets, on its own release.
+
+    It declares that "a future release that ships without scholarly review must
+    say so, here, in public." v0.1.1 IS such a release, and the section stated
+    only v0.1.0's status -- the rule announced and not applied to its author's
+    own release, which is the exact defect the whole section exists to correct.
+    """
+    changelog = (REPO_ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    section = changelog.split("## benchmark-v0.1.0")[0]
+
+    assert "without scholarly\nreview" in section or "without scholarly review" in section
+    assert "benchmark-v0.1.1` ships" in section, (
+        "the Governance section does not state v0.1.1's own review status"
+    )
+
+
+def test_no_surface_still_promises_the_review_folds_into_v0_1_1() -> None:
+    """v0.1.1 is the release. It cannot be the future release that fixes itself.
+
+    This is the F2 false-promise class appearing inside the disclosure that was
+    written to correct it: a commitment whose deadline is the very release
+    making the commitment.
+    """
+    surfaces = [
+        REPO_ROOT / "CHANGELOG.md",
+        REPO_ROOT / ".github" / "workflows" / "release-tag.yml",
+        REPO_ROOT / "RELEASE_SIGNOFF.md",
+    ]
+    offenders = [
+        p.relative_to(REPO_ROOT)
+        for p in surfaces
+        if "folds into v0.1.1" in p.read_text(encoding="utf-8")
+    ]
+
+    assert not offenders, f"self-referential review promise survives in {offenders}"
+
+
 def test_the_gate_would_refuse_the_current_tree_for_an_unsigned_version() -> None:
     """Sanity: the real files do not accidentally authorize an arbitrary tag."""
     errors = check_signoff("benchmark-v0.0.0-never-signed")

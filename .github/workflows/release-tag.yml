@@ -87,7 +87,9 @@
 #   * No review arrived in the 6 days between packet and tag.
 #   * The release proceeded under a decision, recorded in the project's planning
 #     record beforehand, to take the review off the critical path: reviewer
-#     credited, review folds into v0.1.1.
+#     credited, review remains outstanding for a future release. It did NOT
+#     fold into v0.1.1 -- v0.1.1 also ships without it, under the disclosed
+#     maintainer-sign-off policy.
 #
 # Two earlier versions of this comment were wrong. The first said the reviewer
 # "was requested" -- false. The second said the PR sat open 18 days awaiting
@@ -141,7 +143,7 @@ on:
   workflow_dispatch:
     inputs:
       pr_number:
-        description: "PR number to evaluate for the D-16 approval gate (dry run)"
+        description: "PR number to evaluate for the ADVISORY scholarly-review job (dry run)"
         required: false
         type: string
 
@@ -181,11 +183,16 @@ jobs:
         run: python scripts/rebind_manifest_hash.py --check
 
   # --------------------------------------------------------------------------
-  # D-16: no tag, no HF upload, no announcement until the reviewer of record
-  # leaves a WRITTEN "approve" review -- or the review window lapses with the
-  # request outstanding, in which case the release proceeds with a logged
-  # waiver. A thumbs-up reaction does not count, which is precisely why this
-  # queries the reviews API and not reactions.
+  # SUPERSEDED, retained only to describe the `approval` job further down, which
+  # is now ADVISORY (continue-on-error) and gates nothing.
+  #
+  # Under the old D-16 policy this described the blocking condition: no tag, no
+  # HF upload, no announcement until the reviewer of record left a WRITTEN
+  # "approve" review -- or the review window lapsed with the request
+  # outstanding, logging a waiver. A thumbs-up reaction never counted, which is
+  # why the job queries the reviews API and not reactions.
+  #
+  # The blocking gate is now `signoff`, immediately below.
   # --------------------------------------------------------------------------
   # --------------------------------------------------------------------------
   # THE GATE. Maintainer sign-off for THIS version + a published governance
@@ -390,6 +397,6 @@ jobs:
     steps:
       - name: Gates cleared
         run: |
-          echo "release-audit and D-16 approval both passed for ${{ github.ref_name }}."
+          echo "release-audit and the maintainer sign-off gate both passed for ${{ github.ref_name }}."
           echo "HuggingFace upload + GitHub Release creation belong here (REL-01/REL-08)."
           echo "Not yet implemented -- see gap G2 in the planning repo's 260709-v1a FINDINGS.md."
