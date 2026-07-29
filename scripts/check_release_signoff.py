@@ -317,6 +317,44 @@ def _is_substantive(content: str) -> bool:
     return normalized not in PLACEHOLDER_BODIES
 
 
+def _versioned_section(text: str, tag: str) -> str | None:
+    """Body of the ``## ...<tag>...`` section, or None. ONE rule, both halves.
+
+    The two halves of this gate each look up a version-keyed ``##`` heading, and
+    they used to do it differently: the disclosure half searched for a heading
+    *containing* the anchored tag, while the sign-off half demanded a heading
+    that was EXACTLY ``## <tag>``. So a sign-off entry headed
+
+        ## benchmark-v0.1.1 (2026-07-29)
+
+    was rejected while a CHANGELOG section headed
+
+        ## benchmark-v0.1.1 (2026-07-29) — corrections to v0.1.0
+
+    was accepted -- the same dated form, opposite verdicts, in one gate. That
+    is what happened at v0.1.1: the maintainer's sign-off mirrored the CHANGELOG
+    convention, every field was valid, and the gate refused it over a heading
+    suffix. The threat this check exists for is a disclosure forgotten,
+    deferred, or stubbed; a dated heading is none of those.
+
+    Sharing the lookup is what keeps the two halves from drifting apart again.
+    It is not a loosening: ``_version_anchored`` still requires a token boundary
+    (``benchmark-v0.1.10`` cannot satisfy ``benchmark-v0.1.1``), and the
+    sign-off half separately requires the ``Version:`` field to name the same
+    release as its heading.
+    """
+    anchored = _version_anchored(tag)
+    heading = next(
+        (
+            line.lstrip("# ").strip()
+            for line in text.splitlines()
+            if line.startswith("## ") and anchored.search(line)
+        ),
+        None,
+    )
+    return None if heading is None else _section(text, heading)
+
+
 def _field_line(body: str, field: str) -> str | None:
     """The line declaring ``field``, or None. First declaration wins."""
     for line in body.splitlines():
@@ -345,11 +383,12 @@ def check_signoff(tag: str, signoff_path: Path = SIGNOFF_PATH) -> list[str]:
         ]
 
     text = signoff_path.read_text(encoding="utf-8")
-    body = _section(text, tag)
+    body = _versioned_section(text, tag)
     if body is None:
         return [
             f"{signoff_path.name} has no sign-off entry for {tag!r}. "
-            f"Add a '## {tag}' section recording who authorized this release and how. "
+            f"Add a '## {tag}' section recording who authorized this release and how "
+            f"(a trailing date or note in the heading is fine). "
             f"An entry for a different version does not authorize this one."
         ]
 
@@ -441,24 +480,12 @@ def check_disclosure(tag: str, changelog_path: Path = CHANGELOG_PATH) -> list[st
         return [f"{changelog_path.name} is missing; a release must publish a changelog"]
 
     text = changelog_path.read_text(encoding="utf-8")
-    anchored = _version_anchored(tag)
-    heading = next(
-        (
-            line.lstrip("# ").strip()
-            for line in text.splitlines()
-            if line.startswith("## ") and anchored.search(line)
-        ),
-        None,
-    )
-    if heading is None:
+    body = _versioned_section(text, tag)
+    if body is None:
         return [
             f"{changelog_path.name} has no '## ...{tag}...' section. "
             f"The tag being published must have a changelog entry."
         ]
-
-    body = _section(text, heading)
-    if body is None:  # pragma: no cover - heading came from the same parse
-        return [f"could not read the {changelog_path.name} section for {tag!r}"]
 
     match = GOVERNANCE_HEADING_RE.search(body)
     if match is None:
