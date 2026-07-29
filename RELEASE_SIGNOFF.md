@@ -39,3 +39,10 @@ cryptographic proof of it, and this file does not pretend otherwise.
 ---
 
 <!-- Entries below, newest first. -->
+
+## benchmark-v0.1.1 (2026-07-29)
+
+- **Version**: benchmark-v0.1.1
+- **Signed off**: 2026-07-29
+- **Authorized by**: Ben Lamm
+- **Authorization**: Explicit decision in the 2026-07-29 coordination session ("revise the policy. If we are confident it can go out."), reaffirmed by committing this entry personally after three independent reviewers (cold agent, second-pass reviewer, Codex) cleared PR #58 at ad7d05b, merged to main as b83403d.
