@@ -24,6 +24,7 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 from check_release_signoff import (  # noqa: E402
     REQUIRED_FIELDS,
+    _is_substantive,
     check_disclosure,
     check_signoff,
 )
@@ -368,65 +369,153 @@ def test_a_placeholder_governance_body_is_not_a_disclosure(hollow: str, tmp_path
     assert "placeholder" in errors[0]
 
 
-@pytest.mark.parametrize(
-    "invisible",
-    [
-        # CommonMark runs an unterminated comment to end-of-document, so this
-        # renders as nothing. Stripping only CLOSED <!-- --> pairs left it
-        # looking like content to the gate and blank to every reader.
-        "<!-- unclosed comment",
-        "<!-- a --> <!-- b",
-        # Markup with no statement in it.
-        "<span></span>",
-        "<div><span></span></div>",
-        "<br/>",
-        "<p>   </p>",
+# ---------------------------------------------------------------------------
+# The empty-disclosure check, by CATEGORY.
+#
+# Three review rounds each broke the previous version of this check, and each
+# time the fix addressed the literal strings the reviewer sent. Enumerating
+# categories instead is what makes the next instance of a known category fail
+# here rather than in review: a new entity or a new zero-width codepoint is
+# covered by the mechanism these cases exercise, not by having been listed.
+# ---------------------------------------------------------------------------
+
+INVISIBLE_BODIES: dict[str, list[str]] = {
+    # Terminated or not. CommonMark runs an unterminated comment to end of
+    # document, so the section renders blank either way.
+    "html-comment": ["<!-- no published disclosure -->", "<!-- unclosed", "<!-- a --> <!-- b"],
+    # Markup with no statement in it.
+    "tag-only": ["<span></span>", "<div><span></span></div>", "<br/>", "<p>   </p>"],
+    # Contents are not prose. These survived plain tag-stripping as CSS/JS text.
+    "discarded-element": [
+        "<style>body{color:red}</style>",
+        "<script>var x=1</script>",
+        "<template><p>x</p></template>",
+        "<style>body{color:red}",
     ],
+    # Decode to something invisible. Named, decimal and zero-width alike.
+    "html-entity": ["&nbsp;", "&#160;", "&#8203;", "&zwnj;", "&nbsp;&#8203;"],
+    # Literal codepoints. U+200B/U+2060/U+FEFF are NOT Python whitespace, so
+    # `.strip()` preserved them and one zero-width space read as content.
+    "invisible-codepoint": ["​", "⁠", "﻿", "\xa0", "​⁠"],
+    # Declares a label for use elsewhere; renders nothing at spec level.
+    "link-reference-definition": [
+        "[ref]: https://example.org",
+        "[a]: https://x.org\n[b]: https://y.org",
+    ],
+    # The original class: words that hold the space without filling it.
+    "placeholder-word": ["TBD", "TODO", "N/A", "-", "...", "- **TBD**"],
+}
+
+
+@pytest.mark.parametrize(
+    ("category", "body"),
+    [(cat, body) for cat, bodies in INVISIBLE_BODIES.items() for body in bodies],
+    ids=[f"{cat}-{i}" for cat, bodies in INVISIBLE_BODIES.items() for i, _ in enumerate(bodies)],
 )
 def test_a_governance_body_that_renders_to_nothing_is_refused(
-    invisible: str, tmp_path: Path
+    category: str, body: str, tmp_path: Path
 ) -> None:
-    """The contract is a VISIBLE public statement, so measure what renders.
+    """Every category must refuse, whatever spelling it arrives in.
 
-    Each of these cleared the previous fix. The failure they share is the worst
-    shape this gate can take: it reports a published disclosure while the
-    published page shows a bare heading.
+    The failure they share is the worst shape this gate can take: reporting a
+    published governance disclosure while the published page shows a bare
+    heading.
     """
     changelog = _write(
         tmp_path,
         "CHANGELOG.md",
-        f"# Changelog\n\n## {TAG} (2026-07-29) — a release\n\n### Governance\n\n{invisible}\n",
+        f"# Changelog\n\n## {TAG} (2026-07-29) — a release\n\n### Governance\n\n{body}\n",
     )
 
     errors = check_disclosure(TAG, changelog)
 
-    assert errors, f"a Governance body of {invisible!r} renders to nothing but cleared the gate"
+    assert errors, f"[{category}] body {body!r} normalizes to nothing but cleared the gate"
     assert "placeholder" in errors[0]
 
 
 @pytest.mark.parametrize(
-    "visible",
+    ("label", "visible"),
     [
-        "Real disclosure text.",
-        # Real text FIRST is still visible even though the comment eats the
-        # rest of the document -- rejecting this would be the over-correction.
-        "Real text, then a comment. <!-- unclosed",
-        "Real text <span>emphasis</span> here.",
-        # A markdown autolink is content, not a tag. The tag pattern requires a
-        # letter after `<` precisely so this survives.
-        "See <https://example.org/policy> for detail.",
-        "<!-- note --> Authorized by the maintainer.",
+        ("plain", "Real disclosure text."),
+        # Text FIRST is visible even though the comment eats the rest of the
+        # document. Rejecting this would be the over-correction.
+        ("text-then-unclosed-comment", "Real text, then a comment. <!-- unclosed"),
+        ("text-with-inline-tags", "Real text <span>emphasis</span> here."),
+        # An autolink is content, not a tag. The tag pattern requires a letter
+        # after `<` precisely so this survives.
+        ("autolink", "See <https://example.org/policy> for detail."),
+        ("comment-then-text", "<!-- note --> Authorized by the maintainer."),
+        # Entity decoding must not eat an ampersand that is just an ampersand.
+        ("raw-ampersand", "R&D review completed."),
+        ("escaped-ampersand", "R&amp;D review completed."),
+        # Zs collapses to a space rather than being deleted, so the words on
+        # either side of an NBSP survive with their boundary intact.
+        ("internal-nbsp", "Authorized\xa0by the maintainer."),
+        ("text-plus-link-ref", "Authorized by the maintainer.\n\n[policy]: https://example.org"),
     ],
 )
-def test_real_content_survives_the_invisibility_check(visible: str, tmp_path: Path) -> None:
-    """Positive controls. Stripping markup must not strip the statement."""
+def test_real_content_survives_the_invisibility_check(
+    label: str, visible: str, tmp_path: Path
+) -> None:
+    """Positive controls. Normalization must not remove the statement.
+
+    Every tightening in this sequence has been one step away from rejecting the
+    real disclosure, so these carry as much weight as the refusals.
+    """
     changelog = _write(
         tmp_path,
         "CHANGELOG.md",
         f"# Changelog\n\n## {TAG} (2026-07-29) — a release\n\n### Governance\n\n{visible}\n",
     )
 
-    assert check_disclosure(TAG, changelog) == [], f"{visible!r} is visible content and was refused"
+    assert check_disclosure(TAG, changelog) == [], f"[{label}] {visible!r} is content and refused"
+
+
+def test_KNOWN_BOUND_quoted_gt_in_an_attribute_defeats_the_tag_pattern(tmp_path: Path) -> None:
+    """Pins a documented limitation as current behaviour, not as correctness.
+
+    `<span title="a>b"></span>` leaves `b"` behind, so it passes. HTML
+    attributes are not parsed; closing this needs a real HTML parser, which is
+    a dependency this CI gate should not take on in order to defend against its
+    own maintainer.
+
+    The threat this check exists for is a disclosure forgotten, deferred, or
+    left as a stub -- not one deliberately hidden by the person required to
+    write it. `_is_substantive.__doc__` states this bound, and this test fails
+    if that statement is ever removed, so the code cannot quietly start
+    claiming more than it does. Same precedent as the withdrawn-request waiver.
+    """
+    changelog = _write(
+        tmp_path,
+        "CHANGELOG.md",
+        f"# Changelog\n\n## {TAG} (2026-07-29) — a release\n\n"
+        f'### Governance\n\n<span title="a>b"></span>\n',
+    )
+
+    assert check_disclosure(TAG, changelog) == [], (
+        "the quoted-attribute case now refuses -- good, but the documented bound "
+        "in _is_substantive is stale and must be updated"
+    )
+
+    doc = _is_substantive.__doc__ or ""
+    assert "KNOWN BOUND" in doc
+    assert "attributes are not parsed" in doc.replace("\n", " ")
+
+
+def test_the_docstring_describes_the_normalization_it_actually_performs() -> None:
+    """A wrong self-description is this project's documented failure mode.
+
+    The `<DR>` incident began with a docstring claiming behaviour the code did
+    not have, and two external reviewers later quoted that claim back verbatim.
+    So the property statement is asserted here: it must enumerate the
+    normalization rather than promise that the body "renders visibly", which is
+    a stronger claim than removal-based normalization can support.
+    """
+    doc = (_is_substantive.__doc__ or "").replace("\n", " ")
+
+    assert "approximation" in doc, "the docstring must not claim a rendering guarantee"
+    for enumerated in ("comments", "entities", "link-reference", "tags"):
+        assert enumerated in doc, f"the docstring does not mention {enumerated!r}"
 
 
 def test_a_bare_governance_heading_is_not_a_statement(tmp_path: Path) -> None:

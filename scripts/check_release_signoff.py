@@ -54,8 +54,10 @@ Exit codes: 0 ok · 1 gate failure · 2 usage/integrity error.
 from __future__ import annotations
 
 import argparse
+import html
 import re
 import sys
+import unicodedata
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -118,36 +120,87 @@ PLACEHOLDER_BODIES = frozenset(
 #: that body looking like content to the gate and blank to every reader.
 _HTML_COMMENT_RE = re.compile(r"<!--.*?(?:-->|\Z)", re.DOTALL)
 
+#: Elements whose CONTENTS are not prose. ``<style>body{color:red}</style>``
+#: survives tag-stripping as ``body{color:red}`` -- markup counted as a
+#: statement. Closing tag or end of input, for the same reason as comments.
+_DISCARDED_ELEMENT_RE = re.compile(
+    r"<(script|style|template)\b[^>]*>.*?(?:</\1\s*>|\Z)", re.DOTALL | re.IGNORECASE
+)
+
 #: Tag shapes only -- ``<span>``, ``</div>``, ``<br/>``. Deliberately requires a
 #: letter after ``<`` so a markdown autolink such as ``<https://example.org>``
 #: is left intact: that IS visible content. Tags are stripped rather than
 #: rejected, so ``real <em>text</em>`` still reads as the text it renders to.
 _HTML_TAG_RE = re.compile(r"</?[A-Za-z][A-Za-z0-9-]*(?:\s[^<>]*)?/?>")
 
+#: A CommonMark link-reference definition renders nothing at all -- it declares
+#: a label for use elsewhere. A body consisting only of these is blank.
+_LINK_REF_DEF_RE = re.compile(r"^\s*\[[^\]]+\]:\s+\S+\s*$")
+
 _MARKDOWN_NOISE_RE = re.compile(r"[\s*_`>#.\-]+")
 
 
-def _is_substantive(content: str) -> bool:
-    """Does this section body actually say something?
+def _visible_text(content: str) -> str:
+    """Approximate what a reader would see, by removal only. No parser.
 
-    Requiring merely non-whitespace was not enough. Probes showed a Governance
-    body consisting only of ``<!-- no published disclosure -->`` clearing the
-    gate -- an HTML comment renders as nothing at all, so the published page
-    would show a bare heading while the gate reported a disclosure. ``TBD`` and
-    ``-`` cleared it too.
-
-    Stripping only *closed* comment pairs was still not enough. ``<!-- unclosed``
-    runs to end-of-document under CommonMark and renders as nothing, and a body
-    of ``<span></span>`` is markup with no statement in it. The contract is a
-    **visible public statement**, so what is measured is what a reader would
-    actually see: comments removed (terminated or not), tags removed, and then
-    the question asked of what is left.
-
-    This is not a quality judgement and there is no length threshold. It rejects
-    exactly two things: content that renders to nothing, and a fixed set of
-    words that are conventional stand-ins for content not yet written.
+    Order matters and is not arbitrary. Comments and discarded elements come
+    off the RAW text, before entity decoding, so an escaped ``&lt;!--`` stays
+    the literal text it renders as instead of being promoted into a comment and
+    deleted. Entity decoding then happens before the invisible-codepoint pass,
+    because ``&nbsp;`` has to become U+00A0 for that pass to see it.
     """
-    visible = _HTML_TAG_RE.sub("", _HTML_COMMENT_RE.sub("", content)).strip()
+    text = _HTML_COMMENT_RE.sub("", content)
+    text = _DISCARDED_ELEMENT_RE.sub("", text)
+    text = _HTML_TAG_RE.sub("", text)
+    text = html.unescape(text)
+
+    # Cf (format) characters are deleted outright: U+200B, U+2060 and U+FEFF are
+    # not Python whitespace, so `.strip()` preserved them and a body of one
+    # zero-width space read as content. Zs (space separators) become an ordinary
+    # space rather than being deleted, so NBSP-joined words keep their boundary.
+    text = "".join(
+        " " if unicodedata.category(ch) == "Zs" else ch
+        for ch in text
+        if unicodedata.category(ch) != "Cf"
+    )
+
+    return "\n".join(line for line in text.splitlines() if not _LINK_REF_DEF_RE.match(line))
+
+
+def _is_substantive(content: str) -> bool:
+    """Is anything left of this section body after normalization?
+
+    THE TRUE PROPERTY, stated precisely because a wrong self-description is
+    this project's documented failure mode. This does **not** verify that the
+    body "visibly renders"; it verifies that the body is non-empty after a
+    specific, listed normalization:
+
+    * HTML comments removed, terminated or not
+    * ``<script>``/``<style>``/``<template>`` contents removed
+    * remaining HTML tags removed
+    * HTML entities decoded
+    * Unicode ``Cf`` characters deleted, ``Zs`` collapsed to a space
+    * whole-line CommonMark link-reference definitions dropped
+    * a fixed set of placeholder words rejected
+
+    That is an approximation of "renders visibly", not a guarantee of it. Three
+    rounds of review each broke the previous blocklist, so the list above is
+    the honest description of what is enforced rather than a claim about what
+    a browser would show.
+
+    KNOWN BOUND, deliberately not closed. HTML attributes are not parsed, so a
+    quoted ``>`` inside one defeats the tag pattern: ``<span title="a>b"></span>``
+    leaves ``b"`` behind and passes. Closing this needs a real HTML parser,
+    which is a dependency this CI gate should not take on to defend against its
+    own maintainer. A maintainer determined to hide his own disclosure from his
+    own gate can; that is not the threat this check exists for, which is the
+    disclosure being forgotten, deferred, or left as a stub. Pinned by test,
+    same precedent as the withdrawn-request waiver.
+
+    There is no length threshold. Visible punctuation is content, and a
+    threshold would be one more arbitrary surface to argue about.
+    """
+    visible = _visible_text(content).strip()
     if not visible:
         return False
 
