@@ -264,12 +264,12 @@ Leningrad Codex book of Devarim (Deuteronomy): `F118B`, `F119A`, `F119B`,
    (WSRP photographs; rights asserted by WSRP; IIIF-reference-only, never redistributed).
 2. `baselines/tests/fixtures/iaa_folio_leningrad_devarim_<F>_fixture.{page.xml,gt_adapter_golden.json}`
    — the tier-1 GT (F118B hand-transcribed by Open Masorah; F119A/B/120A from UXLC 2.5) plus the source PAGE-XML.
-3. `results/<baseline_id>/leningrad_devarim_<F>_fixture.json` — the frozen
-   per-baseline prediction; `results/scores/leningrad_devarim_<F>_fixture.json`
-   holds the headline CER + F1.
+3. `results/` (per-baseline predictions + `results/scores/` headline CER + F1) —
+   **withdrawn in v0.1**; no baseline prediction/score tree ships. The earlier
+   F118B draft scores were retracted (see `baselines/EVALUATION_PROTOCOL.md`,
+   2026-07-10 row) and re-emission is deferred to v0.1.1.
 
-In v0.1 only `F118B` has a complete predictions-and-scores set across all
-four baselines; `F119A`/`F119B`/`F120A` apply the same pre-registered
-methodology cold (no per-folio tuning) as the IAA set is scored. The
-pre-registration commitment is documented in
-`baselines/EVALUATION_PROTOCOL.md` (append-only).
+v0.1 ships no automated OCR/HTR baseline predictions or scores; the release is
+the ground truth, the inter-annotator agreement measurement, and the scorer.
+The pre-registered methodology that governs the deferred baselines is documented
+in `baselines/EVALUATION_PROTOCOL.md` (append-only).
