@@ -112,7 +112,18 @@ PLACEHOLDER_BODIES = frozenset(
     {"tbd", "todo", "tba", "n/a", "na", "none", "nil", "xxx", "pending", "coming soon"}
 )
 
-_HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
+#: ``<!--`` through ``-->`` **or end of input**. CommonMark treats an
+#: unterminated HTML comment as running to the end of the document, so
+#: ``<!-- unclosed`` renders as nothing at all; matching only closed pairs left
+#: that body looking like content to the gate and blank to every reader.
+_HTML_COMMENT_RE = re.compile(r"<!--.*?(?:-->|\Z)", re.DOTALL)
+
+#: Tag shapes only -- ``<span>``, ``</div>``, ``<br/>``. Deliberately requires a
+#: letter after ``<`` so a markdown autolink such as ``<https://example.org>``
+#: is left intact: that IS visible content. Tags are stripped rather than
+#: rejected, so ``real <em>text</em>`` still reads as the text it renders to.
+_HTML_TAG_RE = re.compile(r"</?[A-Za-z][A-Za-z0-9-]*(?:\s[^<>]*)?/?>")
+
 _MARKDOWN_NOISE_RE = re.compile(r"[\s*_`>#.\-]+")
 
 
@@ -125,11 +136,18 @@ def _is_substantive(content: str) -> bool:
     would show a bare heading while the gate reported a disclosure. ``TBD`` and
     ``-`` cleared it too.
 
+    Stripping only *closed* comment pairs was still not enough. ``<!-- unclosed``
+    runs to end-of-document under CommonMark and renders as nothing, and a body
+    of ``<span></span>`` is markup with no statement in it. The contract is a
+    **visible public statement**, so what is measured is what a reader would
+    actually see: comments removed (terminated or not), tags removed, and then
+    the question asked of what is left.
+
     This is not a quality judgement and there is no length threshold. It rejects
     exactly two things: content that renders to nothing, and a fixed set of
     words that are conventional stand-ins for content not yet written.
     """
-    visible = _HTML_COMMENT_RE.sub("", content).strip()
+    visible = _HTML_TAG_RE.sub("", _HTML_COMMENT_RE.sub("", content)).strip()
     if not visible:
         return False
 

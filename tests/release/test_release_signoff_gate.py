@@ -368,6 +368,67 @@ def test_a_placeholder_governance_body_is_not_a_disclosure(hollow: str, tmp_path
     assert "placeholder" in errors[0]
 
 
+@pytest.mark.parametrize(
+    "invisible",
+    [
+        # CommonMark runs an unterminated comment to end-of-document, so this
+        # renders as nothing. Stripping only CLOSED <!-- --> pairs left it
+        # looking like content to the gate and blank to every reader.
+        "<!-- unclosed comment",
+        "<!-- a --> <!-- b",
+        # Markup with no statement in it.
+        "<span></span>",
+        "<div><span></span></div>",
+        "<br/>",
+        "<p>   </p>",
+    ],
+)
+def test_a_governance_body_that_renders_to_nothing_is_refused(
+    invisible: str, tmp_path: Path
+) -> None:
+    """The contract is a VISIBLE public statement, so measure what renders.
+
+    Each of these cleared the previous fix. The failure they share is the worst
+    shape this gate can take: it reports a published disclosure while the
+    published page shows a bare heading.
+    """
+    changelog = _write(
+        tmp_path,
+        "CHANGELOG.md",
+        f"# Changelog\n\n## {TAG} (2026-07-29) — a release\n\n### Governance\n\n{invisible}\n",
+    )
+
+    errors = check_disclosure(TAG, changelog)
+
+    assert errors, f"a Governance body of {invisible!r} renders to nothing but cleared the gate"
+    assert "placeholder" in errors[0]
+
+
+@pytest.mark.parametrize(
+    "visible",
+    [
+        "Real disclosure text.",
+        # Real text FIRST is still visible even though the comment eats the
+        # rest of the document -- rejecting this would be the over-correction.
+        "Real text, then a comment. <!-- unclosed",
+        "Real text <span>emphasis</span> here.",
+        # A markdown autolink is content, not a tag. The tag pattern requires a
+        # letter after `<` precisely so this survives.
+        "See <https://example.org/policy> for detail.",
+        "<!-- note --> Authorized by the maintainer.",
+    ],
+)
+def test_real_content_survives_the_invisibility_check(visible: str, tmp_path: Path) -> None:
+    """Positive controls. Stripping markup must not strip the statement."""
+    changelog = _write(
+        tmp_path,
+        "CHANGELOG.md",
+        f"# Changelog\n\n## {TAG} (2026-07-29) — a release\n\n### Governance\n\n{visible}\n",
+    )
+
+    assert check_disclosure(TAG, changelog) == [], f"{visible!r} is visible content and was refused"
+
+
 def test_a_bare_governance_heading_is_not_a_statement(tmp_path: Path) -> None:
     """The heading is the container, not the disclosure."""
     hollow = GOOD_CHANGELOG.replace(
