@@ -142,8 +142,14 @@ _HTML_TAG_RE = re.compile(r"</?[A-Za-z][A-Za-z0-9-]*(?:\s[^<>]*)?/?>")
 #: behind as substance -- which made the docstring's own enumeration false, the
 #: precise defect the enumeration was written to prevent.
 _TITLE = r"(?:\"[^\"]*\"|'[^']*'|\([^)]*\))"
+#: CommonMark allows a destination in angle brackets, which may contain spaces:
+#: ``[ref]: <foo bar>``. Without this alternative the definition did not match,
+#: and the tag stripper then ate ``<foo bar>`` as if it were an HTML tag,
+#: leaving ``[ref]:`` behind as substance.
+_DESTINATION = r"(?:<[^<>\n]*>|\S+)"
 _LINK_REF_DEF_RE = re.compile(
-    rf"^[ ]{{0,3}}\[[^\]]+\]:[ \t]*\S+[ \t]*{_TITLE}?[ \t]*(?:\n[ \t]+{_TITLE}[ \t]*)?$",
+    rf"^[ ]{{0,3}}\[[^\]]+\]:[ \t]*{_DESTINATION}[ \t]*{_TITLE}?[ \t]*"
+    rf"(?:\n[ \t]+{_TITLE}[ \t]*)?$",
     re.MULTILINE,
 )
 
@@ -160,18 +166,25 @@ _MARKDOWN_NOISE_RE = re.compile(r"[\s*_`>#.\-]+")
 def _visible_text(content: str) -> str:
     """Approximate what a reader would see, by removal only. No parser.
 
-    Order matters and is not arbitrary. Comments and discarded elements come
-    off the RAW text, before entity decoding, so an escaped ``&lt;!--`` stays
-    the literal text it renders as instead of being promoted into a comment and
-    deleted. Entity decoding then happens before the invisible-codepoint pass,
-    because ``&nbsp;`` has to become U+00A0 for that pass to see it.
+    Order matters and is not arbitrary.
+
+    * Comments and discarded elements come off the RAW text, before entity
+      decoding, so an escaped ``&lt;!--`` stays the literal text it renders as
+      instead of being promoted into a comment and deleted.
+    * Link-reference definitions are removed BEFORE HTML tags. A destination
+      may be angle-bracketed -- ``[ref]: <foo bar>`` -- and the tag stripper
+      would otherwise consume it as if it were a tag, leaving ``[ref]:``
+      stranded as substance. Definition matching is line-anchored on the raw
+      text, so running it earlier is safe.
+    * Entity decoding precedes the invisible-codepoint pass, because
+      ``&nbsp;`` has to become U+00A0 for that pass to see it.
     """
     text = _HTML_COMMENT_RE.sub("", content)
     text = _DISCARDED_ELEMENT_RE.sub("", text)
+    text = _LINK_REF_DEF_RE.sub("", text)
     text = _HTML_TAG_RE.sub("", text)
     text = html.unescape(text)
     text = _EMPTY_LINK_RE.sub("", text)
-    text = _LINK_REF_DEF_RE.sub("", text)
 
     return "".join(_visible_char(ch) for ch in text)
 
@@ -213,9 +226,10 @@ def _is_substantive(content: str) -> bool:
     * ``<script>``/``<style>``/``<template>`` contents removed
     * remaining HTML tags removed
     * HTML entities decoded
-    * empty-text links and empty-alt images removed (``[](/x)``, ``![](x)``)
-    * CommonMark link-reference definitions dropped, including an indented
-      title continuation line
+    * empty-text links and empty-alt images with a SIMPLE destination -- one
+      containing no nested parentheses -- removed (``[](/x)``, ``![](x)``)
+    * CommonMark link-reference definitions dropped, including an angle-
+      bracketed destination and an indented title continuation line
     * Unicode ``Cf`` deleted; ``Cc`` deleted apart from tab/newline/return;
       ``Mn`` (zero-width combining marks) deleted; ``Zs`` collapsed to a space
     * a fixed set of placeholder words rejected
@@ -233,14 +247,23 @@ def _is_substantive(content: str) -> bool:
     plausibly carry Hebrew in a disclosure; breaking that would be a worse
     failure than the hole being closed.
 
-    KNOWN BOUND, deliberately not closed. HTML attributes are not parsed, so a
-    quoted ``>`` inside one defeats the tag pattern: ``<span title="a>b"></span>``
-    leaves ``b"`` behind and passes. Closing this needs a real HTML parser,
-    which is a dependency this CI gate should not take on to defend against its
-    own maintainer. A maintainer determined to hide his own disclosure from his
-    own gate can; that is not the threat this check exists for, which is the
-    disclosure being forgotten, deferred, or left as a stub. Pinned by test,
-    same precedent as the withdrawn-request waiver.
+    KNOWN BOUNDS, deliberately not closed. Both are cases where a regex would
+    have to parse a recursive or context-sensitive grammar, and both are pinned
+    by test so the code cannot quietly start claiming more than it does:
+
+    * **HTML attributes are not parsed**, so a quoted ``>`` inside one defeats
+      the tag pattern: ``<span title="a>b"></span>`` leaves ``b"`` and passes.
+    * **Nested parentheses in a link destination are not counted.** CommonMark
+      permits them, and a regex cannot match balanced delimiters, so
+      ``[](foo(and)bar)`` leaves ``bar)`` and passes. The enumeration above is
+      scoped to simple destinations rather than overstating this.
+
+    Closing either needs a real parser -- an HTML parser, or a CommonMark one.
+    That is a dependency this CI gate should not take on in order to defend
+    against its own maintainer. A maintainer determined to hide his own
+    disclosure from his own gate can; that is not the threat this check exists
+    for, which is the disclosure being forgotten, deferred, or left as a stub.
+    Same precedent as the withdrawn-request waiver.
 
     There is no length threshold. Visible punctuation is content, and a
     threshold would be one more arbitrary surface to argue about.

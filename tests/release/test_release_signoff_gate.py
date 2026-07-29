@@ -407,6 +407,10 @@ INVISIBLE_BODIES: dict[str, list[str]] = {
         '[policy]: https://example.org\n    "title"',
         '[policy]: https://example.org "title"',
         "[policy]: https://example.org\n    (title)",
+        # Angle-bracketed destination: the tag stripper used to eat it,
+        # stranding "[ref]:" as substance. Order-dependent regression.
+        "[ref]: <foo bar>",
+        '[ref]: <foo bar> "t"',
     ],
     # Markup that shows the reader no text at all.
     "empty-link-or-image": ["[]()", "[](/policy)", "![](x)", "[][policy]"],
@@ -525,8 +529,37 @@ def test_KNOWN_BOUND_quoted_gt_in_an_attribute_defeats_the_tag_pattern(tmp_path:
     )
 
     doc = _is_substantive.__doc__ or ""
-    assert "KNOWN BOUND" in doc
+    assert "KNOWN BOUNDS" in doc
     assert "attributes are not parsed" in doc.replace("\n", " ")
+
+
+def test_KNOWN_BOUND_nested_parens_in_a_link_destination_are_not_counted(tmp_path: Path) -> None:
+    """The second documented limitation, pinned the same way as the first.
+
+    CommonMark permits balanced parentheses in a link destination, and a regex
+    cannot match balanced delimiters. `[](foo(and)bar)` therefore leaves `bar)`
+    and passes. Rather than pretend otherwise with a deeper pattern that would
+    fail one nesting level further down, the enumerated clause is scoped to
+    simple destinations and this case is documented as a bound.
+
+    Closing it needs a real CommonMark parser -- a dependency this gate should
+    not take on to defend against its own maintainer.
+    """
+    changelog = _write(
+        tmp_path,
+        "CHANGELOG.md",
+        f"# Changelog\n\n## {TAG} (2026-07-29) — a release\n\n### Governance\n\n[](foo(and)bar)\n",
+    )
+
+    assert check_disclosure(TAG, changelog) == [], (
+        "the nested-paren case now refuses -- good, but the documented bound in "
+        "_is_substantive is stale and must be updated"
+    )
+
+    doc = (_is_substantive.__doc__ or "").replace("\n", " ")
+    assert "KNOWN BOUNDS" in doc
+    assert "Nested parentheses" in doc
+    assert "no nested parentheses" in doc, "the enumerated clause must be scoped, not absolute"
 
 
 def test_the_docstring_describes_the_normalization_it_actually_performs() -> None:
@@ -568,8 +601,14 @@ def test_the_enumeration_is_not_merely_present_but_TRUE() -> None:
         "discarded element contents": "<style>body{color:red}</style>",
         "tags": "<span></span>",
         "entities": "&#8203;",
-        "empty-text links": "[](/policy)",
+        # SCOPED: simple destinations only. Nested parentheses are a KNOWN
+        # BOUND, pinned separately -- the clause claims only what it does.
+        "empty-text links (simple destination)": "[](/policy)",
+        "empty-alt images (simple destination)": "![](x)",
         "link-reference definitions": '[policy]: https://example.org\n    "title"',
+        # The angle-bracketed destination is why ref-def removal must run
+        # BEFORE tag stripping; this fixture fails if that order regresses.
+        "link-reference definitions (angle-bracketed destination)": "[ref]: <foo bar>",
         "Cf": "​",
         "Cc": "\x01",
         "Mn": "ְָ",
