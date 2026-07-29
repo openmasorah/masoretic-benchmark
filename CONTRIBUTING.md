@@ -169,7 +169,9 @@ must respect this split:
 | Artifact | License | Notes |
 |---|---|---|
 | Scorer code (`masoretic_eval/`, `baselines/src/`, `oracles/src/`, `scripts/`, `schemas/`) | Apache-2.0 | Match the root `LICENSE` file. |
-| New ground-truth Hebrew text (e.g., new IAA fixtures) | CC-BY-4.0 | Attribution required. State the source in the fixture file or accompanying `*_PIN.md`. |
+| New consonantal transcription (Tier-1 text) | Public Domain | No rights asserted; dedicated to the public domain. State the text source in the fixture file or accompanying `*_PIN.md`. |
+| New annotation data (Tiers 2–4: nikkud, cantillation, meta-mark positions & labels) | CC0-1.0 | Factual observations, dedicated under CC0-1.0. |
+| Compiled fixtures, schema, adjudication metadata, benchmark compilation | CC-BY-4.0 | Attribution required. State the source in the fixture file or accompanying `*_PIN.md`. |
 | Manuscript images | **Never redistributed** | Reference only via IIIF or archive.org URLs. |
 | External model artifacts (Kraken weights, Nakdimon checkpoints, DictaBERT models) | Upstream license | Pin a hash and source URL in the corresponding `*_PIN.md` file (e.g., `KRAKEN_PIN.md`, `NAKDIMON_PIN.md`, `LLM_PIN.md`); never check binary weights into git. |
 
@@ -224,6 +226,10 @@ For methodology questions or proposed evaluation changes, open an issue
 
 ## License
 
-By contributing, you agree that your contributions to scorer / baseline /
-oracle code are licensed under Apache-2.0 (see [LICENSE](LICENSE)) and that
-ground-truth text contributions are licensed under CC-BY-4.0.
+By contributing, you agree that your contributions are licensed to match the
+per-component model in [`LICENSE.md`](LICENSE.md): scorer / baseline / oracle
+code under Apache-2.0 (see [LICENSE](LICENSE)); new consonantal transcription
+dedicated to the public domain (no rights asserted); new annotation data (nikkud,
+cantillation, meta-mark positions & labels) dedicated under CC0-1.0; and compiled
+fixtures, schema, adjudication metadata, and benchmark-compilation contributions
+under CC-BY-4.0.

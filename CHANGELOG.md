@@ -70,6 +70,13 @@ tier-2 half and the adjudication-count contamination were found while verifying 
   CER on NFD, macro-averaged over verses. The same note wrongly claimed the headline
   CER was not recomputable without the UXLC cache; tiers 1–3 recompute from the three
   committed projections alone.
+- Conformed the v0.1.0 licensing table (in the release notes below) to the ratified
+  multi-component model in `LICENSE.md`: the earlier table listed the consonantal text
+  and the annotation data under CC-BY-4.0, whereas `LICENSE.md` places the consonantal
+  text in the public domain and dedicates the annotation data under CC0-1.0 (schema,
+  adjudication, and compilation remain CC-BY-4.0; the scorer remains Apache-2.0).
+  `LICENSE.md` is authoritative; the immutable `benchmark-v0.1.0` tag keeps the
+  superseded table.
 
 ## benchmark-v0.1.0 — Open Masorah Devarim pilot benchmark
 
@@ -112,13 +119,15 @@ figures reproduce from the three committed projection files alone.
 
 ### Licensing
 
-| Artifact | License |
+| Component | License / status |
 |---|---|
-| Scorer (`masoretic_eval/`) | Apache 2.0 |
-| Annotator projections + adjudicated consensus | CC-BY-4.0 |
-| Tier-1 GT — F118B (hand-transcribed) | CC-BY-4.0 (Open Masorah) |
-| Tier-1 GT — F119A/F119B/F120A (UXLC-derived) | UXLC 2.5 (Tanach.us) — free to copy, citation appreciated; not CC0 |
-| Manuscript images | IIIF reference to archive.org PDM 1.0; never redistributed |
+| Consonantal text (Tier 1, all four folios) | Public Domain |
+| Annotation data (Tiers 2–4: nikkud, cantillation, meta-mark positions & labels) | CC0-1.0 |
+| Scholarly contributions (positional-encoding schema, two-annotator adjudication protocol & metadata, error taxonomy & guidelines, four-folio benchmark compilation) | CC-BY-4.0 |
+| Scorer code (`masoretic_eval/`) | Apache-2.0 |
+| Manuscript images | Not distributed; referenced by IIIF URL only. WSRP asserts rights over the photographs. |
+
+This table summarizes; [`LICENSE.md`](LICENSE.md) is authoritative.
 
 ---
 
