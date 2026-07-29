@@ -275,12 +275,49 @@ accept one canonical enum — `pe`, `samekh`, `large_letter`, `small_letter`,
 `suspended_letter`, `inverted_nun`, `puncta_extraordinaria`, `circellus`,
 `rafe`, `double_rafe` — defined once in `masoretic_eval/tier4_vocabulary.py`.
 
+**Semantic change beyond the rename.** Collapsing `reversednun` into
+`inverted_nun` means UXLC's two encodings of nun hafukha — the `<reversednun/>`
+verse-child tag and the inline `<x>8</x>` code — now share one per-verse ordinal
+counter. Previously a verse carrying both produced `reversednun ordinal=1` *and*
+`inverted_nun ordinal=1`: one phenomenon counted twice, which the tier-4 matcher
+(a set over `(type, verse_ref, ordinal)`) would have scored as two independent
+detections. The new behaviour is correct, and no verse in the frozen v0.1 scope
+carries either encoding, so no published number is affected.
+
+One caveat is recorded rather than fixed: verse-child tags are collected before
+inline `<x>` codes, so a verse carrying both numbers them in parse order, not
+reading order. That is pre-existing loader behaviour (`pe`/`samekh` have always
+been collected first) which only becomes observable once two encodings share a
+type. Fixing it changes ordinal assignment, which is a pre-registered v0.2
+decision rather than a patch-release edit. It is pinned as a **strict xfail** in
+`tests/test_uxlc_nun_encoding_merge.py`, so whoever does fix it gets a failing
+test and has to retire the caveat deliberately.
+
 **Breaking.** `reversednun` and `puncta` are rejected. Migrate with
 `masoretic_eval.tier4_vocabulary.canonicalize()`, which maps them to
 `inverted_nun` and `puncta_extraordinaria` respectively. Consumer pins in
 `baselines/` and `oracles/` cascade to `>=0.3.0,<0.4`.
 
 Rationale, and why no published number moved, under **benchmark-v0.1.1** above.
+
+**Corrected before release: the version bump was only half-applied.**
+`pyproject.toml` moved to `0.3.0` while `masoretic_eval/__init__.py`
+`__version__` and `phase_0_manifest.json` `scorer_version` both stayed at
+`0.2.0`, so the installed package reported a version its own metadata
+contradicted. The field is not a label: `masoretic_eval/output_schema.py` stamps
+`__version__` into every emitted result, and `scripts/verify_gt_hash.py` writes
+it into the manifest, from which `baselines/src/baselines/_base.py` cascades it
+into every `run_meta.json`. No `run_meta.json` ships under v0.1, so nothing
+downstream recorded the stale value this time — unlike the earlier 0.1.0 → 0.2.0
+drift, which had already contaminated four promoted records before it was found.
+
+The guard that should have caught it was **vacuous**: it compared the manifest to
+`__version__` with both ends equally stale, and nothing tied either to
+`pyproject.toml`. It now asserts
+`importlib.metadata.version == __version__ == scorer_version` as a single chain,
+anchored to the distribution metadata — the one end a human necessarily edits
+when releasing. A hardcoded `"0.2.0"` expectation in the CLI test was replaced
+with a comparison against the package for the same reason.
 
 ## masoretic_eval 0.2.0 — scorer
 

@@ -148,7 +148,8 @@ def _cer_block(ref_path: Path, hyp_path: Path, tier: int) -> tuple[float, list[f
 
     Identical path to ``masoretic_eval.iaa.compute._tier_cer_result``: per-verse
     CER through ``iaa.cer.per_verse_cer``, then ``bootstrap_metric`` with
-    ``_macro_cer`` at the package defaults (B, seed 0xBEEF, percentile). Verified
+    :func:`_macro` -- this module's copy of that function's ``_macro_cer``,
+    same arithmetic -- at the package defaults (B, seed 0xBEEF, percentile). Verified
     to reproduce the published ``cer_vs_consensus_b`` point estimates AND their
     CIs exactly, which is what licenses using it for the new blocks.
     """

@@ -3,6 +3,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+import masoretic_eval
 from masoretic_eval.manifest import Manifest
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -51,7 +52,13 @@ def test_cli_score_writes_output(tmp_path):
     data = json.loads(out.read_text())
     assert data["prediction_id"] == "leningrad_devarim_f237b"
     assert data["manifest_hash"] == Manifest.load(MANIFEST_FIXTURE).manifest_hash
-    assert data["scorer_version"] == "0.2.0"
+    # Assert against the package, not a literal. A hardcoded version here is
+    # the same vacuity that let __version__ drift from pyproject.toml through
+    # v0.1.1: the contract is "the CLI stamps the version it is", and pinning
+    # the literal only records which version someone last edited this line for.
+    # The chain pyproject == __version__ == manifest is asserted in
+    # tests/test_scorer_version_cascade.py.
+    assert data["scorer_version"] == masoretic_eval.__version__
     assert "tier1" in data["tiers"]
 
 

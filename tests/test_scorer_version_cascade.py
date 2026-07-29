@@ -63,6 +63,62 @@ def test_manifest_scorer_version_matches_the_package():
     assert _manifest()["scorer_version"] == masoretic_eval.__version__
 
 
+def test_package_version_matches_the_distribution_metadata():
+    """`__version__` must equal what `pip`/`importlib.metadata` reports.
+
+    THE HALF THAT WAS MISSING, and it let the same incident recur. The test
+    above compares the manifest to ``__version__`` -- but when BOTH are stale
+    it passes while saying nothing, because nothing tied either end to
+    ``pyproject.toml``. That is exactly what happened at v0.1.1: the scorer
+    took a BREAKING tier-4 vocabulary bump to ``0.3.0`` in ``pyproject.toml``
+    while ``__version__`` and ``scorer_version`` both sat at ``0.2.0``, so the
+    installed package reported a version its own metadata contradicted -- and
+    the guard above was green throughout.
+
+    Anchoring to the distribution metadata is what makes the chain
+    non-vacuous: ``pyproject.toml`` is the only end a human edits when
+    releasing, so it is the only end that can be trusted to move.
+    """
+    from importlib.metadata import PackageNotFoundError, version  # noqa: PLC0415
+
+    try:
+        installed = version("masoretic-eval")
+    except PackageNotFoundError:  # pragma: no cover - editable/dev checkouts
+        pytest.skip("masoretic-eval is not installed; nothing to compare against")
+
+    assert installed == masoretic_eval.__version__, (
+        f"installed distribution reports {installed} but masoretic_eval.__version__ is "
+        f"{masoretic_eval.__version__} -- bump masoretic_eval/__init__.py to match "
+        f"pyproject.toml"
+    )
+
+
+def test_the_whole_version_chain_is_one_value():
+    """pyproject -> __version__ -> manifest, asserted end to end in one place.
+
+    The three are separate files edited by separate motions, and every prior
+    break in this repo has been two of them agreeing while the third drifted.
+    Comparing them pairwise in separate tests is how that stayed invisible; this
+    asserts the whole chain at once so a partial bump cannot be green.
+    """
+    from importlib.metadata import PackageNotFoundError, version  # noqa: PLC0415
+
+    try:
+        installed = version("masoretic-eval")
+    except PackageNotFoundError:  # pragma: no cover
+        pytest.skip("masoretic-eval is not installed; nothing to compare against")
+
+    chain = {
+        "pyproject (via importlib.metadata)": installed,
+        "masoretic_eval.__version__": masoretic_eval.__version__,
+        "phase_0_manifest.json::scorer_version": _manifest()["scorer_version"],
+    }
+
+    assert len(set(chain.values())) == 1, "scorer version chain has drifted: " + ", ".join(
+        f"{k}={v}" for k, v in chain.items()
+    )
+
+
 @pytest.mark.parametrize("run_meta", RUN_METAS, ids=lambda p: p.parent.name)
 def test_run_meta_scorer_version_matches_the_manifest(run_meta: Path):
     """The cascade's downstream end. This is the half that had no gate."""

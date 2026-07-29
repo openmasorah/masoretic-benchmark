@@ -59,7 +59,7 @@
       "gt_source": "iaa_data/devarim_4folio/goldens/leningrad_devarim_F120A_fixture.gt_adapter_golden.json@4b96e57 (projection of iaa_data/devarim_4folio/consensus_gold_positional.json@3ece579)"
     }
   ],
-  "frozen_at": "2026-07-10T16:05:00Z",
+  "frozen_at": "2026-07-29T13:00:31Z",
   "fuses_fired": [],
   "iaa_subset": [
     "leningrad_devarim_F118B_fixture",
@@ -128,9 +128,14 @@
       "prev_frozen_at": "2026-07-10T14:23:18Z",
       "new_frozen_at": "2026-07-10T16:05:00Z",
       "reason": "phase 04: v0.1 Option A - automated baselines withdrawn to v0.1.1. results/ and results_provisional/ removed from the public tree. The F118B whole-folio scores are RETRACTED: they were computed over 109 Kraken lines (incl. masorah magna/parva apparatus) against 26 physical main-text GT lines, with all bboxes [0,0,0,0] so reading order fell back to line_id. The resulting ranking is inverted - biblia_kraken is reported worst (tier1 0.9282) when ROI-restricted main-text scoring puts it best on consonants. Separately, the biblia_char_menaked tier-2/3 predictions are corrupt (unpinned transformers produced cumulative prefix repetition: tier2 3.3x tier1, nikkud on 7 of 109 lines); they are not model output and are not publishable with a caveat. expected_reports_per_baseline reset to 0; re-promote in v0.1.1 from real re-runs under pinned transformers and ROI/main-text methodology."
+    },
+    {
+      "prev_frozen_at": "2026-07-10T16:05:00Z",
+      "new_frozen_at": "2026-07-29T13:00:31Z",
+      "reason": "phase 04: v0.1.1 scorer_version corrected 0.2.0 -> 0.3.0. The scorer took a BREAKING tier-4 vocabulary bump to 0.3.0 in pyproject.toml, but masoretic_eval/__init__.py::__version__ and this field both stayed at 0.2.0, so the installed package reported a version its own metadata contradicted. The field is not inert: masoretic_eval/output_schema.py stamps __version__ into every emitted result and scripts/verify_gt_hash.py writes it here, from which baselines/src/baselines/_base.py cascades it into every run_meta.json. No run_meta.json is published under v0.1 (Option A), so nothing downstream recorded the stale value this time -- unlike the 0.1.0 -> 0.2.0 correction above, which had already contaminated four promoted records. The guard that should have caught this, tests/test_scorer_version_cascade.py::test_manifest_scorer_version_matches_the_package, was VACUOUS: it compared this field to __version__ with both ends equally stale and nothing tying either to pyproject. It now asserts importlib.metadata.version == __version__ == scorer_version. No score, hash or published figure depends on this field."
     }
   ],
   "nakdimon_model_hash": "8fd7722b8002a690",
-  "scorer_version": "0.2.0",
+  "scorer_version": "0.3.0",
   "version": "v0.2.0"
 }

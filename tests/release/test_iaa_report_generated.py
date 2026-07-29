@@ -105,3 +105,52 @@ def test_the_note_block_carries_the_load_bearing_disclaimers():
     assert "UXLC-anchored" in adj_note and "dropped" in adj_note
     # cer note names the non-independence
     assert "NOT independent of either annotator" in note["cer_vs_consensus_b"]
+
+
+def test_full_check_recompute_passes_on_the_committed_report():
+    """Run the generator's OWN full verification, recompute included.
+
+    README and CHANGELOG state that `iaa_report.json` is "recomputed by
+    `--check` on every push". Before v0.1.1 that was false: CI ran only
+    `--check-schema`, and no test anywhere called `check(recompute=True)` --
+    the tests in this file recompute the adjudication counts by hand, which is
+    not the same thing and left every CER, CI, edit count and denominator
+    unverified by the machinery that claimed to verify them.
+
+    A false self-description of verification machinery is worse than an absent
+    one: it is the class of defect where two independent external reviewers
+    repeated this repo's own wrong comment rather than testing it. So the claim
+    was made true in two places -- a dedicated `--check` step in CI's test job,
+    and this test, which fails locally too.
+    """
+    import scripts.generate_iaa_report as gen
+
+    errors = gen.check(recompute=True)
+
+    assert errors == [], "committed iaa_report.json failed its own full check:\n  " + "\n  ".join(
+        errors
+    )
+
+
+def test_full_check_recompute_actually_recomputes():
+    """Guard against the recompute silently becoming a no-op.
+
+    If `check(recompute=True)` ever stopped recomputing, the test above would
+    still pass and we would be back to a claim nobody executes. Perturb one
+    recomputed field in memory and require the check to object.
+    """
+    import scripts.generate_iaa_report as gen
+
+    original = REPORT.read_text(encoding="utf-8")
+    report = json.loads(original)
+    report["tier3"]["edits_a_vs_b_round0"] += 1
+    try:
+        REPORT.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        errors = gen.check(recompute=True)
+    finally:
+        REPORT.write_text(original, encoding="utf-8")
+
+    assert any("edits_a_vs_b_round0" in e for e in errors), (
+        "tampering with a recomputed field did not produce an error -- "
+        f"is the recompute a no-op? errors={errors}"
+    )
