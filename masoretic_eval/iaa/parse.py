@@ -100,10 +100,17 @@ class Tier4Record:
 def split_chunks(text: str) -> list[str]:
     """Split raw round-0 text into per-verse chunks at sof-pasuq.
 
-    Editor tokens are replaced with spaces (so a token at chunk boundaries
-    does not glue verses together). Empty chunks are discarded — the input
-    file's final sof-pasuq generally produces a trailing empty chunk which
-    we drop.
+    Only the **pass-through** tokens in ``PASSTHRU_TAGS`` are replaced with
+    spaces, so a token sitting at a chunk boundary cannot glue two verses
+    together. ``<DR>`` is deliberately *not* among them: it carries a tier-4
+    double-*rafe* record and must survive into the chunk for the extractor to
+    consume. Empty chunks are discarded — the input file's final sof-pasuq
+    generally produces a trailing empty chunk which we drop.
+
+    (This docstring previously claimed that *editor tokens* are replaced with
+    spaces, unqualified. That reading is what produced the ``<DR>`` incident,
+    and it was quoted back verbatim by two external reviewers who never ran
+    the function. A wrong self-description propagates further than wrong code.)
     """
     cleaned = _PASSTHRU_RE.sub(" ", text).replace("\n", " ")
     return [c.strip() for c in cleaned.split(SOF_PASUQ) if c.strip()]

@@ -6,7 +6,7 @@ makes that a command instead of a hand-edit (cf. the by-hand `daf2c86`).
 
 These tests used to poison the *committed* `results/` artifacts and restore them
 in a `finally`. Those artifacts were withdrawn in the v0.1 Option A scope narrow
-(baselines deferred to v0.1.1), so the tests now build a synthetic results tree
+(baselines deferred to a future release), so the tests now build a synthetic results tree
 per test. That is strictly better: the properties below are properties of the
 script, not of whatever happens to be committed, and they keep guarding the tool
 through the gap in which no promoted artifact exists.

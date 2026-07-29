@@ -155,8 +155,12 @@ inferred.** 0 edits at tier 1, 1 at tier 2, 18 at tier 3: it measures how little
 annotator A changed its mind during adjudication. Raw edit counts ship with every
 CER so a 0.0000 reads as a measurement, not an unpopulated field.
 
-**No previously published value moved.** `cer_vs_consensus_b`, tier-4 F1 0.9187,
-α 0.7470, BL-05 0.6210 and the adjudication summary are all unchanged.
+**No value moved *because of this change*.** Publishing the additional
+comparisons is purely additive: `cer_vs_consensus_b`, tier-4 F1 0.9187, α 0.7470,
+BL-05 0.6210 and the adjudication summary are all unchanged by it. This is scoped
+deliberately — the tier-2 and tier-3 CERs *were* corrected in this same release,
+by the editor-token fix documented above, and an unscoped "nothing moved" here
+would read as a denial of it.
 
 **Every figure is now generator-produced and re-verified.** The CERs were
 previously pinned constants; they are now computed from the three committed
@@ -199,9 +203,9 @@ review from the reviewer of record. What actually happened, in order:
   (2026-07-23 → 2026-07-29).
 - **The release proceeded under a decision, recorded in the project's planning
   record before the release, to take the review off the critical path** — the
-  reviewer stays credited, and the review folds into v0.1.1. v0.1.0 did not slip
-  out past a lapsed review; it shipped under an explicit decision to proceed
-  without one.
+  reviewer stays credited, and the review **remains outstanding for a future
+  release**. v0.1.0 did not slip out past a lapsed review; it shipped under an
+  explicit decision to proceed without one.
 
 The D-16 gate was approval-required, so it failed on the true condition and has
 been publicly red on that tag ever since. None of this was disclosed at the
@@ -249,6 +253,15 @@ the gate cannot be cleared silently, because clearing it requires publishing how
 the release was authorized. A future release that ships without scholarly review
 must say so, here, in public, or it does not ship.
 
+**This release is such a release.** `benchmark-v0.1.1` ships **without scholarly
+review**, authorized solely by the maintainer sign-off recorded in
+`RELEASE_SIGNOFF.md` together with this disclosure. The release packet sent to
+the reviewer of record on 2026-07-23 remains unanswered as of this release date;
+no review of v0.1.0 or of v0.1.1 has been received. The reviewer of record stays
+credited and the review remains outstanding for a future release. This paragraph
+is the requirement above being met on the first release that has to meet it —
+the rule would be worth nothing if its author's own release were the exception.
+
 *Rejected alternative.* Checking **who pushed the tag** was considered and
 rejected. Tag pushes may be performed by a delegate acting on the maintainer's
 authorization, so a pusher-identity check would verify the delegate's
@@ -278,8 +291,8 @@ a reviewer late does not retroactively burn their days. An unset
 `YOSEF_GH_USERNAME` still hard-fails rather than silently passing.
 
 A waiver is a disclosure obligation, not an absolution: every waived release must
-say so here under **Governance**, and the deferred review folds into the next
-patch release. The reviewer of record's review of v0.1.0 folds into v0.1.1.
+say so here under **Governance**, and the deferred review remains outstanding for
+a future release rather than being written off.
 
 **Honest limitation, unchanged.** A `push: tags:` workflow runs after the tag
 object exists, so it cannot prevent a tag from being created — only refuse to

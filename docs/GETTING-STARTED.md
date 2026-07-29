@@ -141,7 +141,7 @@ configuration, is in [CONFIGURATION.md](CONFIGURATION.md).
   "prediction_id": "leningrad_devarim_f237b",
   "gt_version": "v0.1.0",
   "manifest_hash": "<16-hex>",
-  "scorer_version": "0.2.0",
+  "scorer_version": "0.3.0",
   "normalization": "NFD (scoring) / LC-order (raw GT)",
   "denominator_policy": {
     "tier1": "consonants_only",

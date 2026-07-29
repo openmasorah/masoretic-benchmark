@@ -279,7 +279,7 @@ def check_results_manifest_hash(root: Path) -> list[str]:
 def check_expected_reports_match_promoted(root: Path) -> list[str]:
     """The manifest must not promise reports the tree does not ship, or vice versa.
 
-    Under v0.1 (Option A) baselines are deferred to v0.1.1 and `results/` is absent,
+    Under v0.1 (Option A) baselines are deferred to a future release and `results/` is absent,
     so every `expected_reports_per_baseline` count must be 0. This closes a failure
     that was silent in both directions: an absent `results/` turned the REL-09 hash
     check into a no-op, and nothing ever compared the manifest's promised counts

@@ -164,6 +164,26 @@ SCENARIOS: dict[str, dict] = {
         "expect_reason": "The window waiver covers NO response",
         "why": "an APPROVED later changed to REQUEST_CHANGES must not count",
     },
+    "request_withdrawn_after_the_window_lapsed": {
+        "reviews": [],
+        "timeline": _requested(20),
+        "pr": {"created_at": _iso(20), "requested_reviewers": []},
+        "expect_exit": 0,
+        "expect_waiver": True,
+        "expect_reason": "D-16 waiver",
+        "why": (
+            "A KNOWN LIMITATION, pinned rather than fixed. The request was made 20d ago "
+            "and then withdrawn -- `requested_reviewers` is empty now -- but the gate "
+            "reads the timeline's `review_requested` event, which withdrawal does not "
+            "erase. So it waives on a request that no longer stands: the reviewer was "
+            "un-asked, not unresponsive. This mattered while the job was blocking; the "
+            "job is now advisory (continue-on-error) and gates nothing, so the effect "
+            "is a misleading waiver line in the release log, not a bad release. Pinned "
+            "here so the behaviour is a recorded decision rather than a latent surprise "
+            "if the job is ever made blocking again -- at which point the fix is to "
+            "require `still_pending` before waiving."
+        ),
+    },
     "approval_by_someone_else": {
         "reviews": [_review("APPROVED", 1, who=OTHER)],
         "timeline": _requested(20),

@@ -82,8 +82,8 @@ one git root. They are wired together by version pins in their respective
 | Package          | Path                | Imports                                  | Role                                                                 |
 |------------------|---------------------|------------------------------------------|----------------------------------------------------------------------|
 | `masoretic-eval` | `./` (root)         | (none from siblings)                     | The 4-tier CER scorer. Pure, side-effect-free; depends only on third-party libs. |
-| `masoretic-oracles` | `./oracles/`     | `masoretic-eval>=0.2.0,<0.3`             | Hebrew diacritization oracles (Nakdimon OSS, DICTA Nakdan, DictaBERT off-label) used by callers to compute pass-through tier-2 disagreement rates. |
-| `masoretic-baselines` | `./baselines/` | `masoretic-eval[page-xml]>=0.2.0,<0.3`, `masoretic-oracles>=0.1.0,<0.2` | The four Phase 3 reference baselines (BL-01 LLM-vision, BL-02 BiblIA Kraken, BL-03 Kraken→Nakdimon, BL-04 Kraken→DictaBERT char-menaked). |
+| `masoretic-oracles` | `./oracles/`     | `masoretic-eval>=0.3.0,<0.4`             | Hebrew diacritization oracles (Nakdimon OSS, DICTA Nakdan, DictaBERT off-label) used by callers to compute pass-through tier-2 disagreement rates. |
+| `masoretic-baselines` | `./baselines/` | `masoretic-eval[page-xml]>=0.3.0,<0.4`, `masoretic-oracles>=0.1.0,<0.2` | The four Phase 3 reference baselines (BL-01 LLM-vision, BL-02 BiblIA Kraken, BL-03 Kraken→Nakdimon, BL-04 Kraken→DictaBERT char-menaked). |
 
 **Dependency direction is one-way.** The scorer never imports oracles or
 baselines. Oracles import the scorer for shared normalization helpers.

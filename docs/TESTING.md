@@ -423,7 +423,7 @@ Any change to normalization or tier weights MUST come with:
    `tests/test_manifest_immutable.py`).
 
 The version-cascade workflow will surface cases where the scorer version
-moves outside the `>=0.2.0,<0.3` pin in `oracles/pyproject.toml` and
+moves outside the `>=0.3.0,<0.4` pin in `oracles/pyproject.toml` and
 `baselines/pyproject.toml` — bump those pins in the same PR.
 
 ## Coverage requirements
