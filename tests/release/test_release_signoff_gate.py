@@ -556,33 +556,56 @@ def test_KNOWN_BOUND_quoted_gt_in_an_attribute_defeats_the_tag_pattern(tmp_path:
     assert "attributes are not parsed" in doc.replace("\n", " ")
 
 
-def test_KNOWN_BOUND_nested_parens_in_a_link_destination_are_not_counted(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    ("shape", "body"),
+    [
+        ("nested", "[](foo(and)bar)"),
+        ("backslash-escaped", r"[](/foo\)bar)"),
+        ("inside-angle-destination", "[](<foo)bar>)"),
+    ],
+)
+def test_KNOWN_BOUND_a_close_paren_in_a_destination_ends_the_match(
+    shape: str, body: str, tmp_path: Path
+) -> None:
     """The second documented limitation, pinned the same way as the first.
 
-    CommonMark permits balanced parentheses in a link destination, and a regex
-    cannot match balanced delimiters. `[](foo(and)bar)` therefore leaves `bar)`
-    and passes. Rather than pretend otherwise with a deeper pattern that would
-    fail one nesting level further down, the enumerated clause is scoped to
-    simple destinations and this case is documented as a bound.
+    The destination pattern is `[^)]*`, so the FIRST `)` ends it regardless of
+    what that character means in CommonMark. All three shapes here reach the
+    same mechanism and leave a residue that then counts as content.
 
-    Closing it needs a real CommonMark parser -- a dependency this gate should
-    not take on to defend against its own maintainer.
+    This was previously described as "no nested parentheses" -- a false account
+    of the boundary, since two of these three have no nesting in them at all.
+    The wording now states the mechanical rule, which IS the implementation's
+    definition, so no destination shape can make the clause false.
+
+    Deliberately not fixed: extending the pattern to handle escaped parens
+    restarts the chase and moves the boundary somewhere harder to state.
+    Closing it properly needs a real CommonMark parser -- a dependency this
+    gate should not take on to defend against its own maintainer.
     """
     changelog = _write(
         tmp_path,
         "CHANGELOG.md",
-        f"# Changelog\n\n## {TAG} (2026-07-29) — a release\n\n### Governance\n\n[](foo(and)bar)\n",
+        f"# Changelog\n\n## {TAG} (2026-07-29) — a release\n\n### Governance\n\n{body}\n",
     )
 
     assert check_disclosure(TAG, changelog) == [], (
-        "the nested-paren case now refuses -- good, but the documented bound in "
-        "_is_substantive is stale and must be updated"
+        f"the {shape} case now refuses -- good, but the documented bound in "
+        f"_is_substantive is stale and must be updated"
     )
 
-    doc = (_is_substantive.__doc__ or "").replace("\n", " ")
+    # Collapse wrapping so the assertions test the words, not the line breaks.
+    doc = " ".join((_is_substantive.__doc__ or "").split())
+
     assert "KNOWN BOUNDS" in doc
-    assert "Nested parentheses" in doc
-    assert "no nested parentheses" in doc, "the enumerated clause must be scoped, not absolute"
+    assert "ends the match" in doc, "the bound must name the first-`)` mechanism"
+    assert "contains no ``)`` character at all" in doc, (
+        "the enumerated clause must state the mechanical boundary"
+    )
+    assert "no nested parentheses" not in doc, (
+        "the stale scoping wording is back. It was a false account of the boundary: "
+        "two of the three shapes that reach this bound involve no nesting at all."
+    )
 
 
 def test_the_docstring_describes_the_normalization_it_actually_performs() -> None:
@@ -624,10 +647,11 @@ def test_the_enumeration_is_not_merely_present_but_TRUE() -> None:
         "discarded element contents": "<style>body{color:red}</style>",
         "tags": "<span></span>",
         "entities": "&#8203;",
-        # SCOPED: simple destinations only. Nested parentheses are a KNOWN
-        # BOUND, pinned separately -- the clause claims only what it does.
-        "empty-text links (simple destination)": "[](/policy)",
-        "empty-alt images (simple destination)": "![](x)",
+        # SCOPED: destinations with no `)` in them. A `)` in any form ends the
+        # match and is a KNOWN BOUND, pinned separately -- the clause claims
+        # only what the implementation actually does.
+        "empty-text links (no ')' in destination)": "[](/policy)",
+        "empty-alt images (no ')' in destination)": "![](x)",
         "link-reference definitions": '[policy]: https://example.org\n    "title"',
         # The angle-bracketed destination is why ref-def removal must run
         # BEFORE tag stripping; this fixture fails if that order regresses.

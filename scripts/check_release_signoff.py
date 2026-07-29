@@ -158,6 +158,13 @@ _LINK_REF_DEF_RE = re.compile(
 #: nothing. The reference forms ``[][ref]`` / ``![][ref]`` are the same class.
 #: A link WITH text -- ``[policy](https://example.org)`` -- is content and is
 #: deliberately not matched.
+#:
+#: ``[^)]*`` means the destination ends at the FIRST ``)``, whatever that
+#: character means in CommonMark: a nested pair, a backslash-escaped paren and
+#: a paren inside an angle-bracket destination all terminate it early and leave
+#: a residue. That is a documented bound, not an oversight -- see the KNOWN
+#: BOUNDS section of ``_is_substantive``. Do not deepen this pattern; matching
+#: one more shape only moves the boundary somewhere it is harder to state.
 _EMPTY_LINK_RE = re.compile(r"!?\[[ \t]*\](?:\([^)]*\)|\[[^\]]*\])")
 
 _MARKDOWN_NOISE_RE = re.compile(r"[\s*_`>#.\-]+")
@@ -233,10 +240,10 @@ def _is_substantive(content: str) -> bool:
     * ``<script>``/``<style>``/``<template>`` contents removed
     * remaining HTML tags removed
     * HTML entities decoded
-    * empty-text links and empty-alt images with a SIMPLE destination -- one
-      containing no nested parentheses -- removed (``[](/x)``, ``![](x)``),
-      including links whose text is only invisible characters, since those are
-      removed first
+    * empty-text links and empty-alt images whose destination contains no ``)``
+      character at all -- the pattern ends at the first one -- removed
+      (``[](/x)``, ``![](x)``), including links whose text is only invisible
+      characters, since those are removed first
     * CommonMark link-reference definitions dropped, including an angle-
       bracketed destination and an indented title continuation line
     * Unicode ``Cf`` deleted; ``Cc`` deleted apart from tab/newline/return;
@@ -262,10 +269,20 @@ def _is_substantive(content: str) -> bool:
 
     * **HTML attributes are not parsed**, so a quoted ``>`` inside one defeats
       the tag pattern: ``<span title="a>b"></span>`` leaves ``b"`` and passes.
-    * **Nested parentheses in a link destination are not counted.** CommonMark
-      permits them, and a regex cannot match balanced delimiters, so
-      ``[](foo(and)bar)`` leaves ``bar)`` and passes. The enumeration above is
-      scoped to simple destinations rather than overstating this.
+    * **A ``)`` anywhere inside a link destination ends the match.** The
+      destination pattern is ``[^)]*``, so the first ``)`` terminates it no
+      matter what that character means in CommonMark. Three shapes reach this
+      and all leave a residue that then counts as content:
+
+      - nested:            ``[](foo(and)bar)``  -> ``bar)``
+      - backslash-escaped: ``[](/foo\\)bar)``    -> ``bar)``
+      - inside ``<...>``:  ``[](<foo)bar>)``    -> ``bar>)``
+
+      This was previously scoped by nesting depth, which was a false account
+      of the boundary -- two of the three shapes above contain no nesting at
+      all. The wording now states the mechanical rule, which is the
+      implementation's own definition, so no destination shape can make the
+      clause false.
 
     Closing either needs a real parser -- an HTML parser, or a CommonMark one.
     That is a dependency this CI gate should not take on in order to defend
