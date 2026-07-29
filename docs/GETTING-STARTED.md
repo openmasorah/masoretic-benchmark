@@ -10,7 +10,7 @@ One audience is covered in v0.1:
 1. **Score your own baseline.** You have a Hebrew OCR/HTR system and want a
    reproducible CER₃ number against the 4-folio IAA set.
 
-*Reproducing published baseline scores* is deferred to v0.1.1: v0.1 ships no
+*Reproducing published baseline scores* is deferred to a future release: v0.1 ships no
 `results/` tree. See [Baselines](../README.md#baselines) for why the earlier
 scores were retracted.
 
@@ -209,12 +209,12 @@ evaluation pipeline; the methodology is documented in
 [`baselines/EVALUATION_PROTOCOL.md`](../baselines/EVALUATION_PROTOCOL.md).
 
 **v0.1 ships no `results/` tree.** Automated baselines — and therefore any
-headline score — are deferred to v0.1.1. The earlier F118B scores were retracted
+headline score — are deferred to a future release. The earlier F118B scores were retracted
 before publication (apparatus lines scored against main-text GT, `line_id`
 ordering, and corrupt `char_menaked` predictions); see
 [Baselines](../README.md#baselines).
 
-When a baseline is promoted in v0.1.1 it writes
+When a baseline is promoted in a future release it writes
 `results/<baseline_id>/<folio>.json` plus `run_meta.json`, and its scores land in
 `results/scores/<folio>.json`.
 

@@ -5,7 +5,7 @@ independent for the two artifacts this repository holds: the **scorer** Python
 package (`masoretic_eval`, currently `0.3.0`) and the **benchmark dataset**
 (tagged `benchmark-v*`).
 
-## benchmark-v0.1.1 (unreleased) — corrections to v0.1.0
+## benchmark-v0.1.1 (2026-07-29) — corrections to v0.1.0
 
 ### ⚠️ Corrected: tier-2 and tier-3 CER were wrong in v0.1.0
 
@@ -57,6 +57,13 @@ tier-2 half and the adjudication-count contamination were found while verifying 
 
 ### Other corrections
 
+- **The deferred automated baselines are not in this release.** Earlier
+  documentation (README, `docs/GETTING-STARTED.md`, `docs/TESTING.md`,
+  `docs/ARCHITECTURE.md`, and the `baselines/EVALUATION_PROTOCOL.md` 2026-07-10
+  row) stated that the withdrawn automated OCR/HTR baseline scores (BL-01–BL-04)
+  would be re-emitted "in v0.1.1". They are **not** in `benchmark-v0.1.1`. Their
+  re-emission is deferred to a future release, with no version committed; every
+  such promise has been re-pointed accordingly.
 - Removed an internal `personnel_note` from four public test fixtures. It named a
   collaborator in full alongside an internal personnel correction and referenced a
   file in a private repository. It remains in the immutable `benchmark-v0.1.0` tag.

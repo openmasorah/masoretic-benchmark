@@ -3,8 +3,8 @@ message: "If you use this benchmark or scoring suite, please cite as follows. Co
 type: dataset
 title: "Open Masorah Masoretic Benchmark: a 4-tier CER evaluation suite for medieval Tiberian Hebrew (pilot benchmark, Leningrad Codex Deuteronomy)"
 abstract: "A pilot four-tier inter-annotator-agreement benchmark and Character Error Rate scorer for medieval Tiberian Hebrew manuscript transcription. Scope: 96 verses across four folio sides of a single manuscript (Leningrad Codex, Deuteronomy 31:28-34:12), transcribed independently by two annotators and adjudicated to consensus. Tiers score consonants, nikkud, full text, and tier-4 meta-marks (circellus, rafe). Inter-annotator agreement, measured between the two blind pre-adjudication transcriptions, is CER 0.0029 / 0.0031 / 0.0130 at tiers 1-3 and detection F1 0.9187 at tier 4."
-version: "0.1.0"
-date-released: "2026-05-04"
+version: "0.1.1"
+date-released: "2026-07-29"
 license:
   - CC-BY-4.0
   - CC0-1.0

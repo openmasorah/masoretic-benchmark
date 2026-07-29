@@ -66,10 +66,10 @@ masoretic-eval score \
 | Path | Purpose |
 |---|---|
 | `masoretic_eval/` | Scorer Python package (Apache-2.0). |
-| `baselines/` | Baseline code. Automated BL-01 LLM-vision, BL-02 BiblIA Kraken, BL-03 Kraken→Nakdimon, BL-04 Kraken→DictaBERT char-menaked (scores deferred to v0.1.1); BL-05 rafe text-rule is scored — see [Baselines](#baselines). |
+| `baselines/` | Baseline code. Automated BL-01 LLM-vision, BL-02 BiblIA Kraken, BL-03 Kraken→Nakdimon, BL-04 Kraken→DictaBERT char-menaked (scores deferred to a future release); BL-05 rafe text-rule is scored — see [Baselines](#baselines). |
 | `oracles/` | Hebrew diacritization oracle modules consumed externally to populate the scorer's pass-through tier-2 fields. |
 | `schemas/` | JSON Schemas + changelogs for `baseline_prediction.schema.json`, `phase_0_manifest.schema.json`, and `run_meta.schema.json`. |
-| `results/` | *(Not in v0.1.)* Automated baselines are deferred to v0.1.1 — see [Baselines](#baselines). |
+| `results/` | *(Not in v0.1.)* Automated baselines are deferred to a future release — see [Baselines](#baselines). |
 | `scripts/` | Release and gate scripts (manifest immutability, version-cascade, private-path rejection). |
 | `tests/` | Scorer test suite. |
 | `docs/` | Architecture, getting-started, development, testing, and configuration guides. |
@@ -124,14 +124,14 @@ reference side as denominator, verse-bootstrap percentile 95% CIs at seed
 
 ### Baselines
 
-**v0.1 publishes no automated OCR/HTR baseline scores.** The release is the benchmark itself — the adjudicated ground truth, the inter-annotator agreement measurement, and the scorer — plus one parameter-free text-rule baseline (BL-05, below) that needs no model, image, or network. The automated OCR/HTR baselines (BL-01–BL-04) are deferred to **v0.1.1**.
+**v0.1 publishes no automated OCR/HTR baseline scores.** The release is the benchmark itself — the adjudicated ground truth, the inter-annotator agreement measurement, and the scorer — plus one parameter-free text-rule baseline (BL-05, below) that needs no model, image, or network. The automated OCR/HTR baselines (BL-01–BL-04) are deferred to **a future release**.
 
 An earlier draft of this repository carried F118B scores for four baselines. They were **retracted before publication**, for two independent reasons:
 
 - The whole-folio CER was computed over Kraken's 109 segmented lines — which include the masorah magna and parva apparatus — against 26 physical lines of main-text ground truth, with every bounding box `[0,0,0,0]` so reading order fell back to `line_id`. The resulting ranking is *inverted*: it reports `biblia_kraken` as the weakest system when ROI-restricted main-text scoring puts it strongest on consonants.
 - The `biblia_char_menaked` tier-2/3 predictions were corrupt — an unpinned `transformers` release produced cumulative prefix repetition (tier-2 output 3.3× the length of tier-1, with nikkud on 7 of 109 lines). Those bytes are not model output and cannot be published with a caveat.
 
-v0.1.1 will re-emit both from real runs, under a pinned `transformers` and an ROI/main-text methodology.
+A future release will re-emit both from real runs, under a pinned `transformers` and an ROI/main-text methodology.
 
 #### Tier-4 detection baseline: rafe text-rule (BL-05)
 
@@ -214,7 +214,7 @@ If you use this benchmark or scoring suite, please cite. GitHub renders a "Cite 
   title        = {Open Masorah Masoretic Benchmark: a 4-tier CER evaluation suite for medieval Tiberian Hebrew},
   author       = {Lamm, Ben and Ginsberg, Yosef and Moster, David Zev and Finkelstein, Ari},
   year         = {2026},
-  version      = {0.1.0},
+  version      = {0.1.1},
   howpublished = {Hugging Face dataset, \url{https://huggingface.co/datasets/openmasorah/masoretic-benchmark-v0.1}},
   note         = {Code: \url{https://github.com/openmasorah/masoretic-benchmark}}
 }

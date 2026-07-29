@@ -234,7 +234,7 @@ end-to-end fixture. Two scoring tests bind it to the manifest:
   exercise the same folio-id (`leningrad_devarim_F118B_fixture`) through
   the manifest schema validator and the append-only changelog rules.
 
-`results/` is absent in v0.1 (baselines deferred to v0.1.1), so
+`results/` is absent in v0.1 (baselines deferred to a future release), so
 `tests/test_rebind_manifest_hash.py` builds a synthetic results tree per test
 rather than poisoning-and-restoring committed artifacts. Mocked unit tests use
 the IAA folio fixtures under
@@ -401,8 +401,8 @@ consumers were not installed.
 5. Generate real predictions via the live cron job
    (`python -m baselines.run --baseline <your_baseline>` under
    `RUN_LIVE_BASELINES=1`). **In v0.1 these are not committed** — baselines are
-   deferred to v0.1.1, and `tests/test_manifest_hash_artifacts.py` asserts that
-   `results/` publishes nothing. When v0.1.1 re-opens promotion, that test is
+   deferred to a future release, and `tests/test_manifest_hash_artifacts.py` asserts that
+   `results/` publishes nothing. When a future release re-opens promotion, that test is
    replaced by a strict expected-set pin, and every committed artifact must
    carry the current `manifest_hash`.
 
