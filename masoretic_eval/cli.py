@@ -77,7 +77,19 @@ def main() -> None:
 @click.option("--gt", "gt_path", required=True, type=click.Path(exists=True, path_type=Path))
 @click.option("--pred", "pred_path", required=True, type=click.Path(exists=True, path_type=Path))
 @click.option("--folio-id", required=True, type=str)
-@click.option("--gt-version", default="v0.1.0", type=str)
+@click.option(
+    "--gt-version",
+    default="v0.1.0",
+    type=str,
+    help=(
+        "Version of the GROUND-TRUTH DATA the prediction is scored against. This is "
+        "not the benchmark release version and does not track it, so the default "
+        "staying at v0.1.0 while the release moves is correct, not stale. Verified "
+        "at benchmark-v0.1.1: every frozen folio's gt_hash in phase_0_manifest.json "
+        "is byte-identical to its value at benchmark-v0.1.0. Bump this only when the "
+        "ground truth itself is re-cut."
+    ),
+)
 @click.option("--out", "out_path", required=True, type=click.Path(path_type=Path))
 @click.option(
     "--manifest",

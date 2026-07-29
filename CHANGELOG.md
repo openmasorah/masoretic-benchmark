@@ -155,8 +155,12 @@ inferred.** 0 edits at tier 1, 1 at tier 2, 18 at tier 3: it measures how little
 annotator A changed its mind during adjudication. Raw edit counts ship with every
 CER so a 0.0000 reads as a measurement, not an unpopulated field.
 
-**No previously published value moved.** `cer_vs_consensus_b`, tier-4 F1 0.9187,
-α 0.7470, BL-05 0.6210 and the adjudication summary are all unchanged.
+**No value moved *because of this change*.** Publishing the additional
+comparisons is purely additive: `cer_vs_consensus_b`, tier-4 F1 0.9187, α 0.7470,
+BL-05 0.6210 and the adjudication summary are all unchanged by it. This is scoped
+deliberately — the tier-2 and tier-3 CERs *were* corrected in this same release,
+by the editor-token fix documented above, and an unscoped "nothing moved" here
+would read as a denial of it.
 
 **Every figure is now generator-produced and re-verified.** The CERs were
 previously pinned constants; they are now computed from the three committed
