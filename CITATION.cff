@@ -12,6 +12,8 @@ authors:
     given-names: Ben
   - family-names: Ginsberg
     given-names: Yosef
+  - family-names: Moster
+    given-names: David Zev
   - family-names: Finkelstein
     given-names: Ari
 repository-code: "https://github.com/openmasorah/masoretic-benchmark"

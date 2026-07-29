@@ -32,7 +32,7 @@ The original scholarly contributions are licensed under
 
 **Required attribution when you use these components:**
 
-> Lamm, B., Ginsberg, Y., & Finkelstein, A. (2026). *Open Masorah v0.1: a 4-tier
+> Lamm, B., Ginsberg, Y., Moster, D. Z., & Finkelstein, A. (2026). *Open Masorah v0.1: a 4-tier
 > CER benchmark for medieval Tiberian Hebrew.* [URL/DOI]
 
 ## Scorer code
