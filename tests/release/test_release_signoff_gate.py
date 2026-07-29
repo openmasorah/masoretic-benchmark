@@ -397,11 +397,23 @@ INVISIBLE_BODIES: dict[str, list[str]] = {
     # Literal codepoints. U+200B/U+2060/U+FEFF are NOT Python whitespace, so
     # `.strip()` preserved them and one zero-width space read as content.
     "invisible-codepoint": ["​", "⁠", "﻿", "\xa0", "​⁠"],
-    # Declares a label for use elsewhere; renders nothing at spec level.
+    # Declares a label for use elsewhere; renders nothing at spec level. The
+    # title is optional and may sit on the definition line or on an indented
+    # continuation line -- matching single lines only left `  "title"` behind
+    # as substance, which made the docstring's own enumeration false.
     "link-reference-definition": [
         "[ref]: https://example.org",
         "[a]: https://x.org\n[b]: https://y.org",
+        '[policy]: https://example.org\n    "title"',
+        '[policy]: https://example.org "title"',
+        "[policy]: https://example.org\n    (title)",
     ],
+    # Markup that shows the reader no text at all.
+    "empty-link-or-image": ["[]()", "[](/policy)", "![](x)", "[][policy]"],
+    # Zero visible output, and not Python whitespace.
+    "control-character": ["\x01", "\x01\x02\x1f"],
+    # Combining marks have zero advance width with no base character to sit on.
+    "combining-mark-only": ["ְָ", "́"],
     # The original class: words that hold the space without filling it.
     "placeholder-word": ["TBD", "TODO", "N/A", "-", "...", "- **TBD**"],
 }
@@ -452,6 +464,21 @@ def test_a_governance_body_that_renders_to_nothing_is_refused(
         # either side of an NBSP survive with their boundary intact.
         ("internal-nbsp", "Authorized\xa0by the maintainer."),
         ("text-plus-link-ref", "Authorized by the maintainer.\n\n[policy]: https://example.org"),
+        (
+            "text-plus-multiline-link-ref",
+            'Authorized.\n\n[policy]: https://example.org\n    "title"',
+        ),
+        # A link WITH text is content. Only the empty-text form is markup.
+        ("link-with-text", "[policy](https://example.org)"),
+        # THE CONTROL THAT MATTERS MOST IN THIS REPOSITORY. Nikkud are Mn and
+        # are stripped by the visibility measure; the base consonants are not,
+        # so a pointed Hebrew disclosure must survive. Only a body of BARE
+        # marks reduces to nothing.
+        ("hebrew-with-nikkud", "וְאָהַבְתָּ — authorized by the maintainer."),
+        ("hebrew-with-nikkud-alone", "וְאָהַבְתָּ"),
+        ("hebrew-unpointed", "ואהבת"),
+        # Cc is stripped apart from these three, which are real layout.
+        ("tab-and-newline", "Authorized\tby\nthe maintainer."),
     ],
 )
 def test_real_content_survives_the_invisibility_check(
@@ -514,8 +541,48 @@ def test_the_docstring_describes_the_normalization_it_actually_performs() -> Non
     doc = (_is_substantive.__doc__ or "").replace("\n", " ")
 
     assert "approximation" in doc, "the docstring must not claim a rendering guarantee"
-    for enumerated in ("comments", "entities", "link-reference", "tags"):
+    for enumerated in (
+        "comments",
+        "entities",
+        "link-reference",
+        "tags",
+        "empty-text links",
+        "Mn",
+        "Cc",
+        "Cf",
+    ):
         assert enumerated in doc, f"the docstring does not mention {enumerated!r}"
+
+
+def test_the_enumeration_is_not_merely_present_but_TRUE() -> None:
+    """Each enumerated removal is executed against a body that needs it.
+
+    The enumeration went false once already: it claimed link-reference
+    definitions were dropped while the rule matched single lines only, so a
+    multiline definition left its title behind. A list of claims that nothing
+    exercises is the `<DR>` docstring again in a new place, so every clause
+    above is tied here to a body it alone accounts for.
+    """
+    accounted_for = {
+        "comments": "<!-- x -->",
+        "discarded element contents": "<style>body{color:red}</style>",
+        "tags": "<span></span>",
+        "entities": "&#8203;",
+        "empty-text links": "[](/policy)",
+        "link-reference definitions": '[policy]: https://example.org\n    "title"',
+        "Cf": "​",
+        "Cc": "\x01",
+        "Mn": "ְָ",
+        "Zs": "\xa0",
+        "placeholder words": "TBD",
+    }
+
+    survivors = {clause: body for clause, body in accounted_for.items() if _is_substantive(body)}
+
+    assert not survivors, (
+        "the docstring enumerates removals the code does not perform: "
+        + ", ".join(f"{c} ({b!r})" for c, b in survivors.items())
+    )
 
 
 def test_a_bare_governance_heading_is_not_a_statement(tmp_path: Path) -> None:

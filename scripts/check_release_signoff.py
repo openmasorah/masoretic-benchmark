@@ -135,7 +135,24 @@ _HTML_TAG_RE = re.compile(r"</?[A-Za-z][A-Za-z0-9-]*(?:\s[^<>]*)?/?>")
 
 #: A CommonMark link-reference definition renders nothing at all -- it declares
 #: a label for use elsewhere. A body consisting only of these is blank.
-_LINK_REF_DEF_RE = re.compile(r"^\s*\[[^\]]+\]:\s+\S+\s*$")
+#:
+#: The title is optional and may sit on the definition line OR on an indented
+#: continuation line. The first version of this matched single lines only, so
+#: ``[policy]: https://example.org`` + ``    "title"`` left the title line
+#: behind as substance -- which made the docstring's own enumeration false, the
+#: precise defect the enumeration was written to prevent.
+_TITLE = r"(?:\"[^\"]*\"|'[^']*'|\([^)]*\))"
+_LINK_REF_DEF_RE = re.compile(
+    rf"^[ ]{{0,3}}\[[^\]]+\]:[ \t]*\S+[ \t]*{_TITLE}?[ \t]*(?:\n[ \t]+{_TITLE}[ \t]*)?$",
+    re.MULTILINE,
+)
+
+#: Inline links with empty TEXT and images with empty ALT render no visible
+#: text. ``[](/policy)`` and ``![](x)`` are markup that shows the reader
+#: nothing. The reference forms ``[][ref]`` / ``![][ref]`` are the same class.
+#: A link WITH text -- ``[policy](https://example.org)`` -- is content and is
+#: deliberately not matched.
+_EMPTY_LINK_RE = re.compile(r"!?\[[ \t]*\](?:\([^)]*\)|\[[^\]]*\])")
 
 _MARKDOWN_NOISE_RE = re.compile(r"[\s*_`>#.\-]+")
 
@@ -153,18 +170,35 @@ def _visible_text(content: str) -> str:
     text = _DISCARDED_ELEMENT_RE.sub("", text)
     text = _HTML_TAG_RE.sub("", text)
     text = html.unescape(text)
+    text = _EMPTY_LINK_RE.sub("", text)
+    text = _LINK_REF_DEF_RE.sub("", text)
 
-    # Cf (format) characters are deleted outright: U+200B, U+2060 and U+FEFF are
-    # not Python whitespace, so `.strip()` preserved them and a body of one
-    # zero-width space read as content. Zs (space separators) become an ordinary
-    # space rather than being deleted, so NBSP-joined words keep their boundary.
-    text = "".join(
-        " " if unicodedata.category(ch) == "Zs" else ch
-        for ch in text
-        if unicodedata.category(ch) != "Cf"
-    )
+    return "".join(_visible_char(ch) for ch in text)
 
-    return "\n".join(line for line in text.splitlines() if not _LINK_REF_DEF_RE.match(line))
+
+def _visible_char(ch: str) -> str:
+    """One character's contribution to the visible text. May be empty.
+
+    * ``Cf`` (format) is deleted: U+200B, U+2060 and U+FEFF are not Python
+      whitespace, so ``.strip()`` preserved them and a body of one zero-width
+      space read as content.
+    * ``Cc`` (control) is deleted apart from tab/newline/carriage return, which
+      are real layout. A body of a lone ``\\x01`` shows a reader nothing.
+    * ``Mn`` (non-spacing mark) is deleted because it has zero advance width on
+      its own. Hebrew nikkud are ``Mn`` and the base consonants are not, so a
+      pointed Hebrew word survives intact -- only a body of *bare* marks is
+      reduced to nothing. That distinction is load-bearing in this repository.
+    * ``Zs`` becomes an ordinary space rather than being deleted, so
+      NBSP-joined words keep their boundary.
+    """
+    category = unicodedata.category(ch)
+    if category == "Zs":
+        return " "
+    if category in {"Cf", "Mn"}:
+        return ""
+    if category == "Cc" and ch not in "\t\n\r":
+        return ""
+    return ch
 
 
 def _is_substantive(content: str) -> bool:
@@ -179,14 +213,25 @@ def _is_substantive(content: str) -> bool:
     * ``<script>``/``<style>``/``<template>`` contents removed
     * remaining HTML tags removed
     * HTML entities decoded
-    * Unicode ``Cf`` characters deleted, ``Zs`` collapsed to a space
-    * whole-line CommonMark link-reference definitions dropped
+    * empty-text links and empty-alt images removed (``[](/x)``, ``![](x)``)
+    * CommonMark link-reference definitions dropped, including an indented
+      title continuation line
+    * Unicode ``Cf`` deleted; ``Cc`` deleted apart from tab/newline/return;
+      ``Mn`` (zero-width combining marks) deleted; ``Zs`` collapsed to a space
     * a fixed set of placeholder words rejected
 
-    That is an approximation of "renders visibly", not a guarantee of it. Three
+    That is an approximation of "renders visibly", not a guarantee of it. Four
     rounds of review each broke the previous blocklist, so the list above is
     the honest description of what is enforced rather than a claim about what
-    a browser would show.
+    a browser would show. It is also load-bearing: at round four the
+    link-reference rule matched single lines only, so this enumeration was
+    *false* -- exactly the defect enumerating was meant to prevent.
+
+    ``Mn`` deletion is deliberately narrow. Hebrew nikkud are ``Mn`` and the
+    base consonants are not, so a pointed Hebrew disclosure survives and only a
+    body of bare combining marks is reduced to nothing. This repository will
+    plausibly carry Hebrew in a disclosure; breaking that would be a worse
+    failure than the hole being closed.
 
     KNOWN BOUND, deliberately not closed. HTML attributes are not parsed, so a
     quoted ``>`` inside one defeats the tag pattern: ``<span title="a>b"></span>``
