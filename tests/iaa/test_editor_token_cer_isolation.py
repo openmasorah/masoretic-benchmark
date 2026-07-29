@@ -12,6 +12,15 @@ as four spurious edits.
 Published impact before the fix, B-vs-consensus: tier 2 0.0172 -> 0.0031
 (-82%), tier 3 0.0234 -> 0.0119 (-49%); B-vs-UXLC tier 2 0.0375 -> 0.0117.
 
+The B-vs-UXLC pair was carried here without a reproduction path, so it was
+re-derived in v0.1.1 rather than left as an assertion: scoring B's committed
+projection against the pinned UXLC 2.5 Deuteronomy, macro-averaged over the 96
+verses with UXLC as reference, gives **0.0117** through ``tier_view`` and
+**0.0375** through the pre-fix composition (the same strip sequence with
+``strip_editor_tokens`` omitted). Both halves reproduce exactly. Regenerating
+them needs the gitignored UXLC cache, which is why this is a docstring and not
+an assertion in this file.
+
 The invariant below is stronger than "strip ``<DR>``": a chunk's tier CER must
 be *invariant to the presence of editor tokens*, since they are markup, not
 manuscript content. That catches the next token added to the vocabulary too.

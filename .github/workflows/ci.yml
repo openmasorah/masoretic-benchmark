@@ -81,8 +81,13 @@ jobs:
 
       # iaa_report.json is the artifact the release-tag gate requires. The gates
       # job installs only jsonschema, so run the light schema check here; the full
-      # --check (which recomputes tier1-3 via the scorer path, rapidfuzz+grapheme)
-      # runs in the `test` job via tests/release/test_iaa_report_generated.py.
+      # --check (which recomputes every CER, CI, edit count and denominator via
+      # the scorer path, rapidfuzz+grapheme) runs as its own step in the `test`
+      # job. This comment previously credited that coverage to
+      # tests/release/test_iaa_report_generated.py, which recomputes the
+      # adjudication counts but never calls check(recompute=True) -- so the full
+      # check ran nowhere, while README and CHANGELOG claimed it ran on every
+      # push. Corrected in v0.1.1 by making the claim true, not narrower.
       - name: iaa_report.json validates + pinned values intact
         run: python scripts/generate_iaa_report.py --check-schema
 
@@ -118,6 +123,16 @@ jobs:
 
       - name: Unit tests (pytest)
         run: pytest -v --cov=masoretic_eval --cov-report=term-missing
+
+      # The FULL recompute, not the schema-only check the `gates` job runs.
+      # README and CHANGELOG both state that iaa_report.json is "recomputed by
+      # --check on every push"; before v0.1.1 nothing anywhere executed
+      # check(recompute=True), so that was a false description of this repo's
+      # own verification machinery. This step is what makes the claim true.
+      # It belongs here rather than in `gates` because the recompute needs the
+      # scorer path (rapidfuzz + grapheme), which only this job installs.
+      - name: iaa_report.json fully recomputes from the committed projections
+        run: python scripts/generate_iaa_report.py --check
 
       - name: External reference cross-val
         run: pytest tests/test_external_crossval.py -v
