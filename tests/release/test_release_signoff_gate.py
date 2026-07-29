@@ -413,7 +413,22 @@ INVISIBLE_BODIES: dict[str, list[str]] = {
         '[ref]: <foo bar> "t"',
     ],
     # Markup that shows the reader no text at all.
-    "empty-link-or-image": ["[]()", "[](/policy)", "![](x)", "[][policy]"],
+    # Includes links whose TEXT is only invisible characters: those are not
+    # literally empty, so the pattern missed them and the leftover `[]()`
+    # punctuation counted as content. Removing invisible characters FIRST
+    # closes the class rather than one codepoint.
+    "empty-link-or-image": [
+        "[]()",
+        "[](/policy)",
+        "![](x)",
+        "[][policy]",
+        "[\u200b]()",
+        "[\u200b](/policy)",
+        "[\u2060]()",
+        "[\u05b0]()",
+        "[\xa0]()",
+        "![\u200b](x)",
+    ],
     # Zero visible output, and not Python whitespace.
     "control-character": ["\x01", "\x01\x02\x1f"],
     # Combining marks have zero advance width with no base character to sit on.
@@ -474,6 +489,14 @@ def test_a_governance_body_that_renders_to_nothing_is_refused(
         ),
         # A link WITH text is content. Only the empty-text form is markup.
         ("link-with-text", "[policy](https://example.org)"),
+        # Hebrew link text: the base letter survives Mn deletion, so this is
+        # a link with text and must NOT be swept up with the invisible ones.
+        ("link-with-hebrew-text", "[\u05d5\u05b0](https://example.org)"),
+        # Confirmed in review as CORRECT passes, pinned so they are not
+        # re-litigated as holes: visible punctuation is content, and `[]: x`
+        # is not a link-reference definition (CommonMark needs a label).
+        ("visible-punctuation-only", "[]{}()"),
+        ("empty-label-is-not-a-ref-def", "[]: x"),
         # THE CONTROL THAT MATTERS MOST IN THIS REPOSITORY. Nikkud are Mn and
         # are stripped by the visibility measure; the base consonants are not,
         # so a pointed Hebrew disclosure must survive. Only a body of BARE

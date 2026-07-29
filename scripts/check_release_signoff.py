@@ -178,15 +178,22 @@ def _visible_text(content: str) -> str:
       text, so running it earlier is safe.
     * Entity decoding precedes the invisible-codepoint pass, because
       ``&nbsp;`` has to become U+00A0 for that pass to see it.
+    * Empty-link removal runs LAST, after invisible characters are gone. A link
+      whose text is a zero-width space is not literally empty, so the pattern
+      missed it and the leftover ``[]()`` punctuation then counted as content.
+      Deleting invisible characters first turns every invisible-text link into
+      an empty-text link, which closes the class rather than one codepoint:
+      ZWSP, word joiner and a combining-mark-only link text all reduce the same
+      way.
     """
     text = _HTML_COMMENT_RE.sub("", content)
     text = _DISCARDED_ELEMENT_RE.sub("", text)
     text = _LINK_REF_DEF_RE.sub("", text)
     text = _HTML_TAG_RE.sub("", text)
     text = html.unescape(text)
-    text = _EMPTY_LINK_RE.sub("", text)
+    text = "".join(_visible_char(ch) for ch in text)
 
-    return "".join(_visible_char(ch) for ch in text)
+    return _EMPTY_LINK_RE.sub("", text)
 
 
 def _visible_char(ch: str) -> str:
@@ -227,7 +234,9 @@ def _is_substantive(content: str) -> bool:
     * remaining HTML tags removed
     * HTML entities decoded
     * empty-text links and empty-alt images with a SIMPLE destination -- one
-      containing no nested parentheses -- removed (``[](/x)``, ``![](x)``)
+      containing no nested parentheses -- removed (``[](/x)``, ``![](x)``),
+      including links whose text is only invisible characters, since those are
+      removed first
     * CommonMark link-reference definitions dropped, including an angle-
       bracketed destination and an indented title continuation line
     * Unicode ``Cf`` deleted; ``Cc`` deleted apart from tab/newline/return;
@@ -267,6 +276,16 @@ def _is_substantive(content: str) -> bool:
 
     There is no length threshold. Visible punctuation is content, and a
     threshold would be one more arbitrary surface to argue about.
+
+    CORRECT PASSES, recorded so they are not mistaken for holes on a later
+    read. Each was raised in review and confirmed to render visibly:
+
+    * ``[]{}()`` -- punctuation with no markup meaning. Visible, so content;
+      this is the no-threshold position doing its job, not a gap.
+    * ``[]: x`` -- not a link-reference definition. CommonMark requires a
+      non-empty label, so this renders as literal text.
+    * A lone ``Mc`` (spacing combining mark) -- unlike ``Mn`` it has advance
+      width, so it is visible and only ``Mn`` is deleted.
     """
     visible = _visible_text(content).strip()
     if not visible:
