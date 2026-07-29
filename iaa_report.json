@@ -14,17 +14,17 @@
     ]
   },
   "tier2": {
-    "cer_vs_consensus_b": 0.0172,
+    "cer_vs_consensus_b": 0.0031,
     "ci95": [
-      0.0105,
-      0.0248
+      0.0006,
+      0.0062
     ]
   },
   "tier3": {
-    "cer_vs_consensus_b": 0.0234,
+    "cer_vs_consensus_b": 0.0119,
     "ci95": [
-      0.0166,
-      0.0309
+      0.0085,
+      0.0156
     ]
   },
   "tier4": {
@@ -36,12 +36,12 @@
   },
   "adjudication_summary": {
     "tier1_disagreements_reconciled": 18,
-    "tier2_disagreements_reconciled": 165,
-    "tier3_disagreements_reconciled": 280,
+    "tier2_disagreements_reconciled": 33,
+    "tier3_disagreements_reconciled": 148,
     "tier4_disagreements_reconciled": 80
   },
   "_note": {
-    "cer_vs_consensus_b": "Annotator B's (Moster) round-0 transcription vs the adjudicated consensus reference, tiers 1-3, code-point Levenshtein CER on NFC-normalised projection strings (DRAFT_v4 §5.2). The consensus is A's round-1 revision, byte-identical to B's round-2 endorsement -- NOT independent of either annotator, and NOT a bidirectional A-vs-B figure.",
+    "cer_vs_consensus_b": "Annotator B's (Moster) round-0 transcription vs the adjudicated consensus reference, tiers 1-3. Metric: CLUSTER-ALIGNED code-point CER on NFD-normalised projection strings (CGJ stripped first), macro-averaged over the 96 verses, reference side as denominator; annotator-tool editor tokens are stripped before scoring. Recomputable from the three committed projection JSONs alone. CORRECTED 2026-07-29 -- the tier-2/tier-3 values in v0.1.0 counted the `<DR>` token as literal text; see CHANGELOG v0.1.1. The consensus is A's round-1 revision, byte-identical to B's round-2 endorsement -- NOT independent of either annotator, and NOT a bidirectional A-vs-B figure. A-vs-consensus is 0 edits at tier 1 and a single edit at tier 2, so the tier-1/2 rows are in substance a blind A-vs-B round-0 comparison.",
     "tier4_f1_mean": "Pair-level tier-4 F1 EXACT point estimate (DRAFT_v4 §5.1 / App. A.3; tp=452, fp=39, fn=41). This is the exact-match figure, NOT the paper's F1 with +/-1-consonant tolerance (0.9472).",
     "adjudication_summary": "DESCRIPTIVE WORKFLOW STATISTIC -- the paper reports no such counts, and these are NOT a post-adjudication agreement measurement. Each integer is the number of round-0 disagreements between annotator A (Ginsberg) and annotator B (Moster) that the two-round diff-and-revise protocol reconciled into the consensus (the protocol ended in a byte-identical SHA-256 endorsement, so every round-0 divergence was resolved). Units differ by tier and the tier 1-3 counts are NESTED, NOT disjoint -- DO NOT SUM. tier1/2/3 = cluster-aligned code-point edit operations between the two round-0 projections at that tier (tier2 includes tier1's consonantal edits; tier3 includes both); an edit op is not a discrete adjudication case. tier4 = unmatched tier-4 detections (FP+FN) under the §5.1 headline exact-match config (UXLC-anchored, canonicalised {rafe,double_rafe}->rafe; 4 records -- 1 A-side, 3 B-side -- unalignable to the UXLC backbone are dropped per App. A.4), the frame that also produces f1_mean above.",
     "reproduction": "tier1/2/3 adjudication counts recompute from the two committed CC-BY projections alone via scripts/generate_iaa_report.py --check. The CER/F1 headline values and the tier-4 count are UXLC-frame and reproduce via scripts/regenerate_paper_iaa_results.py with the pinned UXLC 2.5 cache and seed 0xBEEF."

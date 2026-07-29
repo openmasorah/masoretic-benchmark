@@ -5,6 +5,72 @@ independent for the two artifacts this repository holds: the **scorer** Python
 package (`masoretic_eval`, currently `0.2.0`) and the **benchmark dataset**
 (tagged `benchmark-v*`).
 
+## benchmark-v0.1.1 (unreleased) — corrections to v0.1.0
+
+### ⚠️ Corrected: tier-2 and tier-3 CER were wrong in v0.1.0
+
+**If you cited tier-2 or tier-3 CER from `benchmark-v0.1.0`, the values were too
+high. Use these instead:**
+
+| figure | v0.1.0 (withdrawn) | corrected |
+|---|---|---|
+| tier-2 CER, B vs consensus | 0.0172 [0.0105, 0.0248] | **0.0031 [0.0006, 0.0062]** |
+| tier-3 CER, B vs consensus | 0.0234 [0.0166, 0.0309] | **0.0119 [0.0085, 0.0156]** |
+| adjudication, tier-2 edits | 165 | **33** |
+| adjudication, tier-3 edits | 280 | **148** |
+
+**Cause.** `<DR>`, the annotator-tool token for a double *rafe*, was scored as
+four literal ASCII characters (`<`, `D`, `R`, `>`) in the tier-2 and tier-3 CER
+path. `masoretic_eval/iaa/cer.py` asserted that editor tokens were "already
+stripped during `split_chunks`"; they were not. `split_chunks` strips only
+`PASSTHRU_TAGS`, and `<DR>` is deliberately excluded from that list so tier-4
+extraction can emit a `double_rafe` record from it — but nothing removed it
+afterwards. The three sides carry unequal counts (annotator A 25, annotator B 56,
+consensus 27), so every excess token scored as four spurious edits.
+
+The defect was self-contradictory as well as wrong: `strip.py` already excludes
+U+05BF (*rafe*) from the tier-2 view precisely "so it is not double-counted
+across tiers". The single *rafe* was stripped; the double *rafe*, written in
+ASCII, was not.
+
+**Direction.** The error was conservative — it made the two annotators look *less*
+consistent than they are. No conclusion in the paper or the README reverses.
+
+**Not affected**, verified field-by-field over the regenerated result JSONs (262
+tier-4 and stratification fields compared, zero changed): tier-1 CER 0.0029; all
+tier-4 figures including F1 exact 0.9187 and Krippendorff α 0.7470; the BL-05
+*rafe* baseline F1 0.6210; every count in the corpus accounting. Tier 1 is immune
+because its projection keeps only Hebrew consonants, space and *maqaf*, so ASCII
+cannot survive it.
+
+**Fixes.** Editor tokens are now stripped in the CER path for every tier, and a
+new `masoretic_eval.iaa.cer.tier_view()` is the single definition of a chunk's
+scoring view — `scripts/generate_iaa_report.py` and the release test had each
+inlined their own copy of the same sequence and would otherwise have silently
+missed the new strip. Regression test: `tests/iaa/test_editor_token_cer_isolation.py`
+asserts that a chunk's tier CER is invariant to the presence of editor tokens, and
+that tier-4 extraction still consumes `<DR>`.
+
+**Credit.** Found during verification of three independent external reviews of
+`benchmark-v0.1.0`. The tier-3 half was flagged by the Codex reviewer; the larger
+tier-2 half and the adjudication-count contamination were found while verifying it.
+
+### Other corrections
+
+- Removed an internal `personnel_note` from four public test fixtures. It named a
+  collaborator in full alongside an internal personnel correction and referenced a
+  file in a private repository. It remains in the immutable `benchmark-v0.1.0` tag.
+- Added David Zev Moster (annotator B) to `CITATION.cff`, the README citation, the
+  `LICENSE.md` attribution string, and `ACKNOWLEDGMENTS.md`. He produced half the
+  inter-annotator agreement this benchmark reports and was previously named only in
+  the changelog and the data files, while his projection ships under
+  attribution-required terms.
+- Corrected the provenance note on `iaa_report.json`, which described the metric as
+  code-point Levenshtein on NFC-normalised strings. It is cluster-aligned code-point
+  CER on NFD, macro-averaged over verses. The same note wrongly claimed the headline
+  CER was not recomputable without the UXLC cache; tiers 1–3 recompute from the three
+  committed projections alone.
+
 ## benchmark-v0.1.0 — Open Masorah Devarim pilot benchmark
 
 First public release of the benchmark: a four-tier inter-annotator-agreement

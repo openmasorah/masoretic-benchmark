@@ -9,11 +9,13 @@ an adjudication summary, in the shape ``schemas/iaa_report.schema.json`` fixes.
 Two classes of number, pinned differently on purpose:
 
 * **Headline CER / F1** (``tierN.cer_vs_consensus_b`` and ``tier4.f1_mean``) are
-  the paper §5.1/§5.2 values. They come from the UXLC-anchored pipeline and are
-  NOT recomputable without the gitignored UXLC 2.5 cache, so they are pinned
-  here as constants and cross-checked against ``PAPER_5_2`` in
-  ``tests/release/test_iaa_report_field_naming.py`` — the same source of truth
-  the schema-rename (B3) test already guards.
+  the paper §5.1/§5.2 values, pinned here as constants and cross-checked against
+  ``PAPER_5_2`` in ``tests/release/test_iaa_report_field_naming.py`` — the same
+  source of truth the schema-rename (B3) test already guards. The tier-1/2/3 CER
+  values ARE recomputable from the three committed projection JSONs alone; only
+  ``tier4.f1_mean`` needs the gitignored UXLC 2.5 cache. (This docstring
+  previously said none of them were recomputable. That was false, and it misled
+  two independent external reviewers who repeated it rather than testing it.)
 
 * **adjudication_summary tier 1-3** are computed from the two committed CC-BY
   round-0 projections ALONE (no UXLC), so ``--check`` recomputes and verifies
@@ -60,11 +62,23 @@ FOLIOS = [
 
 # Paper §5.2 (B round-0 vs adjudicated consensus, tier 1-3) and §5.1 (tier-4 F1
 # exact). Byte-identical to PAPER_5_2 in tests/release/test_iaa_report_field_naming.py
-# and to the abstract. NOT recomputable without the gitignored UXLC cache.
+# and to the abstract.
+#
+# CORRECTED 2026-07-29 (v0.1.1). The tier-2/tier-3 values shipped in
+# benchmark-v0.1.0 (0.0172, 0.0234) were WRONG: the `<DR>` double-rafe editor
+# token was scored as four literal ASCII characters in the tier-2/3 CER path,
+# and the sides carry unequal token counts (A=25, B=56, consensus=27). Fixed in
+# masoretic_eval/iaa/cer.py; see CHANGELOG v0.1.1. Tier 1 is unaffected (the
+# consonant filter drops ASCII) and so is every tier-4 figure.
+#
+# These ARE recomputable from the three committed projection JSONs alone -- no
+# UXLC cache required. The comment here previously claimed otherwise; that was
+# false, and two external reviewers repeated the claim from this comment rather
+# than testing it. Only the tier-4 UXLC-frame figures need the UXLC 2.5 cache.
 CER_VS_CONSENSUS_B = {
     "tier1": (0.0029, [0.0006, 0.0059]),
-    "tier2": (0.0172, [0.0105, 0.0248]),
-    "tier3": (0.0234, [0.0166, 0.0309]),
+    "tier2": (0.0031, [0.0006, 0.0062]),
+    "tier3": (0.0119, [0.0085, 0.0156]),
 }
 TIER4_F1_EXACT = (0.9187, [0.8969, 0.9397])
 
@@ -118,11 +132,18 @@ def build_report() -> dict:
     report["_note"] = {
         "cer_vs_consensus_b": (
             "Annotator B's (Moster) round-0 transcription vs the adjudicated "
-            "consensus reference, tiers 1-3, code-point Levenshtein CER on "
-            "NFC-normalised projection strings (DRAFT_v4 §5.2). The consensus is "
-            "A's round-1 revision, byte-identical to B's round-2 endorsement -- "
-            "NOT independent of either annotator, and NOT a bidirectional A-vs-B "
-            "figure."
+            "consensus reference, tiers 1-3. Metric: CLUSTER-ALIGNED code-point "
+            "CER on NFD-normalised projection strings (CGJ stripped first), "
+            "macro-averaged over the 96 verses, reference side as denominator; "
+            "annotator-tool editor tokens are stripped before scoring. "
+            "Recomputable from the three committed projection JSONs alone. "
+            "CORRECTED 2026-07-29 -- the tier-2/tier-3 values in v0.1.0 counted "
+            "the `<DR>` token as literal text; see CHANGELOG v0.1.1. The "
+            "consensus is A's round-1 revision, byte-identical to B's round-2 "
+            "endorsement -- NOT independent of either annotator, and NOT a "
+            "bidirectional A-vs-B figure. A-vs-consensus is 0 edits at tier 1 "
+            "and a single edit at tier 2, so the tier-1/2 rows are in substance "
+            "a blind A-vs-B round-0 comparison."
         ),
         "tier4_f1_mean": (
             "Pair-level tier-4 F1 EXACT point estimate (DRAFT_v4 §5.1 / App. A.3; "
