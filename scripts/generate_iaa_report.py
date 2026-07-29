@@ -86,20 +86,18 @@ def _tier_disagreement_edits(tier: int) -> int:
     The exact scoring path §5.2's CER uses: normalize -> tier strip ->
     cluster_aligned_cer. Reproducible from the two committed projections alone.
     """
-    from masoretic_eval.iaa.cer import _STRIPPERS  # noqa: PLC0415
+    from masoretic_eval.iaa.cer import tier_view  # noqa: PLC0415
     from masoretic_eval.metrics.cer import cluster_aligned_cer  # noqa: PLC0415
-    from masoretic_eval.normalize import normalize_for_scoring  # noqa: PLC0415
 
     a = json.loads(A_PROJ.read_text(encoding="utf-8"))["verses"]
     b = json.loads(B_PROJ.read_text(encoding="utf-8"))["verses"]
     if len(a) != len(b):
         raise ReportError(f"projection length mismatch: A={len(a)} B={len(b)}")
-    strip = _STRIPPERS[tier]
     edits = 0
     for av, bv in zip(a, b, strict=True):
-        a_view = strip(normalize_for_scoring(av["chunk"]))
-        b_view = strip(normalize_for_scoring(bv["chunk"]))
-        edits += cluster_aligned_cer(a_view, b_view).edits
+        edits += cluster_aligned_cer(
+            tier_view(av["chunk"], tier=tier), tier_view(bv["chunk"], tier=tier)
+        ).edits
     return edits
 
 
